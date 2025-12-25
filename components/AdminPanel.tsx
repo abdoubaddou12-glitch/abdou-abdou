@@ -2,7 +2,7 @@
 import React from 'react';
 import { Post } from '../types.ts';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Plus, Edit2, Trash2, Eye, DollarSign, Settings } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, DollarSign, Settings, ShieldCheck } from 'lucide-react';
 
 interface AdminPanelProps {
   posts: Post[];
@@ -11,6 +11,7 @@ interface AdminPanelProps {
   onEditPost: (id: string) => void;
   onDeletePost: (id: string) => void;
   onOpenAdSense: () => void;
+  onOpenSecurity: () => void;
 }
 
 const statsData = [
@@ -23,22 +24,31 @@ const statsData = [
   { name: 'السبت', views: 4300 },
 ];
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost, onEditPost, onDeletePost, onOpenAdSense }) => {
+export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost, onEditPost, onDeletePost, onOpenAdSense, onOpenSecurity }) => {
   return (
-    <div className="max-w-6xl mx-auto py-10">
+    <div className="max-w-6xl mx-auto py-10 animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
         <div>
           <h1 className="text-5xl font-black mb-3 tracking-tighter italic">الإدارة</h1>
           <p className={`font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>مرحباً بك مجدداً في عبدو ويب، إليك نظرة على أداء مدونتك.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
+          <button 
+            onClick={onOpenSecurity}
+            className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
+              isDark ? 'border-zinc-800 hover:bg-zinc-900 text-zinc-300' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg shadow-zinc-200/50'
+            }`}
+          >
+            <ShieldCheck size={20} className="text-indigo-500" />
+            الأمان
+          </button>
           <button 
             onClick={onOpenAdSense}
             className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
-              isDark ? 'border-zinc-800 hover:bg-zinc-900' : 'border-zinc-200 hover:bg-white'
+              isDark ? 'border-zinc-800 hover:bg-zinc-900 text-zinc-300' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg shadow-zinc-200/50'
             }`}
           >
-            <Settings size={20} />
+            <Settings size={20} className="text-zinc-400" />
             إعدادات أدسنس
           </button>
           <button 
@@ -95,11 +105,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
       <div className={`rounded-[2.5rem] border overflow-hidden ${isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-100 shadow-xl shadow-zinc-200/50'}`}>
         <div className="p-8 border-b border-zinc-800/10 flex justify-between items-center">
           <h3 className="font-black text-xl">جميع المقالات</h3>
-          <input 
-            type="text" 
-            placeholder="ابحث..." 
-            className={`px-4 py-2 rounded-xl text-sm border outline-none ${isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`} 
-          />
+          <div className="flex gap-4">
+             <input 
+              type="text" 
+              placeholder="ابحث..." 
+              className={`px-4 py-2 rounded-xl text-sm border outline-none ${isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`} 
+            />
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-right border-collapse min-w-[600px]">

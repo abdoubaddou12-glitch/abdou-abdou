@@ -17,7 +17,7 @@ export interface AdSenseConfig {
   isEnabled: boolean;
 }
 
-export type View = 'home' | 'post' | 'admin' | 'editor' | 'login' | 'adsense-settings';
+export type View = 'home' | 'post' | 'admin' | 'editor' | 'login' | 'adsense-settings' | 'security-settings';
 
 export interface ThemeContextType {
   isDark: boolean;
