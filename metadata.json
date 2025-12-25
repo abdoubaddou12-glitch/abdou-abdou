@@ -1,5 +1,8 @@
 {
-  "name": "عبدو ويب | Abdouweb",
-  "description": "منصة عبدو ويب الرائدة لأخبار التكنولوجيا، تطوير الذات، واستراتيجيات الأفلييت في المغرب والعالم العربي.",
-  "requestFramePermissions": []
+  "name": "عبدو ويب | The Emerald Dark",
+  "description": "منصة عبدو ويب الفاخرة لأخبار التكنولوجيا وأخبار المغرب بالأسود والزمردي.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
 }
