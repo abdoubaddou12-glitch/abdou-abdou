@@ -52,9 +52,9 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
         </button>
       </div>
 
-      <div className={`glass-card p-10 rounded-[3rem] border ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
+      <div className={`glass-card p-10 rounded-[3rem] border ${isDark ? 'border-emerald-500/20' : 'border-zinc-100'}`}>
         <div className="flex items-center gap-4 mb-10">
-          <div className="w-14 h-14 bg-indigo-600/10 text-indigo-600 rounded-2xl flex items-center justify-center">
+          <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
             <Lock size={28} />
           </div>
           <div className="font-black text-xl">تحديث الرمز السري</div>
@@ -67,7 +67,7 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
               type="password"
               value={currentInput}
               onChange={(e) => setCurrentInput(e.target.value)}
-              className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`}
+              className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
               placeholder="••••••••"
               required
             />
@@ -80,7 +80,7 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`}
+                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
                 placeholder="6 أحرف فأكثر"
                 required
               />
@@ -91,7 +91,7 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`}
+                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
                 placeholder="أعد الكتابة"
                 required
               />
@@ -112,16 +112,12 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
 
           <button 
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-[2rem] font-black shadow-2xl shadow-indigo-600/30 transition-all flex items-center justify-center gap-3 mt-4"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-5 rounded-[2rem] font-black shadow-2xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3 mt-4"
           >
             <Save size={20} />
             حفظ الرمز الجديد
           </button>
         </form>
-      </div>
-      
-      <div className="mt-8 text-center">
-        <p className="text-xs font-bold opacity-30 italic">ملاحظة: تأكد من حفظ الرمز الجديد في مكان آمن، لا يمكن استرجاعه في حال فقدانه إلا عبر مسح بيانات المتصفح.</p>
       </div>
     </div>
   );

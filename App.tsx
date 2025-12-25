@@ -10,18 +10,35 @@ import { AdminLogin } from './components/AdminLogin.tsx';
 import { AdSenseSettings } from './components/AdSenseSettings.tsx';
 import { SecuritySettings } from './components/SecuritySettings.tsx';
 import { AdSense } from './components/AdSense.tsx';
-import { Sparkles, ArrowRight, Star, Cpu, BookOpen, ShoppingBag, Newspaper, Globe, Zap } from 'lucide-react';
+import { 
+  Sparkles, ArrowRight, Star, Cpu, BookOpen, ShoppingBag, 
+  Newspaper, Globe, Zap, Facebook, Twitter, Share2, Copy, 
+  CheckCircle2, MessageCircle, Mail, Instagram
+} from 'lucide-react';
+
+const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
 
 const MOCK_POSTS: Post[] = [
   {
-    id: '1',
-    title: 'مستقبل الذكاء الاصطناعي في الإدارات المغربية 2030',
-    excerpt: 'كيف تستعد المملكة المغربية لدمج تقنيات الذكاء الاصطناعي في الخدمات العمومية لتسهيل حياة المواطنين.',
-    content: 'المغرب يخطو خطوات ثابتة نحو الرقمنة الشاملة...',
-    date: '18 مارس 2024',
+    id: 'can-morocco-2025',
+    title: 'المغرب 2025: عندما تتحول الملاعب إلى تحف فنية تبهر القارة السمراء',
+    excerpt: 'استكشف أجواء "الكان" الأسطورية في المملكة المغربية، حيث تلتقي الحداثة بالتقاليد في ملاعب عالمية جاهزة لكتابة التاريخ الإفريقي الجديد.',
+    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع. مع اقتراب موعد نهائيات كأس أمم إفريقيا "الكان"، تشهد المملكة ثورة حقيقية في البنية التحتية الرياضية.
+
+أجواء الكان في المغرب:
+لا تقتصر الاستعدادات على الملاعب فقط، بل تمتد لتشمل تجربة المشجع المتكاملة. من الرباط إلى طنجة، ومن مراكش إلى أكادير، تعيش المدن المغربية على إيقاع التحول الرقمي والجمالي. الشوارع تتزين بالألوان الإفريقية، ووسائل النقل المتطورة (البراق والحافلات الكهربائية) جاهزة لنقل الآلاف بسلاسة تامة.
+
+الملاعب العالمية:
+1. المجمع الرياضي الأمير مولاي عبد الله بالرباط: تحفة معمارية تم هدمها وبناؤها من جديد لتصبح ملعباً مغطى بالكامل وبسعة جماهيرية ضخمة، معايير "فيفا" هنا تم تجاوزها بمراحل.
+2. ملعب طنجة الكبير: بوابتنا نحو أوروبا، الذي شهد توسعة تاريخية جعلته واحداً من أكبر الملاعب في إفريقيا، بتصميم عصري يمنح المشجع قرباً استثنائياً من أرضية الميدان.
+3. ملعب مراكش وأكادير: حيث تمت ترقية الأنظمة الضوئية والشاشات العمومية لتكون من طراز 4K، مما يضمن نقلاً تلفزيونياً عالمياً يبهر الملايين خلف الشاشات.
+
+نجاح التظاهرة قبل بدايتها:
+إن الإجماع القاري على قدرة المغرب على تنظيم أفضل نسخة في تاريخ الكان لم يأتِ من فراغ، بل هو نتيجة رؤية ملكية متبصرة جعلت من الرياضة قاطرة للتنمية. نحن نتحدث عن ملاعب لا توجد حتى في أكبر الدوريات الأوروبية، مما يجعل المغرب مرشحاً بقوة لاحتضان نهائيات كأس العالم 2030 بأفضل طريقة ممكنة.`,
+    date: '20 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
-    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=2000',
     status: 'published'
   },
   {
@@ -33,28 +50,6 @@ const MOCK_POSTS: Post[] = [
     author: 'عبدو',
     category: 'تقنية',
     image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1200',
-    status: 'published'
-  },
-  {
-    id: '3',
-    title: 'كيف تبني انضباطاً ذاتياً حديدياً في 30 يوماً؟',
-    excerpt: 'خارطة طريق عملية لتطوير عادات النجاح والتحكم في وقتك بفاعلية قصوى.',
-    content: 'النجاح ليس صدفة بل هو نتيجة انضباط يومي...',
-    date: '14 مارس 2024',
-    author: 'عبدو',
-    category: 'تطوير الذات',
-    image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=1200',
-    status: 'published'
-  },
-  {
-    id: '4',
-    title: 'تقييم آيفون 15 برو ماكس بعد 6 أشهر من الاستخدام',
-    excerpt: 'هل يستحق الهاتف سعره الحالي في المغرب؟ وهل الكاميرا فعلاً نقلة نوعية؟',
-    content: 'بعد تجربة طويلة وشاملة، إليكم الخلاصة...',
-    date: '12 مارس 2024',
-    author: 'عبدو',
-    category: 'تقييم المنتجات',
-    image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?auto=format&fit=crop&q=80&w=1200',
     status: 'published'
   }
 ];
@@ -69,6 +64,7 @@ const App: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminPassword, setAdminPassword] = useState(DEFAULT_PASSWORD);
+  const [copied, setCopied] = useState(false);
   const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>({
     publisherId: '',
     slotId: '',
@@ -137,7 +133,13 @@ const App: React.FC = () => {
     }
   };
 
-  const featuredPost = posts.find(p => p.status === 'published');
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const featuredPost = posts.find(p => p.id === 'can-morocco-2025') || posts[0];
 
   return (
     <Layout isDark={isDark}>
@@ -152,7 +154,6 @@ const App: React.FC = () => {
         {currentView === 'home' && (
           <div className="animate-fade-in space-y-24">
             
-            {/* Elegant Hero */}
             <header className="relative py-12 flex flex-col items-center text-center">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10"></div>
               
@@ -171,7 +172,6 @@ const App: React.FC = () => {
                 وحيادية <span className="text-emerald-500 font-bold underline decoration-emerald-200">تقييم المنتجات</span>.
               </p>
 
-              {/* Quick Categories Bar */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl">
                 {[
                   { icon: Newspaper, label: 'أخبار المغرب', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
@@ -187,7 +187,6 @@ const App: React.FC = () => {
               </div>
             </header>
 
-            {/* Featured Post */}
             {featuredPost && (
               <section className="relative group">
                 <div 
@@ -220,7 +219,6 @@ const App: React.FC = () => {
               </section>
             )}
 
-            {/* Grid for other sections */}
             <section className="space-y-16">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="text-center md:text-right">
@@ -244,7 +242,6 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Post View */}
         {currentView === 'post' && selectedPost && (
           <article className="max-w-4xl mx-auto py-10 animate-fade-in">
              <header className="mb-16 text-center">
@@ -271,9 +268,89 @@ const App: React.FC = () => {
                 <img src={selectedPost.image} className="w-full h-full object-cover" alt={selectedPost.title} />
              </div>
 
-             <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] font-medium whitespace-pre-wrap px-4 ${isDark ? 'text-zinc-300' : 'text-zinc-800'}`}>
+             <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] font-medium whitespace-pre-wrap px-4 mb-20 ${isDark ? 'text-zinc-300' : 'text-zinc-800'}`}>
                 {selectedPost.content}
              </div>
+
+             {/* Social Sharing & Contact Section */}
+             <section className={`pt-12 border-t ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+                  <div className="text-center lg:text-right">
+                    <h4 className="text-xl font-black mb-2">هل تريد مناقشة الموضوع؟</h4>
+                    <p className="text-sm opacity-50 font-medium">شارك المقال أو تواصل مع عبدو مباشرة عبر البريد</p>
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    {/* Direct Email Contact */}
+                    <a 
+                      href={`mailto:${CONTACT_EMAIL}?subject=بخصوص مقال: ${selectedPost.title}`}
+                      className="w-14 h-14 rounded-2xl bg-emerald-500 text-black hover:bg-emerald-400 hover:scale-110 transition-all flex items-center justify-center shadow-lg shadow-emerald-500/20 group"
+                      title="تواصل معي بالبريد"
+                    >
+                      <Mail size={24} className="group-hover:rotate-12 transition-transform" />
+                    </a>
+
+                    <div className="w-[1px] h-10 bg-emerald-500/20 mx-2 hidden md:block"></div>
+
+                    {/* Facebook Share */}
+                    <a 
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-2xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all flex items-center justify-center shadow-lg"
+                      title="فايسبوك"
+                    >
+                      <Facebook size={24} fill="currentColor" />
+                    </a>
+
+                    {/* Twitter / X Share */}
+                    <a 
+                      href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(selectedPost.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-2xl bg-black text-white hover:bg-zinc-800 transition-all flex items-center justify-center shadow-lg border border-white/5"
+                      title="تويتر / X"
+                    >
+                      <Twitter size={24} fill="currentColor" />
+                    </a>
+
+                    {/* Pinterest Share */}
+                    <a 
+                      href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(window.location.href)}&media=${encodeURIComponent(selectedPost.image)}&description=${encodeURIComponent(selectedPost.title)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-2xl bg-[#E60023]/10 text-[#E60023] hover:bg-[#E60023] hover:text-white transition-all flex items-center justify-center shadow-lg"
+                      title="بنتريس"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.965 1.406-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.261 7.929-7.261 4.162 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>
+                      </svg>
+                    </a>
+
+                    {/* WhatsApp Share */}
+                    <a 
+                      href={`https://wa.me/?text=${encodeURIComponent(selectedPost.title + " " + window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center shadow-lg"
+                      title="واتساب"
+                    >
+                      <MessageCircle size={24} fill="currentColor" />
+                    </a>
+
+                    {/* Copy Link */}
+                    <button 
+                      onClick={copyToClipboard}
+                      className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center shadow-lg relative overflow-hidden ${
+                        copied ? 'bg-emerald-500 text-black' : 'bg-zinc-900 text-white hover:bg-emerald-500 hover:text-black border border-white/5'
+                      }`}
+                      title="نسخ الرابط"
+                    >
+                      {copied ? <CheckCircle2 size={24} /> : <Copy size={24} />}
+                    </button>
+                  </div>
+                </div>
+             </section>
           </article>
         )}
 
@@ -334,7 +411,6 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Luxury Footer */}
       <footer className="py-32 relative overflow-hidden bg-zinc-50 dark:bg-black border-t border-emerald-500/10">
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
@@ -344,11 +420,15 @@ const App: React.FC = () => {
                  موقع مغربي يهتم بالتقنية وتطوير المهارات الشخصية ومراجعة أحدث المنتجات بحيادية تامة. هدفنا هو إثراء المحتوى العربي بجودة عالمية.
                </p>
                <div className="flex gap-4">
-                  {[Star, Globe, Zap].map((Icon, i) => (
-                    <div key={i} className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer">
-                      <Icon size={24} />
-                    </div>
-                  ))}
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer">
+                    <Mail size={24} />
+                  </a>
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer">
+                    <Facebook size={24} />
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer">
+                    <Instagram size={24} />
+                  </div>
                </div>
             </div>
             
@@ -367,7 +447,7 @@ const App: React.FC = () => {
                   <ul className="space-y-5 font-bold opacity-60 text-lg">
                      <li><a href="#">سياسة الخصوصية</a></li>
                      <li><a href="#">شروط الخدمة</a></li>
-                     <li><a href="#">تواصل معنا</a></li>
+                     <li><a href={`mailto:${CONTACT_EMAIL}`}>تواصل معنا</a></li>
                      <li><button onClick={() => setView('login')}>دخول الإدارة</button></li>
                   </ul>
                </div>
@@ -375,7 +455,7 @@ const App: React.FC = () => {
           </div>
           <div className="mt-24 pt-12 border-t border-emerald-500/10">
             <div className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30 italic text-center">
-               &copy; 2024 ABDOUWEB | MOROCCO DIGITAL EXCELLENCE
+               &copy; 2024 ABDOUWEB | {CONTACT_EMAIL}
             </div>
           </div>
         </div>
