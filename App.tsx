@@ -293,31 +293,41 @@ const App: React.FC = () => {
       </main>
 
       <footer className={`py-20 border-t transition-colors duration-500 ${isDark ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-zinc-100'}`}>
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-right">
           <div className="md:col-span-2">
-            <h2 className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-emerald-500 bg-clip-text text-transparent mb-6">عبدو ويب.</h2>
+            <div className="flex flex-col mb-6">
+              <h2 className="text-5xl font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 bg-clip-text text-transparent leading-none mb-2">عبدو ويب.</h2>
+              <span className={`text-sm font-black uppercase tracking-[0.4em] ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`}>Abdouweb</span>
+            </div>
             <p className={`max-w-md leading-loose font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              المنصة المغربية الأولى التي تدمج بين التكنولوجيا وتطوير الذات، لنصنع جيلاً رقمياً قادراً على المنافسة عالمياً.
+              المنصة المغربية الأولى التي تدمج بين التكنولوجيا وتطوير الذات، لنصنع جيلاً رقمياً قادراً على المنافسة عالمياً. نحن نؤمن بأن المحتوى الهادف هو مفتاح التغيير.
             </p>
           </div>
           <div>
-            <h4 className="font-black mb-6">روابط سريعة</h4>
+            <h4 className="font-black text-xl mb-6">روابط سريعة</h4>
             <ul className={`space-y-4 text-sm font-bold ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
               <li><button onClick={() => setView('home')} className="hover:text-indigo-600 transition-colors">الرئيسية</button></li>
               <li><button onClick={() => handleAdminAccess()} className="hover:text-indigo-600 transition-colors">لوحة الإدارة</button></li>
               <li><a href="#" className="hover:text-indigo-600 transition-colors">تطوير الذات</a></li>
+              <li><a href="#" className="hover:text-indigo-600 transition-colors">سياسة الخصوصية</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-black mb-6">تواصل معنا</h4>
+            <h4 className="font-black text-xl mb-6">تواصل معنا</h4>
             <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-full bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">T</div>
-              <div className="w-10 h-10 rounded-full bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">F</div>
-              <div className="w-10 h-10 rounded-full bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer">I</div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">FB</div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">TW</div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">IG</div>
             </div>
+            <p className="mt-6 text-xs font-bold opacity-60 italic">info@abdouweb.com</p>
           </div>
-          <div className="md:col-span-4 pt-12 border-t border-zinc-800/10 text-center text-xs font-black opacity-40">
-            © {new Date().getFullYear()} عبدو ويب | ABDOUWEB - جميع الحقوق محفوظة لمحبي الإبداع.
+          <div className="md:col-span-4 pt-12 border-t border-zinc-800/10 text-center">
+            <div className="text-[11px] font-black uppercase tracking-[0.5em] opacity-60 mb-2">
+               ABDOUWEB | عبدو ويب
+            </div>
+            <div className="text-[10px] font-bold opacity-30">
+              © {new Date().getFullYear()} - جميع الحقوق محفوظة لمحبي الإبداع والتميز.
+            </div>
           </div>
         </div>
       </footer>
