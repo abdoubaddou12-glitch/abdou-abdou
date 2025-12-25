@@ -19,14 +19,14 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
             onClick={() => setView('home')}
             className="flex items-center gap-3 group shrink-0"
           >
-            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white transition-all duration-500 group-hover:rotate-[360deg] shadow-lg shadow-indigo-600/20">
-              <Zap size={26} fill="white" />
+            <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-black transition-all duration-500 group-hover:rotate-[360deg] shadow-lg shadow-emerald-500/20">
+              <Zap size={26} fill="black" />
             </div>
             <div className="flex flex-col items-start leading-tight">
-              <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-400 bg-clip-text text-transparent tracking-tighter">
+              <span className="text-2xl font-black bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600 bg-clip-text text-transparent tracking-tighter">
                 عبدو ويب
               </span>
-              <span className={`text-[10px] font-black uppercase tracking-[0.4em] ${isDark ? 'text-indigo-400' : 'text-indigo-600 opacity-60'}`}>
+              <span className={`text-[10px] font-black uppercase tracking-[0.4em] ${isDark ? 'text-emerald-400' : 'text-zinc-900 opacity-60'}`}>
                 ABDOUWEB
               </span>
             </div>
@@ -44,11 +44,11 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
                 key={item.id}
                 onClick={() => setView('home')}
                 className={`text-[15px] font-bold transition-all relative group ${
-                  currentView === 'home' && item.id === 'home' ? 'text-indigo-600' : 'opacity-60 hover:opacity-100'
+                  currentView === 'home' && item.id === 'home' ? 'text-emerald-500' : 'opacity-60 hover:opacity-100'
                 }`}
               >
                 {item.label}
-                <span className={`absolute -bottom-1 right-0 h-0.5 bg-indigo-600 transition-all duration-300 ${currentView === 'home' && item.id === 'home' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
+                <span className={`absolute -bottom-1 right-0 h-0.5 bg-emerald-500 transition-all duration-300 ${currentView === 'home' && item.id === 'home' ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
               </button>
             ))}
           </div>
@@ -59,8 +59,8 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
             onClick={() => setView('admin')}
             className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[13px] font-black transition-all ${
               isDark 
-                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700' 
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/20'
+                ? 'bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-emerald-500/20' 
+                : 'bg-black hover:bg-zinc-800 text-white shadow-xl shadow-black/20'
             }`}
           >
             <LayoutDashboard size={18} />
@@ -71,7 +71,7 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
             onClick={toggleTheme}
             className={`p-3 rounded-2xl transition-all border ${
               isDark 
-                ? 'bg-zinc-800 border-zinc-700 text-yellow-400 hover:bg-zinc-700' 
+                ? 'bg-zinc-900 border-zinc-800 text-emerald-400 hover:bg-zinc-800' 
                 : 'bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50'
             }`}
           >

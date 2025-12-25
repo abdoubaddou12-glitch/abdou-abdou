@@ -36,16 +36,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
           <button 
             onClick={onOpenSecurity}
             className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
-              isDark ? 'border-zinc-800 hover:bg-zinc-900 text-zinc-300' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg shadow-zinc-200/50'
+              isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg shadow-zinc-200/50'
             }`}
           >
-            <ShieldCheck size={20} className="text-indigo-500" />
+            <ShieldCheck size={20} className="text-emerald-500" />
             الأمان
           </button>
           <button 
             onClick={onOpenAdSense}
             className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
-              isDark ? 'border-zinc-800 hover:bg-zinc-900 text-zinc-300' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg shadow-zinc-200/50'
+              isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg shadow-zinc-200/50'
             }`}
           >
             <Settings size={20} className="text-zinc-400" />
@@ -53,7 +53,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
           </button>
           <button 
             onClick={onNewPost}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-2xl shadow-indigo-600/40 transition-all"
+            className="bg-emerald-500 hover:bg-emerald-600 text-black px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-2xl shadow-emerald-500/20 transition-all"
           >
             <Plus size={20} />
             إضافة محتوى جديد
@@ -62,9 +62,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-16">
-        <div className={`lg:col-span-3 p-8 rounded-[2.5rem] border ${isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-100 shadow-xl shadow-zinc-200/50'}`}>
+        <div className={`lg:col-span-3 p-8 rounded-[2.5rem] border ${isDark ? 'bg-zinc-900/50 border-emerald-500/10' : 'bg-white border-zinc-100 shadow-xl shadow-zinc-200/50'}`}>
           <h2 className="text-lg font-black mb-8 flex items-center gap-2">
-            <Eye size={20} className="text-indigo-500" /> إحصائيات الزوار الأسبوعية
+            <Eye size={20} className="text-emerald-500" /> إحصائيات الزوار الأسبوعية
           </h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -73,10 +73,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
                 <XAxis dataKey="name" stroke={isDark ? '#71717a' : '#9ca3af'} fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis hide />
                 <Tooltip 
-                  cursor={{fill: isDark ? '#27272a' : '#f9fafb'}}
+                  cursor={{fill: isDark ? '#10b98110' : '#f9fafb'}}
                   contentStyle={{ 
-                    backgroundColor: isDark ? '#18181b' : '#fff', 
-                    borderColor: isDark ? '#27272a' : '#e5e7eb',
+                    backgroundColor: isDark ? '#0a0a0a' : '#fff', 
+                    borderColor: isDark ? '#10b98120' : '#e5e7eb',
                     borderRadius: '16px',
                     fontWeight: 'bold',
                     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
@@ -84,7 +84,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
                 />
                 <Bar dataKey="views" radius={[10, 10, 10, 10]} barSize={40}>
                   {statsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 2 ? '#4f46e5' : '#818cf8'} fillOpacity={0.8} />
+                    <Cell key={`cell-${index}`} fill={index === 2 ? '#10b981' : '#10b98140'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -92,8 +92,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
           </div>
         </div>
 
-        <div className={`p-10 rounded-[2.5rem] border flex flex-col items-center justify-center text-center ${isDark ? 'bg-indigo-600 text-white' : 'bg-indigo-50 border-indigo-100 text-indigo-900'}`}>
-          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
+        <div className={`p-10 rounded-[2.5rem] border flex flex-col items-center justify-center text-center ${isDark ? 'bg-emerald-500 text-black' : 'bg-emerald-50 border-emerald-100 text-emerald-900'}`}>
+          <div className="w-12 h-12 bg-black/10 rounded-xl flex items-center justify-center mb-6">
             <DollarSign size={24} />
           </div>
           <span className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">إجمالي الأرباح المقدرة</span>
@@ -105,13 +105,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
       <div className={`rounded-[2.5rem] border overflow-hidden ${isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-100 shadow-xl shadow-zinc-200/50'}`}>
         <div className="p-8 border-b border-zinc-800/10 flex justify-between items-center">
           <h3 className="font-black text-xl">جميع المقالات</h3>
-          <div className="flex gap-4">
-             <input 
-              type="text" 
-              placeholder="ابحث..." 
-              className={`px-4 py-2 rounded-xl text-sm border outline-none ${isDark ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-50 border-zinc-200'}`} 
-            />
-          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-right border-collapse min-w-[600px]">
@@ -122,21 +115,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
                 <th className="px-8 py-6 text-center">الإجراءات</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/10">
+            <tbody className="divide-y divide-emerald-500/5">
               {posts.map((post) => (
-                <tr key={post.id} className="hover:bg-indigo-500/5 transition-colors group">
+                <tr key={post.id} className="hover:bg-emerald-500/5 transition-colors group">
                   <td className="px-8 py-6">
-                    <div className="font-black text-lg group-hover:text-indigo-500 transition-colors">{post.title}</div>
+                    <div className="font-black text-lg group-hover:text-emerald-500 transition-colors">{post.title}</div>
                     <div className="text-xs opacity-50 mt-1">{post.date}</div>
                   </td>
                   <td className="px-8 py-6">
-                    <span className="px-3 py-1 rounded-full bg-zinc-500/10 text-[10px] font-black">{post.category}</span>
+                    <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black">{post.category}</span>
                   </td>
                   <td className="px-8 py-6">
                     <div className="flex justify-center gap-4">
                       <button 
                         onClick={() => onEditPost(post.id)} 
-                        className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all"
+                        className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-black transition-all"
                       >
                         <Edit2 size={16} />
                       </button>
