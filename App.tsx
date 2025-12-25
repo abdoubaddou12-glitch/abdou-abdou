@@ -42,7 +42,7 @@ const MOCK_POSTS: Post[] = [
 
 خاتمة:
 إن تعويم الدرهم ليس غاية في حد ذاته، بل هو وسيلة لتحقيق اقتصاد قوي ومنفتح. نجاح هذه التجربة يعتمد بشكل أساسي على مواكبتها بإصلاحات هيكلية ترفع من الإنتاجية الوطنية وتقلل من التبعية للخارج. نحن في "عبدو ويب" سنواصل تتبع هذا الملف الاقتصادي الشائك وتقديم تحليلاتنا لمساعدتكم على فهم التحولات المالية الكبرى.`,
-    date: new Date().toLocaleDateString('ar-MA'),
+    date: '21 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
     image: 'https://images.unsplash.com/photo-1611974717537-48358a602114?auto=format&fit=crop&q=80&w=2000',
@@ -57,6 +57,17 @@ const MOCK_POSTS: Post[] = [
     author: 'عبدو',
     category: 'أخبار المغرب',
     image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=2000',
+    status: 'published'
+  },
+  {
+    id: 'ai-future-morocco',
+    title: 'مستقبل الذكاء الاصطناعي في المغرب: كيف نستعد للثورة الرقمية القادمة؟',
+    excerpt: 'استكشف التوجهات الجديدة للمغرب الرقمي وكيف يمكن للشباب المغربي الاستفادة من تقنيات الذكاء الاصطناعي في سوق الشغل.',
+    content: 'يعيش المغرب اليوم على إيقاع تحول رقمي غير مسبوق...',
+    date: '19 مارس 2024',
+    author: 'عبدو',
+    category: 'تقنية',
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=2000',
     status: 'published'
   }
 ];
@@ -94,7 +105,13 @@ const App: React.FC = () => {
     if (savedPosts) {
       try {
         const parsed = JSON.parse(savedPosts);
-        setPosts(parsed.length > 0 ? parsed : MOCK_POSTS);
+        // If the user has old data, we merge it with defaults instead of just ignoring defaults
+        if (parsed.length > 0) {
+          setPosts(parsed);
+        } else {
+          setPosts(MOCK_POSTS);
+          localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
+        }
       } catch (e) {
         setPosts(MOCK_POSTS);
       }
@@ -135,6 +152,29 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     setIsDark(!isDark);
     localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+  };
+
+  const handleSyncData = () => {
+    // Logic to find posts in MOCK_POSTS that aren't in current posts
+    const currentIds = new Set(posts.map(p => p.id));
+    const newDefaults = MOCK_POSTS.filter(p => !currentIds.has(p.id));
+    
+    if (newDefaults.length > 0) {
+      const updatedPosts = [...newDefaults, ...posts];
+      setPosts(updatedPosts);
+      localStorage.setItem('blog_posts', JSON.stringify(updatedPosts));
+    } else {
+      // If everything exists, force refresh from MOCK_POSTS just in case of updates
+      const refreshedPosts = [...posts];
+      MOCK_POSTS.forEach(mock => {
+        const index = refreshedPosts.findIndex(p => p.id === mock.id);
+        if (index !== -1) {
+          refreshedPosts[index] = { ...refreshedPosts[index], ...mock };
+        }
+      });
+      setPosts(refreshedPosts);
+      localStorage.setItem('blog_posts', JSON.stringify(refreshedPosts));
+    }
   };
 
   const handleLogin = (password: string) => {
@@ -334,6 +374,7 @@ const App: React.FC = () => {
             }}
             onOpenAdSense={() => setView('adsense-settings')}
             onOpenSecurity={() => setView('security-settings')}
+            onSyncData={handleSyncData}
           />
         )}
         

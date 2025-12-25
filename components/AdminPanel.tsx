@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Post, AnalyticsData } from '../types.ts';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Plus, Edit2, Trash2, Eye, DollarSign, Settings, ShieldCheck, Users, TrendingUp, MousePointer2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, DollarSign, Settings, ShieldCheck, Users, TrendingUp, MousePointer2, RefreshCw, CheckCircle } from 'lucide-react';
 
 interface AdminPanelProps {
   posts: Post[];
@@ -13,11 +13,25 @@ interface AdminPanelProps {
   onDeletePost: (id: string) => void;
   onOpenAdSense: () => void;
   onOpenSecurity: () => void;
+  onSyncData: () => void;
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ 
-  posts, isDark, analytics, onNewPost, onEditPost, onDeletePost, onOpenAdSense, onOpenSecurity 
+  posts, isDark, analytics, onNewPost, onEditPost, onDeletePost, onOpenAdSense, onOpenSecurity, onSyncData 
 }) => {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showSyncSuccess, setShowSyncSuccess] = useState(false);
+
+  const handleSync = () => {
+    setIsSyncing(true);
+    setTimeout(() => {
+      onSyncData();
+      setIsSyncing(false);
+      setShowSyncSuccess(true);
+      setTimeout(() => setShowSyncSuccess(false), 3000);
+    }, 1000);
+  };
+
   const chartData = analytics.dailyEarnings.map((val, i) => ({
     name: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'][i],
     earnings: val
@@ -26,15 +40,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const totalEarnings = analytics.dailyEarnings.reduce((a, b) => a + b, 0).toFixed(2);
 
   return (
-    <div className="max-w-6xl mx-auto py-10 animate-fade-in">
+    <div className="max-w-6xl mx-auto py-10 animate-fade-in px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
         <div>
           <h1 className="text-5xl font-black mb-3 tracking-tighter italic">مركز التحكم</h1>
           <p className={`font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>مرحباً عبدو، إليك تقرير أداء "عبدو ويب" المباشر.</p>
         </div>
-        <div className="flex flex-wrap gap-4">
-          <button onClick={onOpenSecurity} className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><ShieldCheck size={20} className="text-emerald-500" />الأمان</button>
-          <button onClick={onOpenAdSense} className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><Settings size={20} className="text-zinc-400" />أدسنس</button>
+        <div className="flex flex-wrap gap-3">
+          <button 
+            onClick={handleSync}
+            className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
+              showSyncSuccess 
+                ? 'bg-emerald-500 text-black border-transparent' 
+                : isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'
+            }`}
+          >
+            {showSyncSuccess ? <CheckCircle size={20} /> : <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />}
+            {showSyncSuccess ? 'تم التحديث' : 'تحديث البيانات'}
+          </button>
+          <button onClick={onOpenSecurity} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><ShieldCheck size={20} className="text-emerald-500" />الأمان</button>
+          <button onClick={onOpenAdSense} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><Settings size={20} className="text-zinc-400" />أدسنس</button>
           <button onClick={onNewPost} className="bg-emerald-500 hover:bg-emerald-600 text-black px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-2xl shadow-emerald-500/20 transition-all"><Plus size={20} />نشر مقال</button>
         </div>
       </div>
