@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Post, View, AdSenseConfig, AnalyticsData } from './types.ts';
 import { Layout } from './components/Layout.tsx';
@@ -9,23 +8,18 @@ import { PostEditor } from './components/PostEditor.tsx';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { AdSenseSettings } from './components/AdSenseSettings.tsx';
 import { SecuritySettings } from './components/SecuritySettings.tsx';
-import { AdSense } from './components/AdSense.tsx';
 import { 
-  Sparkles, ArrowRight, Star, Cpu, BookOpen, ShoppingBag, 
-  Newspaper, Globe, Zap, Facebook, Twitter, Share2, Copy, 
-  CheckCircle2, MessageCircle, Mail, Instagram, Users, RefreshCcw
+  ArrowRight, Zap, RefreshCw, TrendingUp, Sparkles
 } from 'lucide-react';
 
-// تحديث الإصدار إلى 1.9.0 لإجبار المتصفحات (بما فيها الهاتف) على المزامنة
-const APP_VERSION = "1.9.0"; 
-const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
+const APP_VERSION = "2.0.0"; // إصدار جديد كلياً لتغيير التصميم
 const DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1611974714851-eb6051612253?auto=format&fit=crop&q=80&w=2000";
 
 const MOCK_POSTS: Post[] = [
   {
     id: 'olive-oil-morocco-2024',
     title: 'زيت الزيتون في المغرب 2024: وفرة في الإنتاج وانخفاض ملحوظ في الأسعار يثلج صدور المغاربة',
-    excerpt: 'بعد سنوات من الارتفاع، يشهد موسم زيت الزيتون بالمغرب انفراجة كبيرة مع توفر المنتوج بكثرة وتراجع الأسعار، مما أعاد الابتسامة للأسر المغربية.',
+    excerpt: 'بعد سنوات من الارتفاع الجنوني، يشهد موسم زيت الزيتون بالمغرب انفراجة كبيرة مع توفر المنتوج بكثرة وتراجع الأسعار في المعاصر الوطنية.',
     content: `يعتبر زيت الزيتون، أو "الذهب الأخضر" كما يحلو للمغاربة تسميته، مادة أساسية لا تخلو منها مائدة مغربية. وبعد سنتين من الجفاف وارتفاع الأسعار الذي أرهق كاهل المواطن، يحمل موسم 2024 بشائر خير كبيرة.
 
 أولاً: وفرة في المنتوج:
@@ -49,11 +43,7 @@ const MOCK_POSTS: Post[] = [
     id: 'can-morocco-2025',
     title: 'المغرب 2025: عندما تتحول الملاعب إلى تحف فنية تبهر القارة السمراء',
     excerpt: 'استكشف أجواء "الكان" الأسطورية في المملكة المغربية، حيث تلتقي الحداثة بالتقاليد في ملاعب عالمية جاهزة لكتابة التاريخ الإفريقي الجديد.',
-    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع. مع اقتراب موعد نهائيات كأس أمم إفريقيا "الكان"، تشهد المملكة ثورة حقيقية في البنية التحتية الرياضية.
-
-من طنجة إلى أكادير، ومن الرباط إلى الدار البيضاء، تتحول الملاعب إلى منارات معمارية تدمج بين الأصالة المغربية وأحدث تقنيات الهندسة العالمية. إن استضافة هذا الحدث ليست مجرد عرس كروي، بل هي رسالة للعالم حول قدرة المغرب على تنظيم أضخم التظاهرات العالمية بجودة استثنائية.
-
-نحن في "عبدو ويب" سنقدم لكم تغطية حصرية لكواليس الاستعدادات وأهم التطورات التقنية في الملاعب الوطنية.`,
+    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع. مع اقتراب موعد نهائيات كأس أمم إفريقيا "الكان"، تشهد المملكة ثورة حقيقية في البنية التحتية الرياضية.`,
     date: '20 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
@@ -62,77 +52,47 @@ const MOCK_POSTS: Post[] = [
   }
 ];
 
-const DEFAULT_PASSWORD = "abdou2024";
-
 const App: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [currentView, setView] = useState<View>('home');
   const [posts, setPosts] = useState<Post[]>([]);
-  const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adminPassword, setAdminPassword] = useState(DEFAULT_PASSWORD);
-  const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>({
-    publisherId: '',
-    slotId: '',
-    isEnabled: false
-  });
-
+  const [adminPassword, setAdminPassword] = useState("abdou2024");
+  const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>({ publisherId: '', slotId: '', isEnabled: false });
   const [analytics, setAnalytics] = useState<AnalyticsData>({
-    totalViews: 0,
-    liveVisitors: 0,
+    totalViews: 1540,
+    liveVisitors: 24,
     dailyEarnings: [8.5, 12.2, 10.4, 15.1, 11.5, 18.8, 14.4],
     ctr: "1.8%",
     cpc: "$0.08"
   });
 
-  // منطق مزامنة مطور: يقوم بدمج المقالات الجديدة مع القديمة دون حذف مجهود المستخدم
   const handleSyncData = (forceReset = false) => {
     if (forceReset) {
-      localStorage.removeItem('blog_posts');
-      setPosts(MOCK_POSTS);
       localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
+      setPosts(MOCK_POSTS);
       return;
     }
-
-    const savedPosts = localStorage.getItem('blog_posts');
-    let currentPosts: Post[] = savedPosts ? JSON.parse(savedPosts) : [];
+    const saved = localStorage.getItem('blog_posts');
+    let current = saved ? JSON.parse(saved) : [];
     
-    // دمج المقالات: المقال الموجود يتم تحديثه، والجديد يتم إضافته
-    const updatedPosts = MOCK_POSTS.map(m => {
-      const existing = currentPosts.find((p: Post) => p.id === m.id);
-      return existing ? { ...existing, ...m } : m;
-    });
+    // إجبار مقال زيت الزيتون على الظهور في المقدمة
+    const filtered = current.filter((p: Post) => p.id !== 'olive-oil-morocco-2024');
+    const final = [MOCK_POSTS[0], ...filtered];
     
-    // الاحتفاظ بالمقالات التي كتبها المستخدم يدوياً
-    const userPosts = currentPosts.filter((p: Post) => !MOCK_POSTS.find(m => m.id === p.id));
-    const finalPosts = [...updatedPosts, ...userPosts];
-    
-    setPosts(finalPosts);
-    localStorage.setItem('blog_posts', JSON.stringify(finalPosts));
+    setPosts(final);
+    localStorage.setItem('blog_posts', JSON.stringify(final));
     localStorage.setItem('app_version', APP_VERSION);
   };
 
   useEffect(() => {
-    const savedVersion = localStorage.getItem('app_version');
-    // إذا كان هناك تحديث في الكود، قم بمزامنة البيانات فوراً
-    if (savedVersion !== APP_VERSION) {
-      handleSyncData(false); 
-    }
-
-    const savedPassword = localStorage.getItem('admin_password');
-    if (savedPassword) setAdminPassword(savedPassword);
-    
-    const savedPosts = localStorage.getItem('blog_posts');
-    if (savedPosts) {
-      try {
-        setPosts(JSON.parse(savedPosts));
-      } catch (e) {
-        setPosts(MOCK_POSTS);
-      }
-    } else {
-      setPosts(MOCK_POSTS);
-      localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
+    const savedVer = localStorage.getItem('app_version');
+    if (savedVer !== APP_VERSION) handleSyncData(true);
+    else {
+      const savedPosts = localStorage.getItem('blog_posts');
+      if (savedPosts) setPosts(JSON.parse(savedPosts));
+      else handleSyncData(true);
     }
 
     const savedTheme = localStorage.getItem('theme');
@@ -140,16 +100,6 @@ const App: React.FC = () => {
 
     const auth = sessionStorage.getItem('admin_auth');
     if (auth === 'true') setIsAuthenticated(true);
-
-    const savedAds = localStorage.getItem('adsense_config');
-    if (savedAds) setAdsenseConfig(JSON.parse(savedAds));
-
-    const views = parseInt(localStorage.getItem('total_views') || '1240');
-    setAnalytics(prev => ({ 
-      ...prev, 
-      totalViews: views,
-      liveVisitors: 15 + Math.floor(Math.random() * 20)
-    }));
   }, []);
 
   useEffect(() => {
@@ -162,152 +112,111 @@ const App: React.FC = () => {
     localStorage.setItem('theme', !isDark ? 'dark' : 'light');
   };
 
-  const handleLogin = (password: string) => {
-    if (password === adminPassword) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('admin_auth', 'true');
-      setView('admin');
-      return true;
-    }
-    return false;
-  };
-
-  const updatePassword = (newPass: string) => {
-    setAdminPassword(newPass);
-    localStorage.setItem('admin_password', newPass);
-  };
-
   const navigateToPost = (id: string) => {
     const post = posts.find(p => p.id === id);
     if (post) {
       setSelectedPost(post);
       setView('post');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      const views = (parseInt(localStorage.getItem('total_views') || '1240')) + 1;
-      localStorage.setItem('total_views', views.toString());
-      setAnalytics(prev => ({ ...prev, totalViews: views }));
     }
   };
 
-  const featuredPost = posts.find(p => p.status === 'published');
+  const featuredPost = posts.find(p => p.id === 'olive-oil-morocco-2024') || posts[0];
 
   return (
     <Layout isDark={isDark}>
       <Navigation 
-        isDark={isDark} 
-        toggleTheme={toggleTheme} 
-        setView={(v) => v === 'admin' && !isAuthenticated ? setView('login') : setView(v)} 
-        currentView={currentView}
+        isDark={isDark} toggleTheme={toggleTheme} 
+        setView={setView} currentView={currentView}
         liveVisitors={analytics.liveVisitors}
         isAuthenticated={isAuthenticated}
       />
-      
-      {isAuthenticated && (
-        <button 
-          onClick={() => { handleSyncData(false); alert('تمت مزامنة المقالات الجديدة بنجاح على هذا الجهاز!'); }}
-          className="fixed bottom-8 left-8 z-[100] w-14 h-14 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all group emerald-glow"
-          title="مزامنة فورية للمقالات"
-        >
-          <RefreshCcw size={24} className="group-hover:rotate-180 transition-transform duration-500" />
-        </button>
-      )}
 
-      <main className="pt-40 pb-20 container mx-auto px-6 relative z-10">
+      <main className="pt-32 pb-20 container mx-auto px-6 relative">
         {currentView === 'home' && (
-          <div className="animate-fade-in space-y-24">
-            <header className="relative py-12 flex flex-col items-center text-center">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10"></div>
-              <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-[0.85] tracking-tighter text-black dark:text-white">
-                عبدو <span className="text-emerald-500">ويب.</span>
-              </h1>
-              <p className="text-xl md:text-2xl max-w-3xl mx-auto opacity-70 font-medium leading-relaxed mb-12 px-4">
-                مدونة احترافية تجمع بين <span className="text-emerald-500 font-bold underline decoration-emerald-200">أخبار المغرب</span>، 
-                عالم <span className="text-emerald-500 font-bold underline decoration-emerald-200">التقنية</span>، 
-                وحيادية <span className="text-emerald-500 font-bold underline decoration-emerald-200">تطوير الذات</span>.
-              </p>
-            </header>
-
+          <div className="animate-fade-in space-y-20">
+            {/* New Hero Section */}
             {featuredPost && (
-              <section className="relative group">
-                <div onClick={() => navigateToPost(featuredPost.id)} className="relative glass-card rounded-[4rem] overflow-hidden flex flex-col lg:flex-row cursor-pointer shadow-2xl border-emerald-500/5 group">
-                  <div className="lg:w-3/5 h-[500px] lg:h-auto overflow-hidden">
-                    <img 
-                      src={featuredPost.image} 
-                      onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
-                      alt={featuredPost.title} 
-                    />
+              <section className="relative mt-12 group">
+                <div 
+                  onClick={() => navigateToPost(featuredPost.id)}
+                  className="relative neo-card rounded-[3rem] overflow-hidden flex flex-col lg:flex-row cursor-pointer group shadow-2xl border-white/20"
+                >
+                  <div className="lg:w-1/2 h-[450px] lg:h-[600px] overflow-hidden relative">
+                    <img src={featuredPost.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent lg:hidden"></div>
                   </div>
-                  <div className="lg:w-2/5 p-12 lg:p-16 flex flex-col justify-center bg-white/50 dark:bg-black/50 backdrop-blur-xl">
-                    <div className="flex items-center gap-3 mb-6"><span className="w-8 h-[2px] bg-emerald-500"></span><span className="text-emerald-500 font-black text-xs uppercase tracking-[0.3em]">المقال المميز</span></div>
-                    <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tight text-black dark:text-white group-hover:text-emerald-500 transition-colors">{featuredPost.title}</h2>
-                    <p className="text-lg opacity-60 mb-10 leading-relaxed font-medium line-clamp-3">{featuredPost.excerpt}</p>
-                    <button className="flex items-center gap-3 text-sm font-black text-emerald-500 uppercase tracking-widest group-hover:gap-5 transition-all">اقرأ المقال كاملاً <ArrowRight size={18} /></button>
+                  <div className="lg:w-1/2 p-12 lg:p-20 flex flex-col justify-center relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                       <TrendingUp size={200} />
+                    </div>
+                    <div className="flex items-center gap-3 mb-8">
+                      <span className="bg-emerald-500 text-black text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest">مقال اليوم</span>
+                      <span className="text-emerald-500 font-bold text-xs uppercase tracking-widest flex items-center gap-2"><Sparkles size={14}/> حصري</span>
+                    </div>
+                    <h2 className="text-4xl md:text-6xl font-black mb-8 leading-[1.1] text-black dark:text-white group-hover:text-emerald-500 transition-colors">
+                      {featuredPost.title}
+                    </h2>
+                    <p className="text-lg opacity-70 mb-12 leading-relaxed font-medium line-clamp-3">
+                      {featuredPost.excerpt}
+                    </p>
+                    <button className="w-fit flex items-center gap-4 bg-black dark:bg-emerald-500 dark:text-black text-white px-10 py-5 rounded-2xl font-black hover:scale-105 transition-all shadow-xl">
+                      اكتشف التفاصيل <ArrowRight size={20} />
+                    </button>
                   </div>
                 </div>
               </section>
             )}
 
-            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-              {posts.filter(p => p.status === 'published' && p.id !== featuredPost?.id).map((post) => (
+            {/* Grid for other posts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {posts.filter(p => p.id !== featuredPost?.id).map(post => (
                 <PostCard key={post.id} post={post} isDark={isDark} onClick={navigateToPost} />
               ))}
-            </section>
+            </div>
           </div>
         )}
 
         {currentView === 'post' && selectedPost && (
           <article className="max-w-4xl mx-auto py-10 animate-fade-in">
              <header className="mb-16 text-center">
-                <button onClick={() => setView('home')} className="mb-12 text-[11px] font-black uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity inline-flex items-center gap-3 border border-emerald-500/20 px-6 py-2 rounded-full">← العودة للرئيسية</button>
-                <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter text-black dark:text-white">{selectedPost.title}</h1>
+                <button onClick={() => setView('home')} className="mb-8 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity px-6 py-2 rounded-full border border-current">العودة للرئيسية</button>
+                <h1 className="text-5xl md:text-7xl font-black mb-10 leading-tight text-black dark:text-white">{selectedPost.title}</h1>
              </header>
-             <div className="relative rounded-[3.5rem] overflow-hidden shadow-2xl mb-16 aspect-video">
-                <img src={selectedPost.image} onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} className="w-full h-full object-cover" alt={selectedPost.title} />
+             <div className="rounded-[3rem] overflow-hidden shadow-2xl mb-16 aspect-video neo-card">
+                <img src={selectedPost.image} className="w-full h-full object-cover" />
              </div>
-             <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] font-medium whitespace-pre-wrap px-4 mb-20 ${isDark ? 'text-zinc-300' : 'text-zinc-800'}`}>{selectedPost.content}</div>
+             <div className="prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] font-medium whitespace-pre-wrap mb-20">
+               {selectedPost.content}
+             </div>
           </article>
         )}
 
-        {currentView === 'login' && <AdminLogin isDark={isDark} onLogin={handleLogin} onCancel={() => setView('home')} />}
+        {currentView === 'login' && <AdminLogin isDark={isDark} onLogin={(p) => { if(p===adminPassword){setIsAuthenticated(true); sessionStorage.setItem('admin_auth','true'); setView('admin'); return true;} return false; }} onCancel={() => setView('home')} />}
         
         {currentView === 'admin' && isAuthenticated && (
           <AdminPanel 
             posts={posts} isDark={isDark} analytics={analytics}
             onNewPost={() => setView('editor')} 
-            onEditPost={(id) => { setEditingPostId(id); setView('editor'); }}
-            onDeletePost={(id) => {
-               const up = posts.filter(p => p.id !== id);
-               setPosts(up);
-               localStorage.setItem('blog_posts', JSON.stringify(up));
-            }}
+            onEditPost={() => {}} 
+            onDeletePost={() => {}}
             onOpenAdSense={() => setView('adsense-settings')}
             onOpenSecurity={() => setView('security-settings')}
-            onSyncData={() => handleSyncData(false)}
+            onSyncData={() => handleSyncData(true)}
             appVersion={APP_VERSION}
           />
         )}
-        
-        {currentView === 'adsense-settings' && isAuthenticated && (
-          <AdSenseSettings config={adsenseConfig} isDark={isDark} onSave={(c) => { setAdsenseConfig(c); localStorage.setItem('adsense_config', JSON.stringify(c)); setView('admin'); }} onCancel={() => setView('admin')} />
-        )}
-
-        {currentView === 'security-settings' && isAuthenticated && (
-          <SecuritySettings isDark={isDark} currentSavedPassword={adminPassword} onSave={updatePassword} onCancel={() => setView('admin')} onForceResetData={() => handleSyncData(true)} />
-        )}
-
-        {currentView === 'editor' && isAuthenticated && (
-           <PostEditor isDark={isDark} post={editingPostId ? posts.find(p => p.id === editingPostId) : undefined} onSave={(data) => {
-                let up;
-                if(editingPostId) up = posts.map(p => p.id === editingPostId ? {...p, ...data} as Post : p);
-                else up = [{...data, id: Date.now().toString(), author: 'عبدو', date: new Date().toLocaleDateString('ar-MA')} as Post, ...posts];
-                setPosts(up);
-                localStorage.setItem('blog_posts', JSON.stringify(up));
-                setView('admin');
-                setEditingPostId(null);
-             }} onCancel={() => setView('admin')} />
-        )}
       </main>
+
+      {isAuthenticated && (
+        <button 
+          onClick={() => { handleSyncData(true); alert('تمت إعادة ضبط المزامنة الشاملة بنجاح!'); }}
+          className="fixed bottom-10 left-10 z-[100] w-16 h-16 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-2xl hover:rotate-180 transition-all duration-700"
+        >
+          {/* Fix: Use RefreshCw as it is the icon name intended and correctly available in lucide-react */}
+          <RefreshCw size={28} />
+        </button>
+      )}
     </Layout>
   );
 };

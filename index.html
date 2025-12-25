@@ -4,95 +4,125 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>عبدو ويب | Abdouweb - تكنولوجيا، تطوير ذات وأفلييت</title>
+    <title>عبدو ويب | Abdouweb - التميز الرقمي</title>
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="منصة عبدو ويب (Abdouweb) هي دليلك الأول في المغرب لأخبار التقنية، استراتيجيات الربح من الأفلييت، ودروس تطوير الذات والنجاح المهني." />
-    <meta name="keywords" content="عبدو ويب, Abdouweb, أخبار التقنية المغرب, الربح من الانترنت المغرب, الأفلييت, تطوير الذات, المغرب الرقمي 2030" />
-    <meta name="author" content="Abdouweb" />
-    <link rel="canonical" href="https://abdouweb.com/" />
-    
+    <meta name="description" content="منصة عبدو ويب للتقنية وأخبار المغرب - تجربة بصرية جديدة" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://esm.sh">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
     
     <style>
+      :root {
+        --primary: #10b981;
+        --primary-glow: rgba(16, 185, 129, 0.4);
+      }
+      
       body { 
         font-family: 'Tajawal', sans-serif; 
-        scroll-behavior: smooth; 
         margin: 0; 
         overflow-x: hidden; 
-        text-rendering: optimizeLegibility;
-        -webkit-font-smoothing: antialiased;
-        background-color: #ffffff;
+        background-color: #f8fafc;
+        color: #1e293b;
       }
-      .dark body { background-color: #000000; }
+      
+      .dark body { 
+        background-color: #050505; 
+        color: #f8fafc;
+      }
 
-      .bg-mesh {
-        background-image: 
-          radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+      /* Dynamic Aurora Background */
+      .bg-aurora {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        overflow: hidden;
+        background: radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
       }
-      .dark .bg-mesh {
-        background-image: 
-          radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(0, 0, 0, 1) 0px, transparent 50%);
+      
+      .dark .bg-aurora {
+        background: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 70%, rgba(79, 70, 229, 0.1) 0%, transparent 40%),
+                    #050505;
+      }
+
+      .aurora-blur {
+        position: absolute;
+        width: 60vw;
+        height: 60vw;
+        background: var(--primary-glow);
+        filter: blur(120px);
+        border-radius: 50%;
+        opacity: 0.4;
+        animation: float 20s infinite alternate;
+      }
+
+      @keyframes float {
+        0% { transform: translate(-10%, -10%) scale(1); }
+        100% { transform: translate(20%, 20%) scale(1.2); }
       }
 
       .glass-nav {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
       }
-      .dark .glass-nav {
-        background: rgba(10, 10, 10, 0.8);
-        border: 1px solid rgba(16, 185, 129, 0.1);
-      }
-
-      .glass-card {
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .dark .glass-card {
-        background: rgba(15, 15, 15, 0.4);
-        border: 1px solid rgba(16, 185, 129, 0.05);
-      }
-
-      @keyframes fadeIn { 
-        from { opacity: 0; transform: translateY(10px); } 
-        to { opacity: 1; transform: translateY(0); } 
-      }
-      .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
-
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
       
-      .prose h2, .prose h3 { font-weight: 900 !important; color: inherit; }
-
-      .emerald-glow {
-        box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.3);
+      .dark .glass-nav {
+        background: rgba(10, 10, 10, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.05);
       }
+
+      .neo-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      
+      .dark .neo-card {
+        background: rgba(20, 20, 20, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      }
+
+      .neo-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 40px 80px -20px rgba(16, 185, 129, 0.15);
+      }
+
+      .emerald-text-glow {
+        text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+      }
+
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "recharts": "https://esm.sh/recharts@^3.6.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
-  }
-}
-</script>
-</head>
-  <body class="bg-mesh text-zinc-900 dark:text-zinc-100 min-h-screen">
+    
+    <script type="importmap">
+    {
+      "imports": {
+        "recharts": "https://esm.sh/recharts@^3.6.0",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3",
+        "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+        "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+      }
+    }
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <div class="bg-aurora">
+      <div class="aurora-blur" style="top: -10%; left: -10%;"></div>
+      <div class="aurora-blur" style="bottom: -10%; right: -10%; background: rgba(79, 70, 229, 0.2);"></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
   </body>
