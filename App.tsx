@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Post, View } from './types';
-import { Layout } from './components/Layout';
-import { Navigation } from './components/Navigation';
-import { PostCard } from './components/PostCard';
-import { AdminPanel } from './components/AdminPanel';
-import { PostEditor } from './components/PostEditor';
+import { Post, View } from './types.ts';
+import { Layout } from './components/Layout.tsx';
+import { Navigation } from './components/Navigation.tsx';
+import { PostCard } from './components/PostCard.tsx';
+import { AdminPanel } from './components/AdminPanel.tsx';
+import { PostEditor } from './components/PostEditor.tsx';
 
 const MOCK_POSTS: Post[] = [
   {

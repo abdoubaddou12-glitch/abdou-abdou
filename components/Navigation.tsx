@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View } from '../types';
+import { View } from '../types.ts';
 import { Moon, Sun, LayoutDashboard, Home } from 'lucide-react';
 
 interface NavigationProps {
