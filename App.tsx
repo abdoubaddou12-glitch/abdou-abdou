@@ -99,7 +99,6 @@ const App: React.FC = () => {
     if (savedPosts) {
       try {
         let parsed = JSON.parse(savedPosts);
-        // Force update images for default posts if they match old broken ones
         parsed = parsed.map((p: Post) => {
           const defaultPost = MOCK_POSTS.find(m => m.id === p.id);
           return defaultPost ? { ...p, image: defaultPost.image } : p;
@@ -214,9 +213,7 @@ const App: React.FC = () => {
           <div className="animate-fade-in space-y-24">
             <header className="relative py-12 flex flex-col items-center text-center">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10"></div>
-              <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full glass-card text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500 border border-emerald-500/10">
-                <Sparkles size={14} className="animate-pulse" /> تم إصلاح مشاكل العرض الفنية
-              </div>
+              
               <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-[0.85] tracking-tighter text-black dark:text-white">
                 عبدو <span className="text-emerald-500">ويب.</span>
               </h1>
