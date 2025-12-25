@@ -16,7 +16,8 @@ import {
   CheckCircle2, MessageCircle, Mail, Instagram, Users, RefreshCcw
 } from 'lucide-react';
 
-const APP_VERSION = "1.8.0"; // تحديث الإصدار لفرض ظهور الأزرار الجديدة
+// تحديث الإصدار إلى 1.9.0 لإجبار المتصفحات (بما فيها الهاتف) على المزامنة
+const APP_VERSION = "1.9.0"; 
 const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
 const DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1611974714851-eb6051612253?auto=format&fit=crop&q=80&w=2000";
 
@@ -85,6 +86,7 @@ const App: React.FC = () => {
     cpc: "$0.08"
   });
 
+  // منطق مزامنة مطور: يقوم بدمج المقالات الجديدة مع القديمة دون حذف مجهود المستخدم
   const handleSyncData = (forceReset = false) => {
     if (forceReset) {
       localStorage.removeItem('blog_posts');
@@ -92,24 +94,30 @@ const App: React.FC = () => {
       localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
       return;
     }
+
     const savedPosts = localStorage.getItem('blog_posts');
-    let currentPosts = savedPosts ? JSON.parse(savedPosts) : [];
+    let currentPosts: Post[] = savedPosts ? JSON.parse(savedPosts) : [];
     
+    // دمج المقالات: المقال الموجود يتم تحديثه، والجديد يتم إضافته
     const updatedPosts = MOCK_POSTS.map(m => {
       const existing = currentPosts.find((p: Post) => p.id === m.id);
       return existing ? { ...existing, ...m } : m;
     });
     
-    const finalPosts = [...updatedPosts, ...currentPosts.filter((p: Post) => !MOCK_POSTS.find(m => m.id === p.id))];
+    // الاحتفاظ بالمقالات التي كتبها المستخدم يدوياً
+    const userPosts = currentPosts.filter((p: Post) => !MOCK_POSTS.find(m => m.id === p.id));
+    const finalPosts = [...updatedPosts, ...userPosts];
+    
     setPosts(finalPosts);
     localStorage.setItem('blog_posts', JSON.stringify(finalPosts));
+    localStorage.setItem('app_version', APP_VERSION);
   };
 
   useEffect(() => {
     const savedVersion = localStorage.getItem('app_version');
+    // إذا كان هناك تحديث في الكود، قم بمزامنة البيانات فوراً
     if (savedVersion !== APP_VERSION) {
-      handleSyncData(true);
-      localStorage.setItem('app_version', APP_VERSION);
+      handleSyncData(false); 
     }
 
     const savedPassword = localStorage.getItem('admin_password');
@@ -196,9 +204,9 @@ const App: React.FC = () => {
       
       {isAuthenticated && (
         <button 
-          onClick={() => { handleSyncData(true); alert('تمت المزامنة وتحديث البيانات بنجاح!'); }}
+          onClick={() => { handleSyncData(false); alert('تمت مزامنة المقالات الجديدة بنجاح على هذا الجهاز!'); }}
           className="fixed bottom-8 left-8 z-[100] w-14 h-14 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all group emerald-glow"
-          title="تحديث شامل وسريع"
+          title="مزامنة فورية للمقالات"
         >
           <RefreshCcw size={24} className="group-hover:rotate-180 transition-transform duration-500" />
         </button>
@@ -275,7 +283,7 @@ const App: React.FC = () => {
             }}
             onOpenAdSense={() => setView('adsense-settings')}
             onOpenSecurity={() => setView('security-settings')}
-            onSyncData={() => handleSyncData(true)}
+            onSyncData={() => handleSyncData(false)}
             appVersion={APP_VERSION}
           />
         )}
