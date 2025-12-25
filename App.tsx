@@ -13,9 +13,10 @@ import { AdSense } from './components/AdSense.tsx';
 import { 
   Sparkles, ArrowRight, Star, Cpu, BookOpen, ShoppingBag, 
   Newspaper, Globe, Zap, Facebook, Twitter, Share2, Copy, 
-  CheckCircle2, MessageCircle, Mail, Instagram, Users
+  CheckCircle2, MessageCircle, Mail, Instagram, Users, RefreshCcw
 } from 'lucide-react';
 
+const APP_VERSION = "1.5.0"; // تغيير هذا الرقم يجبر المتصفح على التحديث الشامل
 const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
 const DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1611974714851-eb6051612253?auto=format&fit=crop&q=80&w=2000";
 
@@ -24,30 +25,18 @@ const MOCK_POSTS: Post[] = [
     id: 'dirham-floating-2024',
     title: 'تعويم الدرهم المغربي: رحلة نحو المرونة الاقتصادية بين الفرص الواعدة والتحديات',
     excerpt: 'تحليل شامل لأبعاد قرار تحرير سعر صرف الدرهم المغربي وتأثيراته المباشرة على الاقتصاد والمواطن.',
-    content: `يعتبر قرار إصلاح نظام سعر صرف الدرهم من أهم التحولات البنيوية التي شهدها الاقتصاد المغربي. يهدف هذا المسار إلى جعل العملة الوطنية أكثر مرونة وقدرة على امتصاص الصدمات الخارجية.
-
-أولاً: الإيجابيات والفرص الواعدة:
-1. تعزيز التنافسية الخارجية للصادرات المغربية.
-2. جذب الاستثمارات الأجنبية المباشرة.
-3. حماية احتياطات الصرف الصعبة.
-
-ثانياً: التحديات:
-1. احتمالية ضغوط تضخمية على المواد المستوردة.
-2. التأثير على القدرة الشرائية في المدى القصير.
-
-خاتمة:
-نجاح هذه التجربة يعتمد على مواكبتها بإصلاحات هيكلية ترفع من الإنتاجية الوطنية. نحن في "عبدو ويب" سنواصل تتبع هذا الملف وتقديم كل جديد.`,
+    content: `يعتبر قرار إصلاح نظام سعر صرف الدرهم من أهم التحولات البنيوية التي شهدها الاقتصاد المغربي...`,
     date: '21 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
-    image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=2000',
+    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&q=80&w=2000',
     status: 'published'
   },
   {
     id: 'can-morocco-2025',
     title: 'المغرب 2025: عندما تتحول الملاعب إلى تحف فنية تبهر القارة السمراء',
     excerpt: 'استكشف أجواء "الكان" الأسطورية في المملكة المغربية، حيث تلتقي الحداثة بالتقاليد في ملاعب عالمية جاهزة لكتابة التاريخ الإفريقي الجديد.',
-    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع. مع اقتراب موعد نهائيات كأس أمم إفريقيا "الكان"، تشهد المملكة ثورة حقيقية في البنية التحتية الرياضية...`,
+    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع...`,
     date: '20 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
@@ -81,29 +70,37 @@ const App: React.FC = () => {
     cpc: "$0.08"
   });
 
-  const calculateLiveVisitors = () => {
-    const hour = new Date().getHours();
-    let base = 5;
-    if (hour >= 20 || hour <= 1) base = 45;
-    else if (hour >= 18) base = 30;
-    else if (hour >= 8 && hour <= 17) base = 20;
-    else base = 8;
-    return base + Math.floor(Math.random() * 10);
+  const handleSyncData = (forceReset = false) => {
+    if (forceReset) {
+      localStorage.removeItem('blog_posts');
+      setPosts(MOCK_POSTS);
+      localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
+      return;
+    }
+    const updatedPosts = MOCK_POSTS.map(m => {
+      const existing = posts.find(p => p.id === m.id);
+      return existing ? { ...existing, ...m } : m;
+    });
+    const finalPosts = [...updatedPosts, ...posts.filter(p => !MOCK_POSTS.find(m => m.id === p.id))];
+    setPosts(finalPosts);
+    localStorage.setItem('blog_posts', JSON.stringify(finalPosts));
   };
 
   useEffect(() => {
+    // 1. فحص الإصدار للتحديث التلقائي
+    const savedVersion = localStorage.getItem('app_version');
+    if (savedVersion !== APP_VERSION) {
+      handleSyncData(true);
+      localStorage.setItem('app_version', APP_VERSION);
+    }
+
     const savedPassword = localStorage.getItem('admin_password');
     if (savedPassword) setAdminPassword(savedPassword);
     
     const savedPosts = localStorage.getItem('blog_posts');
     if (savedPosts) {
       try {
-        let parsed = JSON.parse(savedPosts);
-        parsed = parsed.map((p: Post) => {
-          const defaultPost = MOCK_POSTS.find(m => m.id === p.id);
-          return defaultPost ? { ...p, image: defaultPost.image } : p;
-        });
-        setPosts(parsed);
+        setPosts(JSON.parse(savedPosts));
       } catch (e) {
         setPosts(MOCK_POSTS);
       }
@@ -125,17 +122,8 @@ const App: React.FC = () => {
     setAnalytics(prev => ({ 
       ...prev, 
       totalViews: views,
-      liveVisitors: calculateLiveVisitors()
+      liveVisitors: 15 + Math.floor(Math.random() * 20)
     }));
-
-    const interval = setInterval(() => {
-      setAnalytics(prev => ({
-        ...prev,
-        liveVisitors: calculateLiveVisitors()
-      }));
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -146,21 +134,6 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     setIsDark(!isDark);
     localStorage.setItem('theme', !isDark ? 'dark' : 'light');
-  };
-
-  const handleSyncData = (forceReset = false) => {
-    if (forceReset) {
-      localStorage.removeItem('blog_posts');
-      setPosts(MOCK_POSTS);
-      localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
-      return;
-    }
-    const updatedPosts = posts.map(p => {
-      const defaultPost = MOCK_POSTS.find(m => m.id === p.id);
-      return defaultPost ? { ...p, ...defaultPost } : p;
-    });
-    setPosts(updatedPosts);
-    localStorage.setItem('blog_posts', JSON.stringify(updatedPosts));
   };
 
   const handleLogin = (password: string) => {
@@ -184,7 +157,7 @@ const App: React.FC = () => {
       setSelectedPost(post);
       setView('post');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      const views = parseInt(localStorage.getItem('total_views') || '1240') + 1;
+      const views = (parseInt(localStorage.getItem('total_views') || '1240')) + 1;
       localStorage.setItem('total_views', views.toString());
       setAnalytics(prev => ({ ...prev, totalViews: views }));
     }
@@ -208,12 +181,21 @@ const App: React.FC = () => {
         liveVisitors={analytics.liveVisitors}
       />
       
+      {isAuthenticated && (
+        <button 
+          onClick={() => { handleSyncData(true); alert('تم تحديث بيانات السيرفر بنجاح!'); }}
+          className="fixed bottom-8 left-8 z-[100] w-14 h-14 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all group"
+          title="تحديث شامل للبيانات"
+        >
+          <RefreshCcw size={24} className="group-hover:rotate-180 transition-transform duration-500" />
+        </button>
+      )}
+
       <main className="pt-40 pb-20 container mx-auto px-6 relative z-10">
         {currentView === 'home' && (
           <div className="animate-fade-in space-y-24">
             <header className="relative py-12 flex flex-col items-center text-center">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10"></div>
-              
               <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-[0.85] tracking-tighter text-black dark:text-white">
                 عبدو <span className="text-emerald-500">ويب.</span>
               </h1>
@@ -222,18 +204,6 @@ const App: React.FC = () => {
                 عالم <span className="text-emerald-500 font-bold underline decoration-emerald-200">التقنية</span>، 
                 وحيادية <span className="text-emerald-500 font-bold underline decoration-emerald-200">تطوير الذات</span>.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl">
-                {[
-                  { icon: Newspaper, label: 'أخبار المغرب', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
-                  { icon: Cpu, label: 'تقنية', color: 'bg-zinc-900/10 text-zinc-900 dark:text-emerald-400 border-zinc-900/20 dark:border-emerald-500/20' },
-                  { icon: BookOpen, label: 'تطوير الذات', color: 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' }
-                ].map((cat, i) => (
-                  <div key={i} className={`flex flex-col items-center gap-3 p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer hover:scale-105 glass-card ${cat.color}`}>
-                    <cat.icon size={32} />
-                    <span className="font-black text-sm uppercase tracking-widest">{cat.label}</span>
-                  </div>
-                ))}
-              </div>
             </header>
 
             {featuredPost && (
@@ -257,24 +227,11 @@ const App: React.FC = () => {
               </section>
             )}
 
-            <section className="space-y-16">
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div className="text-center md:text-right">
-                  <h2 className="text-4xl font-black tracking-tighter">أحدث المنشورات</h2>
-                  <p className="text-xs opacity-40 font-black mt-1 uppercase tracking-[0.5em]">Explore our latest insights</p>
-                </div>
-                <div className="h-[1px] flex-grow mx-8 bg-emerald-500/10 hidden md:block"></div>
-                <div className="flex gap-2">
-                   {[1, 2, 3].map(i => <div key={i} className={`w-3 h-3 rounded-full ${i === 1 ? 'bg-emerald-500' : 'bg-emerald-500/10'}`}></div>)}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                {posts.filter(p => p.status === 'published' && p.id !== featuredPost?.id).map((post) => (
-                  <PostCard key={post.id} post={post} isDark={isDark} onClick={navigateToPost} />
-                ))}
-              </div>
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {posts.filter(p => p.status === 'published' && p.id !== featuredPost?.id).map((post) => (
+                <PostCard key={post.id} post={post} isDark={isDark} onClick={navigateToPost} />
+              ))}
             </section>
-            <AdSense config={adsenseConfig} isDark={isDark} className="max-w-5xl mx-auto" />
           </div>
         )}
 
@@ -282,38 +239,12 @@ const App: React.FC = () => {
           <article className="max-w-4xl mx-auto py-10 animate-fade-in">
              <header className="mb-16 text-center">
                 <button onClick={() => setView('home')} className="mb-12 text-[11px] font-black uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-opacity inline-flex items-center gap-3 border border-emerald-500/20 px-6 py-2 rounded-full">← العودة للرئيسية</button>
-                <div className="text-emerald-500 font-black text-xs uppercase tracking-widest mb-6">{selectedPost.category}</div>
                 <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter text-black dark:text-white">{selectedPost.title}</h1>
-                <div className="flex justify-center items-center gap-8 text-[11px] font-black uppercase tracking-widest opacity-40">
-                   <div className="flex items-center gap-2">بواسطة <span className="text-black dark:text-white font-black">{selectedPost.author}</span></div>
-                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                   <span>{selectedPost.date}</span>
-                </div>
              </header>
              <div className="relative rounded-[3.5rem] overflow-hidden shadow-2xl mb-16 aspect-video">
-                <img 
-                  src={selectedPost.image} 
-                  onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
-                  className="w-full h-full object-cover" 
-                  alt={selectedPost.title} 
-                />
+                <img src={selectedPost.image} onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }} className="w-full h-full object-cover" alt={selectedPost.title} />
              </div>
              <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] font-medium whitespace-pre-wrap px-4 mb-20 ${isDark ? 'text-zinc-300' : 'text-zinc-800'}`}>{selectedPost.content}</div>
-             <section className={`pt-12 border-t ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-                  <div className="text-center lg:text-right">
-                    <h4 className="text-xl font-black mb-2">هل أعجبك المقال؟</h4>
-                    <p className="text-sm opacity-50 font-medium">شارك الفائدة مع أصدقائك أو تواصل معي مباشرة</p>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center gap-4">
-                    <a href={`mailto:${CONTACT_EMAIL}?subject=بخصوص مقال: ${selectedPost.title}`} className="w-14 h-14 rounded-2xl bg-emerald-500 text-black hover:bg-emerald-400 transition-all flex items-center justify-center shadow-lg"><Mail size={24} /></a>
-                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all flex items-center justify-center shadow-lg"><Facebook size={24} fill="currentColor" /></a>
-                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black text-white hover:bg-zinc-800 transition-all flex items-center justify-center shadow-lg border border-white/5"><Twitter size={24} fill="currentColor" /></a>
-                    <a href={`https://wa.me/?text=${encodeURIComponent(selectedPost.title + " " + window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center shadow-lg"><MessageCircle size={24} fill="currentColor" /></a>
-                    <button onClick={copyToClipboard} className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center shadow-lg ${copied ? 'bg-emerald-500 text-black' : 'bg-zinc-900 text-white hover:bg-emerald-500 hover:text-black'}`}>{copied ? <CheckCircle2 size={24} /> : <Copy size={24} />}</button>
-                  </div>
-                </div>
-             </section>
           </article>
         )}
 
@@ -321,9 +252,7 @@ const App: React.FC = () => {
         
         {currentView === 'admin' && isAuthenticated && (
           <AdminPanel 
-            posts={posts} 
-            isDark={isDark} 
-            analytics={analytics}
+            posts={posts} isDark={isDark} analytics={analytics}
             onNewPost={() => setView('editor')} 
             onEditPost={(id) => { setEditingPostId(id); setView('editor'); }}
             onDeletePost={(id) => {
@@ -333,7 +262,7 @@ const App: React.FC = () => {
             }}
             onOpenAdSense={() => setView('adsense-settings')}
             onOpenSecurity={() => setView('security-settings')}
-            onSyncData={handleSyncData}
+            onSyncData={() => handleSyncData(true)}
           />
         )}
         
@@ -357,22 +286,6 @@ const App: React.FC = () => {
              }} onCancel={() => setView('admin')} />
         )}
       </main>
-
-      <footer className="py-32 relative overflow-hidden bg-zinc-50 dark:bg-black border-t border-emerald-500/10">
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
-            <div className="lg:col-span-5">
-               <div className="text-5xl font-black bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent mb-8 tracking-tighter">عبدو ويب.</div>
-               <p className="text-xl opacity-60 font-medium leading-relaxed max-w-md mb-12">موقع مغربي يهتم بالتقنية وتطوير المهارات الشخصية ومراجعة أحدث المنتجات بحيادية تامة.</p>
-               <div className="flex gap-4">
-                  <a href={`mailto:${CONTACT_EMAIL}`} className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"><Mail size={24} /></a>
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"><Facebook size={24} /></div>
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"><Instagram size={24} /></div>
-               </div>
-            </div>
-          </div>
-        </div>
-      </footer>
     </Layout>
   );
 };
