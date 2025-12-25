@@ -5,46 +5,73 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>عبدو ويب | Abdouweb - تكنولوجيا، تطوير ذات وأفلييت</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="منصة عبدو ويب (Abdouweb) هي دليلك الأول في المغرب لأخبار التقنية، استراتيجيات الربح من الأفلييت، ودروس تطوير الذات والنجاح المهني." />
+    <meta name="keywords" content="عبدو ويب, Abdouweb, أخبار التقنية المغرب, الربح من الانترنت المغرب, الأفلييت, تطوير الذات, المغرب الرقمي 2030" />
+    <meta name="author" content="Abdouweb" />
+    <link rel="canonical" href="https://abdouweb.com/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://abdouweb.com/" />
+    <meta property="og:title" content="عبدو ويب | Abdouweb - تكنولوجيا وتطوير ذات" />
+    <meta property="og:description" content="اكتشف عالم التقنية والأفلييت بأسلوب عصري مع عبدو ويب." />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://abdouweb.com/" />
+    <meta property="twitter:title" content="عبدو ويب | Abdouweb" />
+    <meta property="twitter:description" content="دليلك للنجاح الرقمي والتقني في المغرب." />
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
     <style>
       body { 
         font-family: 'Cairo', sans-serif; 
         scroll-behavior: smooth; 
         margin: 0; 
         overflow-x: hidden; 
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
       }
       .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       
       .glass-nav {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
       }
       .dark .glass-nav {
-        background: rgba(15, 15, 20, 0.7);
+        background: rgba(15, 15, 20, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.05);
       }
       
       .blog-card {
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        content-visibility: auto;
       }
       .blog-card:hover {
-        transform: translateY(-10px) scale(1.02);
+        transform: translateY(-8px);
       }
       
       .hero-gradient {
-        background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.1), transparent),
-                    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent);
+        background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.08), transparent),
+                    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.08), transparent);
       }
       
-      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 10px; }
+      
+      /* تحسين سرعة العرض */
+      img { font-display: swap; }
     </style>
     <script type="importmap">
 {
@@ -55,8 +82,8 @@
     "@google/genai": "https://esm.sh/@google/genai@1.3.0",
     "recharts": "https://esm.sh/recharts@2.15.0?external=react,react-dom",
     "lucide-react": "https://esm.sh/lucide-react@0.474.0?external=react",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
   }
 }
 </script>
@@ -64,5 +91,20 @@
   <body class="bg-zinc-50 text-zinc-900 transition-colors duration-500 dark:bg-zinc-950 dark:text-zinc-100">
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
+    
+    <!-- Structured Data for Search Engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Abdouweb | عبدو ويب",
+      "url": "https://abdouweb.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://abdouweb.com/?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
   </body>
 </html>

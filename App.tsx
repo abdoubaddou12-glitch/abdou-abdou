@@ -61,8 +61,44 @@ const App: React.FC = () => {
     isEnabled: false
   });
 
+  // Inject JSON-LD Schema for articles dynamically
   useEffect(() => {
-    // تحميل المقالات
+    if (currentView === 'post' && selectedPost) {
+      const schemaData = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": selectedPost.title,
+        "image": selectedPost.image,
+        "author": {
+          "@type": "Person",
+          "name": selectedPost.author
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Abdouweb",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://abdouweb.com/logo.png"
+          }
+        },
+        "datePublished": selectedPost.date,
+        "description": selectedPost.excerpt
+      };
+      
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'json-ld-article';
+      script.text = JSON.stringify(schemaData);
+      document.head.appendChild(script);
+      
+      return () => {
+        const oldScript = document.getElementById('json-ld-article');
+        if (oldScript) oldScript.remove();
+      };
+    }
+  }, [currentView, selectedPost]);
+
+  useEffect(() => {
     const savedPosts = localStorage.getItem('blog_posts');
     if (savedPosts) {
       try {
@@ -76,15 +112,12 @@ const App: React.FC = () => {
       localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
     }
 
-    // تحميل السمة
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') setIsDark(true);
 
-    // تحميل حالة تسجيل الدخول
     const auth = sessionStorage.getItem('admin_auth');
     if (auth === 'true') setIsAuthenticated(true);
 
-    // تحميل إعدادات أدسنس
     const savedAds = localStorage.getItem('adsense_config');
     if (savedAds) setAdsenseConfig(JSON.parse(savedAds));
   }, []);
@@ -181,17 +214,17 @@ const App: React.FC = () => {
         {currentView === 'home' && (
           <div className="animate-fade-in">
             <section className="text-center mb-24 py-10">
-              <div className="inline-block mb-4 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-500 text-xs font-black uppercase tracking-widest border border-indigo-500/20">
-                منصة عبدو ويب 2024
+              <div className="inline-block mb-4 px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-600 text-[10px] font-black uppercase tracking-[0.2em] border border-indigo-500/20">
+                عبد وويب | المنصة الأولى تقنياً في المغرب
               </div>
-              <h1 className="text-5xl md:text-8xl font-black mb-8 leading-[1.1] tracking-tighter">
+              <h1 className="text-6xl md:text-9xl font-black mb-8 leading-[1.1] tracking-tighter">
                 عالمك الرقمي يبدأ <br />
-                <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-500 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 bg-clip-text text-transparent">
                   من هنا.
                 </span>
               </h1>
-              <p className={`text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                اكتشف آخر أخبار المغرب التقنية، استراتيجيات الأفلييت، ودروس تطوير الذات بأسلوب عصري ومحتوى ذكي.
+              <p className={`text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-bold ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                اكتشف آخر أخبار المغرب التقنية، استراتيجيات الأفلييت المتقدمة، ودروس النجاح المهني بأسلوب عصري.
               </p>
               
               <AdSense config={adsenseConfig} isDark={isDark} className="mb-12 max-w-4xl mx-auto" />
@@ -199,14 +232,9 @@ const App: React.FC = () => {
               <div className="flex justify-center gap-4">
                 <button 
                   onClick={() => document.getElementById('latest-posts')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-2xl shadow-indigo-600/30 transition-all"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-5 rounded-[2rem] font-black shadow-2xl shadow-indigo-600/40 transition-all hover:scale-105"
                 >
-                  ابدأ القراءة
-                </button>
-                <button 
-                  onClick={() => handleAdminAccess()}
-                  className={`px-8 py-4 rounded-2xl font-black border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900' : 'border-zinc-200 hover:bg-white'}`}>
-                  دخول الإدارة
+                  استكشف المقالات
                 </button>
               </div>
             </section>
@@ -215,7 +243,6 @@ const App: React.FC = () => {
               {posts.filter(p => p.status === 'published').map((post, index) => (
                 <React.Fragment key={post.id}>
                   <PostCard post={post} isDark={isDark} onClick={navigateToPost} />
-                  {/* إدراج إعلان بعد كل 3 مقالات */}
                   {(index + 1) % 3 === 0 && adsenseConfig.isEnabled && (
                     <div className="md:col-span-2 lg:col-span-3 py-10">
                       <AdSense config={adsenseConfig} isDark={isDark} />
@@ -232,34 +259,39 @@ const App: React.FC = () => {
         )}
 
         {currentView === 'post' && selectedPost && (
-          <div className="max-w-4xl mx-auto py-10 animate-fade-in">
-            <button 
-              onClick={() => setView('home')} 
-              className="group flex items-center gap-3 text-indigo-600 font-black mb-12 hover:pr-4 transition-all"
-            >
-              <span>←</span> العودة للمقالات
-            </button>
-            <div className="relative rounded-[3rem] overflow-hidden shadow-2xl mb-12 aspect-video">
-              <img src={selectedPost.image} className="w-full h-full object-cover" alt={selectedPost.title} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-              <div className="absolute bottom-10 right-10 left-10">
-                <h1 className="text-3xl md:text-6xl font-black text-white leading-tight mb-4">{selectedPost.title}</h1>
-                <div className="flex items-center gap-4 text-white/70 text-sm font-bold">
-                  <span>بواسطة {selectedPost.author}</span>
-                  <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
-                  <span>{selectedPost.date}</span>
+          <article className="max-w-4xl mx-auto py-10 animate-fade-in">
+            <nav className="mb-12">
+              <button 
+                onClick={() => setView('home')} 
+                className="group flex items-center gap-3 text-indigo-600 font-black hover:pr-4 transition-all"
+              >
+                <span>←</span> العودة للمقالات
+              </button>
+            </nav>
+
+            <header className="mb-12">
+              <div className="relative rounded-[3.5rem] overflow-hidden shadow-2xl aspect-video border-8 border-white/5 dark:border-zinc-900/50">
+                <img src={selectedPost.image} className="w-full h-full object-cover" alt={selectedPost.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <div className="absolute bottom-12 right-12 left-12">
+                  <h1 className="text-4xl md:text-7xl font-black text-white leading-[1.15] mb-6 tracking-tighter">{selectedPost.title}</h1>
+                  <div className="flex items-center gap-6 text-white/80 text-sm font-black uppercase tracking-widest">
+                    <span className="bg-indigo-600 px-4 py-1 rounded-full text-white">{selectedPost.category}</span>
+                    <span className="w-1.5 h-1.5 bg-white/40 rounded-full"></span>
+                    <span>{selectedPost.date}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </header>
 
             <AdSense config={adsenseConfig} isDark={isDark} className="mb-12" />
 
-            <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-loose whitespace-pre-wrap font-medium ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+            <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] whitespace-pre-wrap font-medium tracking-wide ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
               {selectedPost.content}
             </div>
 
             <AdSense config={adsenseConfig} isDark={isDark} className="mt-12" />
-          </div>
+          </article>
         )}
 
         {currentView === 'admin' && isAuthenticated && (
@@ -293,40 +325,39 @@ const App: React.FC = () => {
       </main>
 
       <footer className={`py-20 border-t transition-colors duration-500 ${isDark ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-zinc-100'}`}>
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-right">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 text-right">
           <div className="md:col-span-2">
-            <div className="flex flex-col mb-6">
-              <h2 className="text-5xl font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 bg-clip-text text-transparent leading-none mb-2">عبدو ويب.</h2>
-              <span className={`text-sm font-black uppercase tracking-[0.4em] ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`}>Abdouweb</span>
+            <div className="flex flex-col mb-8">
+              <div className="text-5xl font-black bg-gradient-to-r from-indigo-600 via-blue-600 to-emerald-500 bg-clip-text text-transparent leading-none mb-3">عبدو ويب.</div>
+              <div className={`text-sm font-black uppercase tracking-[0.4em] ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`}>Abdouweb Media</div>
             </div>
-            <p className={`max-w-md leading-loose font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>
-              المنصة المغربية الأولى التي تدمج بين التكنولوجيا وتطوير الذات، لنصنع جيلاً رقمياً قادراً على المنافسة عالمياً. نحن نؤمن بأن المحتوى الهادف هو مفتاح التغيير.
+            <p className={`max-w-md leading-loose font-medium text-lg ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              المنصة المغربية الرائدة في تقاطع التكنولوجيا والنجاح الشخصي. نهدف لتمكين الشباب المغربي من أدوات العصر الرقمي.
             </p>
           </div>
           <div>
-            <h4 className="font-black text-xl mb-6">روابط سريعة</h4>
-            <ul className={`space-y-4 text-sm font-bold ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+            <h4 className="font-black text-2xl mb-8">استكشف</h4>
+            <ul className={`space-y-4 text-[15px] font-bold ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
               <li><button onClick={() => setView('home')} className="hover:text-indigo-600 transition-colors">الرئيسية</button></li>
               <li><button onClick={() => handleAdminAccess()} className="hover:text-indigo-600 transition-colors">لوحة الإدارة</button></li>
-              <li><a href="#" className="hover:text-indigo-600 transition-colors">تطوير الذات</a></li>
+              <li><a href="#" className="hover:text-indigo-600 transition-colors">عالم الأفلييت</a></li>
               <li><a href="#" className="hover:text-indigo-600 transition-colors">سياسة الخصوصية</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-black text-xl mb-6">تواصل معنا</h4>
+            <h4 className="font-black text-2xl mb-8">تواصل</h4>
             <div className="flex gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">FB</div>
-              <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">TW</div>
-              <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">IG</div>
+              <div className="w-14 h-14 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">FB</div>
+              <div className="w-14 h-14 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all cursor-pointer font-black border border-indigo-600/20">IG</div>
             </div>
-            <p className="mt-6 text-xs font-bold opacity-60 italic">info@abdouweb.com</p>
+            <p className="mt-8 text-sm font-black opacity-40 uppercase tracking-tighter italic">connect@abdouweb.com</p>
           </div>
           <div className="md:col-span-4 pt-12 border-t border-zinc-800/10 text-center">
-            <div className="text-[11px] font-black uppercase tracking-[0.5em] opacity-60 mb-2">
-               ABDOUWEB | عبدو ويب
+            <div className="text-[11px] font-black uppercase tracking-[0.6em] opacity-40 mb-3">
+               ABDOUWEB | عبدو ويب - 2024
             </div>
             <div className="text-[10px] font-bold opacity-30">
-              © {new Date().getFullYear()} - جميع الحقوق محفوظة لمحبي الإبداع والتميز.
+               مصمم خصيصاً لسرعة الأداء وتجربة المستخدم المثالية (Core Web Vitals Optimized)
             </div>
           </div>
         </div>
