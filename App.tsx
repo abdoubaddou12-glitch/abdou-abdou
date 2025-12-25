@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Post, View } from './types.ts';
-import { Layout } from './components/Layout.tsx';
-import { Navigation } from './components/Navigation.tsx';
-import { PostCard } from './components/PostCard.tsx';
-import { AdminPanel } from './components/AdminPanel.tsx';
-import { PostEditor } from './components/PostEditor.tsx';
+import { Post, View } from './types';
+import { Layout } from './components/Layout';
+import { Navigation } from './components/Navigation';
+import { PostCard } from './components/PostCard';
+import { AdminPanel } from './components/AdminPanel';
+import { PostEditor } from './components/PostEditor';
 
 const MOCK_POSTS: Post[] = [
   {
@@ -113,9 +113,9 @@ const App: React.FC = () => {
         currentView={currentView}
       />
       
-      <main className="min-h-[80vh]">
+      <main className="min-h-[80vh] container mx-auto">
         {currentView === 'home' && (
-          <div className="max-w-7xl mx-auto px-6 py-12 animate-fade-in">
+          <div className="px-6 py-12 animate-fade-in">
             <header className="mb-16 text-center">
               <h1 className="text-5xl md:text-8xl font-black mb-8 italic tracking-tighter leading-tight bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent">
                 نكتب الإبداع.

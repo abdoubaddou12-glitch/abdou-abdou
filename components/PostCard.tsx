@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Post } from '../types.ts';
+import { Post } from '../types';
 
 interface PostCardProps {
   post: Post;
