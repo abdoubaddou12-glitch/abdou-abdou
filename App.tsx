@@ -20,6 +20,29 @@ const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
 
 const MOCK_POSTS: Post[] = [
   {
+    id: 'dirham-floating-2024',
+    title: 'تعويم الدرهم المغربي: رحلة نحو المرونة الاقتصادية بين الفرص الواعدة والتحديات',
+    excerpt: 'تحليل شامل لأبعاد قرار تحرير سعر صرف الدرهم المغربي وتأثيراته المباشرة على الاقتصاد والمواطن.',
+    content: `يعتبر قرار إصلاح نظام سعر صرف الدرهم من أهم التحولات البنيوية التي شهدها الاقتصاد المغربي. يهدف هذا المسار إلى جعل العملة الوطنية أكثر مرونة وقدرة على امتصاص الصدمات الخارجية.
+
+أولاً: الإيجابيات والفرص الواعدة:
+1. تعزيز التنافسية الخارجية للصادرات المغربية.
+2. جذب الاستثمارات الأجنبية المباشرة.
+3. حماية احتياطات الصرف الصعبة.
+
+ثانياً: التحديات:
+1. احتمالية ضغوط تضخمية على المواد المستوردة.
+2. التأثير على القدرة الشرائية في المدى القصير.
+
+خاتمة:
+نجاح هذه التجربة يعتمد على مواكبتها بإصلاحات هيكلية ترفع من الإنتاجية الوطنية. نحن في "عبدو ويب" سنواصل تتبع هذا الملف وتقديم كل جديد.`,
+    date: '21 مارس 2024',
+    author: 'عبدو',
+    category: 'أخبار المغرب',
+    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&q=80&w=2000',
+    status: 'published'
+  },
+  {
     id: 'can-morocco-2025',
     title: 'المغرب 2025: عندما تتحول الملاعب إلى تحف فنية تبهر القارة السمراء',
     excerpt: 'استكشف أجواء "الكان" الأسطورية في المملكة المغربية، حيث تلتقي الحداثة بالتقاليد في ملاعب عالمية جاهزة لكتابة التاريخ الإفريقي الجديد.',
@@ -68,6 +91,7 @@ const App: React.FC = () => {
     cpc: "$0.12"
   });
 
+  // Load Data Effect
   useEffect(() => {
     const savedPassword = localStorage.getItem('admin_password');
     if (savedPassword) setAdminPassword(savedPassword);
@@ -76,12 +100,16 @@ const App: React.FC = () => {
     if (savedPosts) {
       try {
         const parsed = JSON.parse(savedPosts);
-        if (parsed.length > 0) {
-          // Filter out the deleted post if it still exists in user's localStorage
-          setPosts(parsed.filter((p: Post) => p.id !== 'dirham-floating-2024'));
+        // Ensure that new default posts are always merged even if storage exists
+        const currentIds = new Set(parsed.map((p: Post) => p.id));
+        const missingDefaults = MOCK_POSTS.filter(p => !currentIds.has(p.id));
+        
+        if (missingDefaults.length > 0) {
+          const merged = [...missingDefaults, ...parsed];
+          setPosts(merged);
+          localStorage.setItem('blog_posts', JSON.stringify(merged));
         } else {
-          setPosts(MOCK_POSTS);
-          localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
+          setPosts(parsed);
         }
       } catch (e) {
         setPosts(MOCK_POSTS);
@@ -101,9 +129,7 @@ const App: React.FC = () => {
     if (savedAds) setAdsenseConfig(JSON.parse(savedAds));
 
     const views = parseInt(localStorage.getItem('total_views') || '0');
-    const newViews = views + 1;
-    localStorage.setItem('total_views', newViews.toString());
-    setAnalytics(prev => ({ ...prev, totalViews: newViews }));
+    setAnalytics(prev => ({ ...prev, totalViews: views }));
 
     const interval = setInterval(() => {
       setAnalytics(prev => ({
@@ -125,16 +151,26 @@ const App: React.FC = () => {
     localStorage.setItem('theme', !isDark ? 'dark' : 'light');
   };
 
-  const handleSyncData = () => {
+  const handleSyncData = (forceReset = false) => {
+    if (forceReset) {
+      localStorage.removeItem('blog_posts');
+      setPosts(MOCK_POSTS);
+      localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
+      return;
+    }
+
     const currentIds = new Set(posts.map(p => p.id));
     const newDefaults = MOCK_POSTS.filter(p => !currentIds.has(p.id));
     
-    // We also explicitly ensure dirham post is removed during sync
-    const filteredCurrent = posts.filter(p => p.id !== 'dirham-floating-2024');
-    
-    const updatedPosts = [...newDefaults, ...filteredCurrent];
-    setPosts(updatedPosts);
-    localStorage.setItem('blog_posts', JSON.stringify(updatedPosts));
+    // Also update existing posts if they are defaults (to fix images/content)
+    const updatedPosts = posts.map(p => {
+      const defaultPost = MOCK_POSTS.find(m => m.id === p.id);
+      return defaultPost ? { ...p, ...defaultPost } : p;
+    });
+
+    const finalPosts = [...newDefaults, ...updatedPosts];
+    setPosts(finalPosts);
+    localStorage.setItem('blog_posts', JSON.stringify(finalPosts));
   };
 
   const handleLogin = (password: string) => {
@@ -158,6 +194,10 @@ const App: React.FC = () => {
       setSelectedPost(post);
       setView('post');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Track view
+      const views = parseInt(localStorage.getItem('total_views') || '0') + 1;
+      localStorage.setItem('total_views', views.toString());
+      setAnalytics(prev => ({ ...prev, totalViews: views }));
     }
   };
 
@@ -167,7 +207,7 @@ const App: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const featuredPost = posts[0];
+  const featuredPost = posts.find(p => p.status === 'published');
 
   return (
     <Layout isDark={isDark}>
@@ -187,7 +227,7 @@ const App: React.FC = () => {
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10"></div>
               
               <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full glass-card text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500 border border-emerald-500/10">
-                <Sparkles size={14} className="animate-pulse" /> وجهتك الأولى للمحتوى الهادف
+                <Sparkles size={14} className="animate-pulse" /> تم تحديث المنصة مؤخراً
               </div>
 
               <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-[0.85] tracking-tighter text-black dark:text-white">
@@ -353,6 +393,7 @@ const App: React.FC = () => {
             currentSavedPassword={adminPassword}
             onSave={updatePassword}
             onCancel={() => setView('admin')}
+            onForceResetData={() => handleSyncData(true)}
           />
         )}
 

@@ -1,20 +1,22 @@
 
 import React, { useState } from 'react';
-import { ShieldCheck, Lock, Save, ArrowRight, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, Lock, Save, ArrowRight, AlertTriangle, DatabaseBackup, RefreshCcw } from 'lucide-react';
 
 interface SecuritySettingsProps {
   isDark: boolean;
   onSave: (newPassword: string) => void;
   onCancel: () => void;
   currentSavedPassword: string;
+  onForceResetData: () => void;
 }
 
-export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSave, onCancel, currentSavedPassword }) => {
+export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSave, onCancel, currentSavedPassword, onForceResetData }) => {
   const [currentInput, setCurrentInput] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [resetConfirm, setResetConfirm] = useState(false);
 
   const handleUpdate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +42,17 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
     setTimeout(() => onCancel(), 1500);
   };
 
+  const handleForceReset = () => {
+    if (!resetConfirm) {
+      setResetConfirm(true);
+      setTimeout(() => setResetConfirm(false), 5000);
+      return;
+    }
+    onForceResetData();
+    alert("تمت إعادة تعيين قاعدة البيانات وجلب أحدث المقالات بنجاح!");
+    onCancel();
+  };
+
   return (
     <div className="max-w-2xl mx-auto py-10 animate-fade-in">
       <div className="flex justify-between items-center mb-10">
@@ -52,72 +65,92 @@ export const SecuritySettings: React.FC<SecuritySettingsProps> = ({ isDark, onSa
         </button>
       </div>
 
-      <div className={`glass-card p-10 rounded-[3rem] border ${isDark ? 'border-emerald-500/20' : 'border-zinc-100'}`}>
-        <div className="flex items-center gap-4 mb-10">
-          <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
-            <Lock size={28} />
+      <div className="space-y-8">
+        <div className={`glass-card p-10 rounded-[3rem] border ${isDark ? 'border-emerald-500/20' : 'border-zinc-100'}`}>
+          <div className="flex items-center gap-4 mb-10">
+            <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center">
+              <Lock size={28} />
+            </div>
+            <div className="font-black text-xl">تحديث الرمز السري</div>
           </div>
-          <div className="font-black text-xl">تحديث الرمز السري</div>
+
+          <form onSubmit={handleUpdate} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">كلمة المرور الحالية</label>
+              <input 
+                type="password"
+                value={currentInput}
+                onChange={(e) => setCurrentInput(e.target.value)}
+                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">الرمز الجديد</label>
+                <input 
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
+                  placeholder="6 أحرف فأكثر"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">تأكيد الرمز الجديد</label>
+                <input 
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
+                  placeholder="أعد الكتابة"
+                  required
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 p-4 bg-red-500/10 text-red-500 rounded-2xl text-sm font-bold animate-shake">
+                <AlertTriangle size={18} /> {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="flex items-center gap-2 p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl text-sm font-bold">
+                <ShieldCheck size={18} /> تم تحديث الرمز السري بنجاح!
+              </div>
+            )}
+
+            <button 
+              type="submit"
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-5 rounded-[2rem] font-black shadow-2xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3 mt-4"
+            >
+              <Save size={20} />
+              حفظ الرمز الجديد
+            </button>
+          </form>
         </div>
 
-        <form onSubmit={handleUpdate} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">كلمة المرور الحالية</label>
-            <input 
-              type="password"
-              value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">الرمز الجديد</label>
-              <input 
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
-                placeholder="6 أحرف فأكثر"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">تأكيد الرمز الجديد</label>
-              <input 
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`w-full px-6 py-4 rounded-2xl outline-none border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`}
-                placeholder="أعد الكتابة"
-                required
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="flex items-center gap-2 p-4 bg-red-500/10 text-red-500 rounded-2xl text-sm font-bold animate-shake">
-              <AlertTriangle size={18} /> {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="flex items-center gap-2 p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl text-sm font-bold">
-              <ShieldCheck size={18} /> تم تحديث الرمز السري بنجاح!
-            </div>
-          )}
-
-          <button 
-            type="submit"
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-5 rounded-[2rem] font-black shadow-2xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3 mt-4"
-          >
-            <Save size={20} />
-            حفظ الرمز الجديد
-          </button>
-        </form>
+        <div className={`p-8 rounded-[3rem] border border-dashed flex flex-col items-center text-center ${isDark ? 'bg-zinc-900/30 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}>
+           <DatabaseBackup size={32} className="text-emerald-500 mb-4 opacity-50" />
+           <h3 className="font-black text-lg mb-2">إصلاح مشاكل المزامنة</h3>
+           <p className="text-sm opacity-60 max-w-sm mb-6 font-medium">إذا لم تظهر بعض المقالات على هاتفك أو جهاز آخر، يمكنك "إعادة ضبط المصنع" للمقالات لجلب التحديثات الجديدة فوراً.</p>
+           
+           <button 
+             onClick={handleForceReset}
+             className={`px-8 py-4 rounded-2xl font-black text-sm flex items-center gap-2 transition-all ${
+               resetConfirm 
+                ? 'bg-red-500 text-white animate-pulse' 
+                : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500 hover:text-black'
+             }`}
+           >
+             <RefreshCcw size={18} className={resetConfirm ? 'animate-spin' : ''} />
+             {resetConfirm ? 'هل أنت متأكد؟ (سيتم حذف المقالات المكتوبة يدوياً)' : 'إعادة تعيين المقالات والمزامنة الشاملة'}
+           </button>
+        </div>
       </div>
     </div>
   );
