@@ -17,24 +17,37 @@ import {
 } from 'lucide-react';
 
 const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
+const DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1611974714851-eb6051612253?auto=format&fit=crop&q=80&w=2000";
 
 const MOCK_POSTS: Post[] = [
   {
     id: 'dirham-floating-2024',
     title: 'تعويم الدرهم المغربي: رحلة نحو المرونة الاقتصادية بين الفرص الواعدة والتحديات',
     excerpt: 'تحليل شامل لأبعاد قرار تحرير سعر صرف الدرهم المغربي وتأثيراته المباشرة على الاقتصاد والمواطن.',
-    content: `يعتبر قرار إصلاح نظام سعر صرف الدرهم من أهم التحولات البنيوية التي شهدها الاقتصاد المغربي...`,
+    content: `يعتبر قرار إصلاح نظام سعر صرف الدرهم من أهم التحولات البنيوية التي شهدها الاقتصاد المغربي. يهدف هذا المسار إلى جعل العملة الوطنية أكثر مرونة وقدرة على امتصاص الصدمات الخارجية.
+
+أولاً: الإيجابيات والفرص الواعدة:
+1. تعزيز التنافسية الخارجية للصادرات المغربية.
+2. جذب الاستثمارات الأجنبية المباشرة.
+3. حماية احتياطات الصرف الصعبة.
+
+ثانياً: التحديات:
+1. احتمالية ضغوط تضخمية على المواد المستوردة.
+2. التأثير على القدرة الشرائية في المدى القصير.
+
+خاتمة:
+نجاح هذه التجربة يعتمد على مواكبتها بإصلاحات هيكلية ترفع من الإنتاجية الوطنية. نحن في "عبدو ويب" سنواصل تتبع هذا الملف وتقديم كل جديد.`,
     date: '21 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
-    image: 'https://images.unsplash.com/photo-1580519542036-c47de6196ba5?auto=format&fit=crop&q=80&w=2000',
+    image: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=2000',
     status: 'published'
   },
   {
     id: 'can-morocco-2025',
     title: 'المغرب 2025: عندما تتحول الملاعب إلى تحف فنية تبهر القارة السمراء',
     excerpt: 'استكشف أجواء "الكان" الأسطورية في المملكة المغربية، حيث تلتقي الحداثة بالتقاليد في ملاعب عالمية جاهزة لكتابة التاريخ الإفريقي الجديد.',
-    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع...`,
+    content: `المغرب يثبت للعالم مرة أخرى أنه عاصمة الرياضة الإفريقية بلا منازع. مع اقتراب موعد نهائيات كأس أمم إفريقيا "الكان"، تشهد المملكة ثورة حقيقية في البنية التحتية الرياضية...`,
     date: '20 مارس 2024',
     author: 'عبدو',
     category: 'أخبار المغرب',
@@ -68,17 +81,13 @@ const App: React.FC = () => {
     cpc: "$0.08"
   });
 
-  // Realistic Traffic Simulator Logic
   const calculateLiveVisitors = () => {
     const hour = new Date().getHours();
-    // Peak hours (20:00 - 23:00) have more visitors
-    // Early morning (03:00 - 06:00) has fewer
     let base = 5;
     if (hour >= 20 || hour <= 1) base = 45;
     else if (hour >= 18) base = 30;
     else if (hour >= 8 && hour <= 17) base = 20;
     else base = 8;
-    
     return base + Math.floor(Math.random() * 10);
   };
 
@@ -89,7 +98,13 @@ const App: React.FC = () => {
     const savedPosts = localStorage.getItem('blog_posts');
     if (savedPosts) {
       try {
-        setPosts(JSON.parse(savedPosts));
+        let parsed = JSON.parse(savedPosts);
+        // Force update images for default posts if they match old broken ones
+        parsed = parsed.map((p: Post) => {
+          const defaultPost = MOCK_POSTS.find(m => m.id === p.id);
+          return defaultPost ? { ...p, image: defaultPost.image } : p;
+        });
+        setPosts(parsed);
       } catch (e) {
         setPosts(MOCK_POSTS);
       }
@@ -200,7 +215,7 @@ const App: React.FC = () => {
             <header className="relative py-12 flex flex-col items-center text-center">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -z-10"></div>
               <div className="inline-flex items-center gap-2 mb-6 px-5 py-2 rounded-full glass-card text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500 border border-emerald-500/10">
-                <Sparkles size={14} className="animate-pulse" /> محتوى واقعي، تحليلات حية
+                <Sparkles size={14} className="animate-pulse" /> تم إصلاح مشاكل العرض الفنية
               </div>
               <h1 className="text-6xl md:text-[8rem] font-black mb-8 leading-[0.85] tracking-tighter text-black dark:text-white">
                 عبدو <span className="text-emerald-500">ويب.</span>
@@ -228,7 +243,12 @@ const App: React.FC = () => {
               <section className="relative group">
                 <div onClick={() => navigateToPost(featuredPost.id)} className="relative glass-card rounded-[4rem] overflow-hidden flex flex-col lg:flex-row cursor-pointer shadow-2xl border-emerald-500/5 group">
                   <div className="lg:w-3/5 h-[500px] lg:h-auto overflow-hidden">
-                    <img src={featuredPost.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={featuredPost.title} />
+                    <img 
+                      src={featuredPost.image} 
+                      onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                      alt={featuredPost.title} 
+                    />
                   </div>
                   <div className="lg:w-2/5 p-12 lg:p-16 flex flex-col justify-center bg-white/50 dark:bg-black/50 backdrop-blur-xl">
                     <div className="flex items-center gap-3 mb-6"><span className="w-8 h-[2px] bg-emerald-500"></span><span className="text-emerald-500 font-black text-xs uppercase tracking-[0.3em]">المقال المميز</span></div>
@@ -274,7 +294,12 @@ const App: React.FC = () => {
                 </div>
              </header>
              <div className="relative rounded-[3.5rem] overflow-hidden shadow-2xl mb-16 aspect-video">
-                <img src={selectedPost.image} className="w-full h-full object-cover" alt={selectedPost.title} />
+                <img 
+                  src={selectedPost.image} 
+                  onError={(e) => { e.currentTarget.src = DEFAULT_FALLBACK_IMAGE; }}
+                  className="w-full h-full object-cover" 
+                  alt={selectedPost.title} 
+                />
              </div>
              <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-[1.8] font-medium whitespace-pre-wrap px-4 mb-20 ${isDark ? 'text-zinc-300' : 'text-zinc-800'}`}>{selectedPost.content}</div>
              <section className={`pt-12 border-t ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
@@ -346,22 +371,6 @@ const App: React.FC = () => {
                   <a href={`mailto:${CONTACT_EMAIL}`} className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"><Mail size={24} /></a>
                   <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"><Facebook size={24} /></div>
                   <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-all cursor-pointer"><Instagram size={24} /></div>
-               </div>
-            </div>
-            <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12">
-               <div className="space-y-8">
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">الأقسام الرئيسية</h4>
-                  <ul className="space-y-5 font-bold opacity-60 text-lg">
-                     <li><button onClick={() => setView('home')}>أخبار المغرب</button></li>
-                     <li><button onClick={() => setView('home')}>عالم التقنية</button></li>
-                  </ul>
-               </div>
-               <div className="space-y-8">
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">المزيد</h4>
-                  <ul className="space-y-5 font-bold opacity-60 text-lg">
-                     <li><a href="#">سياسة الخصوصية</a></li>
-                     <li><button onClick={() => setView('login')}>دخول الإدارة</button></li>
-                  </ul>
                </div>
             </div>
           </div>

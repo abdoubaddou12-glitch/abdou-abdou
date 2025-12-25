@@ -9,6 +9,8 @@ interface PostCardProps {
   onClick: (id: string) => void;
 }
 
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1611974714851-eb6051612253?auto=format&fit=crop&q=80&w=1000";
+
 export const PostCard: React.FC<PostCardProps> = ({ post, isDark, onClick }) => {
   return (
     <article 
@@ -20,6 +22,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDark, onClick }) => 
           <img 
             src={post.image} 
             alt={post.title} 
+            onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }}
             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
