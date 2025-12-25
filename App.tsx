@@ -1,11 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Post, View } from './types.ts';
+import { Post, View, AdSenseConfig } from './types.ts';
 import { Layout } from './components/Layout.tsx';
 import { Navigation } from './components/Navigation.tsx';
 import { PostCard } from './components/PostCard.tsx';
 import { AdminPanel } from './components/AdminPanel.tsx';
 import { PostEditor } from './components/PostEditor.tsx';
+import { AdminLogin } from './components/AdminLogin.tsx';
+import { AdSenseSettings } from './components/AdSenseSettings.tsx';
+import { AdSense } from './components/AdSense.tsx';
 
 const MOCK_POSTS: Post[] = [
   {
@@ -43,14 +46,23 @@ const MOCK_POSTS: Post[] = [
   }
 ];
 
+const ADMIN_PASSWORD = "abdou2024";
+
 const App: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [currentView, setView] = useState<View>('home');
   const [posts, setPosts] = useState<Post[]>([]);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>({
+    publisherId: '',
+    slotId: '',
+    isEnabled: false
+  });
 
   useEffect(() => {
+    // تحميل المقالات
     const savedPosts = localStorage.getItem('blog_posts');
     if (savedPosts) {
       try {
@@ -64,8 +76,17 @@ const App: React.FC = () => {
       localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
     }
 
+    // تحميل السمة
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') setIsDark(true);
+
+    // تحميل حالة تسجيل الدخول
+    const auth = sessionStorage.getItem('admin_auth');
+    if (auth === 'true') setIsAuthenticated(true);
+
+    // تحميل إعدادات أدسنس
+    const savedAds = localStorage.getItem('adsense_config');
+    if (savedAds) setAdsenseConfig(JSON.parse(savedAds));
   }, []);
 
   useEffect(() => {
@@ -79,6 +100,30 @@ const App: React.FC = () => {
   const toggleTheme = () => {
     setIsDark(!isDark);
     localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+  };
+
+  const handleLogin = (password: string) => {
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('admin_auth', 'true');
+      setView('admin');
+      return true;
+    }
+    return false;
+  };
+
+  const handleAdminAccess = () => {
+    if (isAuthenticated) {
+      setView('admin');
+    } else {
+      setView('login');
+    }
+  };
+
+  const handleSaveAdSense = (config: AdSenseConfig) => {
+    setAdsenseConfig(config);
+    localStorage.setItem('adsense_config', JSON.stringify(config));
+    setView('admin');
   };
 
   const handleSavePost = (newPostData: Partial<Post>) => {
@@ -128,7 +173,7 @@ const App: React.FC = () => {
       <Navigation 
         isDark={isDark} 
         toggleTheme={toggleTheme} 
-        setView={setView} 
+        setView={(v) => v === 'admin' ? handleAdminAccess() : setView(v)} 
         currentView={currentView}
       />
       
@@ -148,22 +193,42 @@ const App: React.FC = () => {
               <p className={`text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-medium ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
                 اكتشف آخر أخبار المغرب التقنية، استراتيجيات الأفلييت، ودروس تطوير الذات بأسلوب عصري ومحتوى ذكي.
               </p>
+              
+              <AdSense config={adsenseConfig} isDark={isDark} className="mb-12 max-w-4xl mx-auto" />
+
               <div className="flex justify-center gap-4">
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-2xl shadow-indigo-600/30 transition-all">
+                <button 
+                  onClick={() => document.getElementById('latest-posts')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-2xl shadow-indigo-600/30 transition-all"
+                >
                   ابدأ القراءة
                 </button>
-                <button className={`px-8 py-4 rounded-2xl font-black border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900' : 'border-zinc-200 hover:bg-white'}`}>
-                  عن عبدو
+                <button 
+                  onClick={() => handleAdminAccess()}
+                  className={`px-8 py-4 rounded-2xl font-black border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900' : 'border-zinc-200 hover:bg-white'}`}>
+                  دخول الإدارة
                 </button>
               </div>
             </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-              {posts.filter(p => p.status === 'published').map(post => (
-                <PostCard key={post.id} post={post} isDark={isDark} onClick={navigateToPost} />
+            <div id="latest-posts" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {posts.filter(p => p.status === 'published').map((post, index) => (
+                <React.Fragment key={post.id}>
+                  <PostCard post={post} isDark={isDark} onClick={navigateToPost} />
+                  {/* إدراج إعلان بعد كل 3 مقالات */}
+                  {(index + 1) % 3 === 0 && adsenseConfig.isEnabled && (
+                    <div className="md:col-span-2 lg:col-span-3 py-10">
+                      <AdSense config={adsenseConfig} isDark={isDark} />
+                    </div>
+                  )}
+                </React.Fragment>
               ))}
             </div>
           </div>
+        )}
+
+        {currentView === 'login' && (
+          <AdminLogin isDark={isDark} onLogin={handleLogin} onCancel={() => setView('home')} />
         )}
 
         {currentView === 'post' && selectedPost && (
@@ -186,23 +251,38 @@ const App: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <AdSense config={adsenseConfig} isDark={isDark} className="mb-12" />
+
             <div className={`prose prose-zinc dark:prose-invert prose-2xl max-w-none leading-loose whitespace-pre-wrap font-medium ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
               {selectedPost.content}
             </div>
+
+            <AdSense config={adsenseConfig} isDark={isDark} className="mt-12" />
           </div>
         )}
 
-        {currentView === 'admin' && (
+        {currentView === 'admin' && isAuthenticated && (
           <AdminPanel 
             posts={posts} 
             isDark={isDark} 
             onNewPost={() => { setEditingPostId(null); setView('editor'); }} 
             onEditPost={(id) => { setEditingPostId(id); setView('editor'); }}
             onDeletePost={handleDeletePost}
+            onOpenAdSense={() => setView('adsense-settings')}
           />
         )}
 
-        {currentView === 'editor' && (
+        {currentView === 'adsense-settings' && isAuthenticated && (
+          <AdSenseSettings 
+            config={adsenseConfig} 
+            isDark={isDark} 
+            onSave={handleSaveAdSense} 
+            onCancel={() => setView('admin')} 
+          />
+        )}
+
+        {currentView === 'editor' && isAuthenticated && (
           <PostEditor 
             isDark={isDark}
             post={editingPostId ? posts.find(p => p.id === editingPostId) : undefined}
@@ -223,8 +303,8 @@ const App: React.FC = () => {
           <div>
             <h4 className="font-black mb-6">روابط سريعة</h4>
             <ul className={`space-y-4 text-sm font-bold ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
-              <li><a href="#" className="hover:text-indigo-600 transition-colors">أخبار التقنية</a></li>
-              <li><a href="#" className="hover:text-indigo-600 transition-colors">دليل الأفلييت</a></li>
+              <li><button onClick={() => setView('home')} className="hover:text-indigo-600 transition-colors">الرئيسية</button></li>
+              <li><button onClick={() => handleAdminAccess()} className="hover:text-indigo-600 transition-colors">لوحة الإدارة</button></li>
               <li><a href="#" className="hover:text-indigo-600 transition-colors">تطوير الذات</a></li>
             </ul>
           </div>

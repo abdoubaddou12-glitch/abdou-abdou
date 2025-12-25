@@ -11,7 +11,13 @@ export interface Post {
   status: 'published' | 'draft';
 }
 
-export type View = 'home' | 'post' | 'admin' | 'editor';
+export interface AdSenseConfig {
+  publisherId: string;
+  slotId: string;
+  isEnabled: boolean;
+}
+
+export type View = 'home' | 'post' | 'admin' | 'editor' | 'login' | 'adsense-settings';
 
 export interface ThemeContextType {
   isDark: boolean;

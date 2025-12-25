@@ -2,7 +2,7 @@
 import React from 'react';
 import { Post } from '../types.ts';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Plus, Edit2, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, DollarSign, Settings } from 'lucide-react';
 
 interface AdminPanelProps {
   posts: Post[];
@@ -10,6 +10,7 @@ interface AdminPanelProps {
   onNewPost: () => void;
   onEditPost: (id: string) => void;
   onDeletePost: (id: string) => void;
+  onOpenAdSense: () => void;
 }
 
 const statsData = [
@@ -22,7 +23,7 @@ const statsData = [
   { name: 'السبت', views: 4300 },
 ];
 
-export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost, onEditPost, onDeletePost }) => {
+export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost, onEditPost, onDeletePost, onOpenAdSense }) => {
   return (
     <div className="max-w-6xl mx-auto py-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
@@ -30,13 +31,24 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
           <h1 className="text-5xl font-black mb-3 tracking-tighter italic">الإدارة</h1>
           <p className={`font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>مرحباً بك مجدداً في عبدو ويب، إليك نظرة على أداء مدونتك.</p>
         </div>
-        <button 
-          onClick={onNewPost}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-2xl shadow-indigo-600/40 transition-all"
-        >
-          <Plus size={20} />
-          إضافة محتوى جديد
-        </button>
+        <div className="flex gap-4">
+          <button 
+            onClick={onOpenAdSense}
+            className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
+              isDark ? 'border-zinc-800 hover:bg-zinc-900' : 'border-zinc-200 hover:bg-white'
+            }`}
+          >
+            <Settings size={20} />
+            إعدادات أدسنس
+          </button>
+          <button 
+            onClick={onNewPost}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-2xl shadow-indigo-600/40 transition-all"
+          >
+            <Plus size={20} />
+            إضافة محتوى جديد
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-16">
@@ -71,9 +83,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ posts, isDark, onNewPost
         </div>
 
         <div className={`p-10 rounded-[2.5rem] border flex flex-col items-center justify-center text-center ${isDark ? 'bg-indigo-600 text-white' : 'bg-indigo-50 border-indigo-100 text-indigo-900'}`}>
-          <span className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">عدد المقالات</span>
-          <div className="text-8xl font-black mb-4 tracking-tighter">{posts.length}</div>
-          <p className="text-sm font-bold opacity-80">مقالاً منشوراً</p>
+          <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-6">
+            <DollarSign size={24} />
+          </div>
+          <span className="text-xs font-black uppercase tracking-widest opacity-60 mb-2">إجمالي الأرباح المقدرة</span>
+          <div className="text-4xl font-black mb-4 tracking-tighter">$142.00</div>
+          <p className="text-xs font-bold opacity-80">أداء أدسنس لهذا الشهر</p>
         </div>
       </div>
 
