@@ -1,33 +1,33 @@
 
 import React, { useState, useEffect } from 'react';
-import { Post, View } from './types';
-import { Layout } from './components/Layout';
-import { Navigation } from './components/Navigation';
-import { PostCard } from './components/PostCard';
-import { AdminPanel } from './components/AdminPanel';
-import { PostEditor } from './components/PostEditor';
+import { Post, View } from './types.ts';
+import { Layout } from './components/Layout.tsx';
+import { Navigation } from './components/Navigation.tsx';
+import { PostCard } from './components/PostCard.tsx';
+import { AdminPanel } from './components/AdminPanel.tsx';
+import { PostEditor } from './components/PostEditor.tsx';
 
 const MOCK_POSTS: Post[] = [
   {
     id: '1',
-    title: 'كيف تبدأ في تعلم البرمجة من الصفر؟',
-    excerpt: 'دليل شامل لكل مبتدئ يرغب في دخول عالم البرمجة، مع نصائح حول اختيار اللغة الأولى ومصادر التعلم.',
-    content: 'البداية دائماً هي الأصعب، ولكن مع وجود خطة واضحة ومصادر موثوقة تصبح الرحلة ممتعة. في هذا المقال سنتناول خارطة طريق شاملة للمبتدئين...',
-    date: '20 مايو 2024',
-    author: 'أدمن',
-    category: 'تقنية',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800',
+    title: 'أسرار تحسين تجربة المستخدم في 2025',
+    excerpt: 'تعرف على الاتجاهات الحديثة في تصميم الواجهات وكيفية جعل موقعك أكثر جاذبية للمستخدمين.',
+    content: 'في ظل التطور المتسارع، لم تعد تجربة المستخدم مجرد ألوان وأشكال، بل أصبحت تعتمد بشكل أساسي على سرعة الاستجابة وفهم سلوك المستخدم بدقة...',
+    date: '1 مارس 2024',
+    author: 'أحمد محمود',
+    category: 'تصميم',
+    image: 'https://images.unsplash.com/photo-1551033406-611cf9a28f67?auto=format&fit=crop&q=80&w=800',
     status: 'published'
   },
   {
     id: '2',
-    title: 'تأثير الألوان في تجربة المستخدم (UX)',
-    excerpt: 'هل سألت نفسك يوماً لماذا تختار الشركات ألواناً محددة؟ اكتشف سيكولوجية الألوان وكيف تؤثر على سلوك المستخدم.',
-    content: 'الألوان ليست مجرد زينة، بل هي أداة تواصل قوية. فاللون الأزرق يعطي انطباعاً بالثقة، بينما الأحمر يحفز على الحركة والسرعة...',
-    date: '18 مايو 2024',
-    author: 'أدمن',
-    category: 'تصميم',
-    image: 'https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=800',
+    title: 'دليل المبرمج للتعامل مع الذكاء الاصطناعي',
+    excerpt: 'كيف تستخدم أدوات الذكاء الاصطناعي لمضاعفة إنتاجيتك في كتابة الكود البرمجي.',
+    content: 'أصبحت أدوات مثل GitHub Copilot و ChatGPT جزءاً لا يتجزأ من بيئة عمل المبرمج العصري. في هذا الدليل نستعرض أفضل الممارسات...',
+    date: '28 فبراير 2024',
+    author: 'سارة العلي',
+    category: 'تقنية',
+    image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
     status: 'published'
   }
 ];
@@ -41,8 +41,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const savedPosts = localStorage.getItem('blog_posts');
-    if (savedPosts && JSON.parse(savedPosts).length > 0) {
-      setPosts(JSON.parse(savedPosts));
+    if (savedPosts) {
+      const parsed = JSON.parse(savedPosts);
+      if (parsed.length > 0) {
+        setPosts(parsed);
+      } else {
+        setPosts(MOCK_POSTS);
+      }
     } else {
       setPosts(MOCK_POSTS);
       localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
@@ -86,62 +91,35 @@ const App: React.FC = () => {
   };
 
   const renderHome = () => (
-    <div className="max-w-7xl mx-auto px-6 py-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="mb-16 text-center space-y-4">
-        <h1 className="text-5xl md:text-7xl font-black mb-6 italic tracking-tight bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent leading-normal">
-          نكتب لنصنع المستقبل.
+    <div className="max-w-7xl mx-auto px-6 py-12 animate-fade-in">
+      <header className="mb-16 text-center">
+        <div className="inline-block px-4 py-1.5 mb-6 text-sm font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full">
+          مدونة الجيل القادم
+        </div>
+        <h1 className="text-5xl md:text-8xl font-black mb-8 italic tracking-tighter leading-tight">
+          نبني المحتوى <br/> <span className="text-indigo-600">بذكاء.</span>
         </h1>
         <p className={`text-xl max-w-2xl mx-auto leading-relaxed ${isDark ? 'text-zinc-400' : 'text-gray-500'}`}>
-          انضم إلى مجتمعنا التقني المتنامي واستمتع بمقالات حصرية حول أحدث التقنيات والابتكارات الرقمية.
+          استكشف مقالات معمقة في عالم التكنولوجيا والتصميم، مدعومة بأحدث تقنيات الذكاء الاصطناعي.
         </p>
       </header>
 
-      {posts.length === 0 ? (
-        <div className="text-center py-20 opacity-50">لا توجد مقالات حالياً..</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.filter(p => p.status === 'published').map(post => (
-            <PostCard 
-              key={post.id} 
-              post={post} 
-              isDark={isDark} 
-              onClick={(id) => {
-                setSelectedPost(posts.find(p => p.id === id) || null);
-                setView('post');
-                window.scrollTo(0, 0);
-              }}
-            />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {posts.filter(p => p.status === 'published').map(post => (
+          <PostCard 
+            key={post.id} 
+            post={post} 
+            isDark={isDark} 
+            onClick={(id) => {
+              setSelectedPost(posts.find(p => p.id === id) || null);
+              setView('post');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
-
-  const renderPostDetail = () => {
-    if (!selectedPost) return null;
-    return (
-      <div className="max-w-4xl mx-auto px-6 py-12 animate-in fade-in duration-500">
-        <button 
-          onClick={() => setView('home')}
-          className="flex items-center text-indigo-500 font-bold mb-8 hover:opacity-80 transition-opacity"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 12H5m7 7l-7-7 7-7" />
-          </svg>
-          العودة للرئيسية
-        </button>
-        <img src={selectedPost.image} className="w-full h-[300px] md:h-[500px] object-cover rounded-3xl mb-10 shadow-2xl" />
-        <div className="flex items-center mb-6 space-x-reverse space-x-4">
-          <span className="bg-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md">{selectedPost.category}</span>
-          <span className="text-sm opacity-60">{selectedPost.date}</span>
-        </div>
-        <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight">{selectedPost.title}</h1>
-        <div className={`prose prose-lg max-w-none text-xl leading-relaxed space-y-8 whitespace-pre-wrap ${isDark ? 'text-zinc-300' : 'text-gray-700'}`}>
-          {selectedPost.content}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <Layout isDark={isDark}>
@@ -152,21 +130,36 @@ const App: React.FC = () => {
         currentView={currentView}
       />
       
-      <main>
+      <main className="min-h-[70vh]">
         {currentView === 'home' && renderHome()}
-        {currentView === 'post' && renderPostDetail()}
+        {currentView === 'post' && selectedPost && (
+          <div className="max-w-4xl mx-auto px-6 py-12 animate-fade-in">
+            <button 
+              onClick={() => setView('home')}
+              className="flex items-center text-indigo-600 font-bold mb-10 hover:translate-x-1 transition-transform"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 12H5m7 7l-7-7 7-7" />
+              </svg>
+              العودة للرئيسية
+            </button>
+            <img src={selectedPost.image} className="w-full h-[300px] md:h-[500px] object-cover rounded-3xl mb-12 shadow-2xl" alt={selectedPost.title} />
+            <div className="flex items-center mb-6 gap-4">
+              <span className="bg-indigo-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">{selectedPost.category}</span>
+              <span className="text-sm opacity-50">{selectedPost.date}</span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-black mb-10 leading-tight tracking-tight">{selectedPost.title}</h1>
+            <div className={`prose prose-xl max-w-none leading-relaxed whitespace-pre-wrap ${isDark ? 'text-zinc-300' : 'text-gray-700'}`}>
+              {selectedPost.content}
+            </div>
+          </div>
+        )}
         {currentView === 'admin' && (
           <AdminPanel 
             posts={posts} 
             isDark={isDark} 
-            onNewPost={() => {
-              setEditingPostId(null);
-              setView('editor');
-            }} 
-            onEditPost={(id) => {
-              setEditingPostId(id);
-              setView('editor');
-            }}
+            onNewPost={() => { setEditingPostId(null); setView('editor'); }} 
+            onEditPost={(id) => { setEditingPostId(id); setView('editor'); }}
             onDeletePost={handleDeletePost}
           />
         )}
@@ -180,14 +173,18 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className={`mt-20 py-12 border-t text-center ${isDark ? 'bg-zinc-950 border-zinc-900 text-zinc-500' : 'bg-white border-gray-100 text-gray-400'}`}>
+      <footer className={`mt-24 py-16 border-t ${isDark ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-gray-100'}`}>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-2xl font-black text-indigo-600 mb-6 italic">مدونتي</div>
-          <p className="text-sm">© {new Date().getFullYear()} جميع الحقوق محفوظة لمدونتي الاحترافية</p>
-          <div className="mt-8 flex justify-center space-x-reverse space-x-8">
-            <button className="hover:text-indigo-500 transition-colors">عن المدونة</button>
-            <button className="hover:text-indigo-500 transition-colors">سياسة الخصوصية</button>
-            <button className="hover:text-indigo-500 transition-colors">اتصل بنا</button>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="text-3xl font-black text-indigo-600 italic">مدونتي.</div>
+            <div className="flex gap-8 text-sm font-medium opacity-60">
+              <button className="hover:text-indigo-600">سياسة الخصوصية</button>
+              <button className="hover:text-indigo-600">اتصل بنا</button>
+              <button className="hover:text-indigo-600">الأرشيف</button>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t border-gray-50 dark:border-zinc-900 text-center text-xs opacity-40">
+            © {new Date().getFullYear()} جميع الحقوق محفوظة لمدونتي الاحترافية. صنع بكل شغف.
           </div>
         </div>
       </footer>
