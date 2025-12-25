@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import { Post } from '../types.ts';
-import { generatePostContent } from '../services/geminiService.ts';
-import { Save, X, Sparkles } from 'lucide-react';
+import { generatePostContent, generatePostImage } from '../services/geminiService.ts';
+import { Save, X, Sparkles, Image as ImageIcon, Loader2 } from 'lucide-react';
 
 interface PostEditorProps {
   post?: Post;
@@ -23,6 +23,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({ post, isDark, onSave, on
   });
 
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
 
   const handleAiAssist = async () => {
     if (!formData.title) {
@@ -41,6 +42,26 @@ export const PostEditor: React.FC<PostEditorProps> = ({ post, isDark, onSave, on
       console.error(err);
     } finally {
       setIsAiLoading(false);
+    }
+  };
+
+  const handleImageGenerate = async () => {
+    if (!formData.title) {
+      alert("يرجى كتابة عنوان المقال أولاً لتوليد صورة مناسبة له!");
+      return;
+    }
+    setIsImageLoading(true);
+    try {
+      const imageUrl = await generatePostImage(formData.title || "");
+      if (imageUrl) {
+        setFormData(prev => ({ ...prev, image: imageUrl }));
+      } else {
+        alert("عذراً، فشل توليد الصورة. يرجى المحاولة مرة أخرى.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsImageLoading(false);
     }
   };
 
@@ -69,7 +90,7 @@ export const PostEditor: React.FC<PostEditorProps> = ({ post, isDark, onSave, on
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             className={`w-full px-6 py-4 rounded-2xl border outline-none transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-gray-50 border-zinc-200'}`}
-            placeholder="مثال: ملاعب الكان في المغرب 2025"
+            placeholder="مثال: تعويم الدرهم المغربي: الفرص والتحديات"
           />
         </div>
 
@@ -93,28 +114,57 @@ export const PostEditor: React.FC<PostEditorProps> = ({ post, isDark, onSave, on
           placeholder="ابدأ بكتابة أفكارك هنا أو استخدم مساعد الذكاء الاصطناعي..."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">رابط صورة الغلاف (URL)</label>
-            <input 
-              type="text"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className={`w-full px-6 py-4 rounded-2xl border outline-none transition-all ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50'}`}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">صورة الغلاف</label>
+              <button 
+                onClick={handleImageGenerate}
+                disabled={isImageLoading}
+                className={`flex items-center gap-2 text-xs font-black transition-all ${isImageLoading ? 'opacity-50' : 'text-emerald-500 hover:scale-105'}`}
+              >
+                {isImageLoading ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                {isImageLoading ? 'جاري التوليد...' : 'توليد صورة بالذكاء الاصطناعي'}
+              </button>
+            </div>
+            
+            <div className="relative group">
+              <img 
+                src={formData.image} 
+                className="w-full aspect-video object-cover rounded-2xl border border-emerald-500/10 mb-2" 
+                alt="معاينة" 
+              />
+              <input 
+                type="text"
+                value={formData.image}
+                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                className={`w-full px-4 py-3 rounded-xl border text-[10px] outline-none transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 focus:border-emerald-500' : 'bg-gray-50 border-zinc-200'}`}
+                placeholder="رابط الصورة (URL)"
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">التصنيف</label>
-            <select 
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className={`w-full px-6 py-4 rounded-2xl border outline-none transition-all ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50'}`}
-            >
-              <option value="أخبار المغرب">أخبار المغرب</option>
-              <option value="تقنية">تقنية</option>
-              <option value="تطوير الذات">تطوير الذات</option>
-              <option value="تقييم المنتجات">تقييم المنتجات</option>
-            </select>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest opacity-40 pr-2">التصنيف</label>
+              <select 
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className={`w-full px-6 py-4 rounded-2xl border outline-none transition-all ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-gray-50'}`}
+              >
+                <option value="أخبار المغرب">أخبار المغرب</option>
+                <option value="تقنية">تقنية</option>
+                <option value="تطوير الذات">تطوير الذات</option>
+                <option value="تقييم المنتجات">تقييم المنتجات</option>
+              </select>
+            </div>
+            
+            <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-emerald-500">نصيحة ذكية</h4>
+              <p className="text-xs opacity-60 leading-relaxed font-medium">
+                استخدم العناوين التي تحتوي على كلمات دلالية قوية لتحصل على أفضل النتائج من محركات البحث ومن مولد الصور الذكي.
+              </p>
+            </div>
           </div>
         </div>
       </div>

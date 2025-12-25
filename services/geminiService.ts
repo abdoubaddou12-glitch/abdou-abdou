@@ -45,6 +45,40 @@ export const generatePostContent = async (topic: string) => {
   }
 };
 
+export const generatePostImage = async (title: string) => {
+  const apiKey = getApiKey();
+  if (!apiKey) return null;
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = `A professional, high-quality cinematic editorial photography for a blog post titled "${title}". 
+    The image should represent Moroccan economy, currency (Dirham), modern Moroccan architecture, or high-tech business environment depending on the topic. 
+    Style: Realistic, 4k, professional lighting, corporate but artistic. If it's about Moroccan Dirham, show artistic representation of coins and notes with financial charts in the background.`;
+    
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: [{ text: prompt }]
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: "16:9"
+        }
+      }
+    });
+
+    for (const part of response.candidates[0].content.parts) {
+      if (part.inlineData) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error("Image Generation Error:", error);
+    return null;
+  }
+};
+
 export const suggestTitles = async (content: string) => {
   const apiKey = getApiKey();
   if (!apiKey) return "";
