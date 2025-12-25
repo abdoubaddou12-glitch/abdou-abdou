@@ -20,35 +20,6 @@ const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
 
 const MOCK_POSTS: Post[] = [
   {
-    id: 'dirham-floating-2024',
-    title: 'تعويم الدرهم المغربي: رحلة نحو المرونة الاقتصادية بين الفرص الواعدة والتحديات الجسيمة',
-    excerpt: 'تحليل معمق لمسار تحرير سعر صرف الدرهم المغربي، استكشف الإيجابيات المتوقعة للاقتصاد الوطني، السلبيات المحتملة على القدرة الشرائية، والسبل الكفيلة لمواجهة المخاطر.',
-    content: `يعتبر قرار إصلاح نظام سعر صرف الدرهم، أو ما يعرف بـ "التعويم"، من أهم التحولات البنيوية التي شهدها الاقتصاد المغربي في العقد الأخير. هذا المسار الذي بدأه بنك المغرب ووزارة المالية يهدف إلى جعل العملة الوطنية أكثر مرونة وقدرة على امتصاص الصدمات الخارجية.
-
-أولاً: الإيجابيات والفرص الواعدة:
-1. تعزيز التنافسية الخارجية: يسمح التعويم للدرهم بالتكيف مع واقع السوق، مما يجعل الصادرات المغربية (خاصة الفوسفاط، السيارات، والمنتجات الفلاحية) أكثر تنافسية في الأسواق العالمية.
-2. جذب الاستثمارات الأجنبية: يفضل المستثمرون الأسواق التي تتميز بمرونة في سعر الصرف، حيث يقلل ذلك من مخاطر التعديلات المفاجئة والقوية للعملة.
-3. حماية احتياطات الصرف: من خلال السماح للسعر بالتحرك، يقل الضغط على بنك المغرب للتدخل باستخدام العملة الصعبة لدعم الدرهم، مما يحافظ على سيولة البلاد من العملات الأجنبية.
-
-ثانياً: السلبيات والمخاطر المحتملة:
-1. ضغوط تضخمية: بما أن المغرب يستورد جزءاً كبيراً من احتياجاته من الطاقة (البترول والغاز) والمواد الأولية، فإن أي انخفاض في قيمة الدرهم يؤدي مباشرة إلى ارتفاع أسعار هذه المواد في السوق الداخلي.
-2. التأثير على القدرة الشرائية: الارتفاع في أسعار الواردات قد ينتقل إلى المستهلك النهائي، مما يشكل عبئاً على الطبقة المتوسطة والفقيرة.
-3. تقلبات غير متوقعة: في حالة الأزمات العالمية الحادة، قد يشهد الدرهم تقلبات سريعة قد تصعب من مأمورية الفاعلين الاقتصاديين في وضع توقعات مالية دقيقة.
-
-ثالثاً: سبل مواجهة التحديات وضمان النجاح:
-1. التنويع الاقتصادي: تقليل الاعتماد على الواردات من خلال تشجيع الصناعة المحلية (صنع في المغرب) يخفف من أثر تقلبات العملة.
-2. سياسة نقدية يقظة: استمرار بنك المغرب في نهج سياسة استهداف التضخم والتدخل التدريجي يضمن عدم خروج الأمور عن السيطرة.
-3. دعم المقاولات الصغرى والمتوسطة: توفير أدوات مالية للمقاولات لحمايتها من مخاطر الصرف عبر "عقود التحوط".
-
-خاتمة:
-إن تعويم الدرهم ليس غاية في حد ذاته، بل هو وسيلة لتحقيق اقتصاد قوي ومنفتح. نجاح هذه التجربة يعتمد بشكل أساسي على مواكبتها بإصلاحات هيكلية ترفع من الإنتاجية الوطنية وتقلل من التبعية للخارج. نحن في "عبدو ويب" سنواصل تتبع هذا الملف الاقتصادي الشائك وتقديم تحليلاتنا لمساعدتكم على فهم التحولات المالية الكبرى.`,
-    date: '21 مارس 2024',
-    author: 'عبدو',
-    category: 'أخبار المغرب',
-    image: 'https://images.unsplash.com/photo-1611974717537-48358a602114?auto=format&fit=crop&q=80&w=2000',
-    status: 'published'
-  },
-  {
     id: 'can-morocco-2025',
     title: 'المغرب 2025: عندما تتحول الملاعب إلى تحف فنية تبهر القارة السمراء',
     excerpt: 'استكشف أجواء "الكان" الأسطورية في المملكة المغربية، حيث تلتقي الحداثة بالتقاليد في ملاعب عالمية جاهزة لكتابة التاريخ الإفريقي الجديد.',
@@ -105,9 +76,9 @@ const App: React.FC = () => {
     if (savedPosts) {
       try {
         const parsed = JSON.parse(savedPosts);
-        // If the user has old data, we merge it with defaults instead of just ignoring defaults
         if (parsed.length > 0) {
-          setPosts(parsed);
+          // Filter out the deleted post if it still exists in user's localStorage
+          setPosts(parsed.filter((p: Post) => p.id !== 'dirham-floating-2024'));
         } else {
           setPosts(MOCK_POSTS);
           localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
@@ -155,26 +126,15 @@ const App: React.FC = () => {
   };
 
   const handleSyncData = () => {
-    // Logic to find posts in MOCK_POSTS that aren't in current posts
     const currentIds = new Set(posts.map(p => p.id));
     const newDefaults = MOCK_POSTS.filter(p => !currentIds.has(p.id));
     
-    if (newDefaults.length > 0) {
-      const updatedPosts = [...newDefaults, ...posts];
-      setPosts(updatedPosts);
-      localStorage.setItem('blog_posts', JSON.stringify(updatedPosts));
-    } else {
-      // If everything exists, force refresh from MOCK_POSTS just in case of updates
-      const refreshedPosts = [...posts];
-      MOCK_POSTS.forEach(mock => {
-        const index = refreshedPosts.findIndex(p => p.id === mock.id);
-        if (index !== -1) {
-          refreshedPosts[index] = { ...refreshedPosts[index], ...mock };
-        }
-      });
-      setPosts(refreshedPosts);
-      localStorage.setItem('blog_posts', JSON.stringify(refreshedPosts));
-    }
+    // We also explicitly ensure dirham post is removed during sync
+    const filteredCurrent = posts.filter(p => p.id !== 'dirham-floating-2024');
+    
+    const updatedPosts = [...newDefaults, ...filteredCurrent];
+    setPosts(updatedPosts);
+    localStorage.setItem('blog_posts', JSON.stringify(updatedPosts));
   };
 
   const handleLogin = (password: string) => {
