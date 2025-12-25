@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Post, View, AdSenseConfig } from './types.ts';
+import { Post, View, AdSenseConfig, AnalyticsData } from './types.ts';
 import { Layout } from './components/Layout.tsx';
 import { Navigation } from './components/Navigation.tsx';
 import { PostCard } from './components/PostCard.tsx';
@@ -13,7 +13,7 @@ import { AdSense } from './components/AdSense.tsx';
 import { 
   Sparkles, ArrowRight, Star, Cpu, BookOpen, ShoppingBag, 
   Newspaper, Globe, Zap, Facebook, Twitter, Share2, Copy, 
-  CheckCircle2, MessageCircle, Mail, Instagram
+  CheckCircle2, MessageCircle, Mail, Instagram, Users
 } from 'lucide-react';
 
 const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
@@ -40,17 +40,6 @@ const MOCK_POSTS: Post[] = [
     category: 'أخبار المغرب',
     image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&q=80&w=2000',
     status: 'published'
-  },
-  {
-    id: '2',
-    title: 'أفضل الحواسيب المحمولة للمبرمجين في السوق المغربي',
-    excerpt: 'مراجعة شاملة لأحدث الأجهزة المتاحة حالياً مع مقارنة الأسعار والأداء للمحترفين.',
-    content: 'اختيار الحاسوب المناسب هو أول خطوة في مسارك المهني...',
-    date: '16 مارس 2024',
-    author: 'عبدو',
-    category: 'تقنية',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=1200',
-    status: 'published'
   }
 ];
 
@@ -71,11 +60,20 @@ const App: React.FC = () => {
     isEnabled: false
   });
 
+  // Analytics State
+  const [analytics, setAnalytics] = useState<AnalyticsData>({
+    totalViews: 0,
+    liveVisitors: Math.floor(Math.random() * 20) + 5,
+    dailyEarnings: [12.5, 15.2, 8.4, 19.1, 14.5, 22.8, 18.4],
+    ctr: "2.4%",
+    cpc: "$0.12"
+  });
+
   useEffect(() => {
+    // Load data from LocalStorage
     const savedPassword = localStorage.getItem('admin_password');
     if (savedPassword) setAdminPassword(savedPassword);
-    else localStorage.setItem('admin_password', DEFAULT_PASSWORD);
-
+    
     const savedPosts = localStorage.getItem('blog_posts');
     if (savedPosts) {
       try {
@@ -86,7 +84,6 @@ const App: React.FC = () => {
       }
     } else {
       setPosts(MOCK_POSTS);
-      localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
     }
 
     const savedTheme = localStorage.getItem('theme');
@@ -97,6 +94,22 @@ const App: React.FC = () => {
 
     const savedAds = localStorage.getItem('adsense_config');
     if (savedAds) setAdsenseConfig(JSON.parse(savedAds));
+
+    // Handle View Counts
+    const views = parseInt(localStorage.getItem('total_views') || '0');
+    const newViews = views + 1;
+    localStorage.setItem('total_views', newViews.toString());
+    setAnalytics(prev => ({ ...prev, totalViews: newViews }));
+
+    // Simulate Live Visitors changes
+    const interval = setInterval(() => {
+      setAnalytics(prev => ({
+        ...prev,
+        liveVisitors: Math.max(3, prev.liveVisitors + (Math.random() > 0.5 ? 1 : -1))
+      }));
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -148,6 +161,7 @@ const App: React.FC = () => {
         toggleTheme={toggleTheme} 
         setView={(v) => v === 'admin' && !isAuthenticated ? setView('login') : setView(v)} 
         currentView={currentView}
+        liveVisitors={analytics.liveVisitors}
       />
       
       <main className="pt-40 pb-20 container mx-auto px-6 relative z-10">
@@ -272,82 +286,20 @@ const App: React.FC = () => {
                 {selectedPost.content}
              </div>
 
-             {/* Social Sharing & Contact Section */}
+             {/* Social Sharing Section */}
              <section className={`pt-12 border-t ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
                   <div className="text-center lg:text-right">
-                    <h4 className="text-xl font-black mb-2">هل تريد مناقشة الموضوع؟</h4>
-                    <p className="text-sm opacity-50 font-medium">شارك المقال أو تواصل مع عبدو مباشرة عبر البريد</p>
+                    <h4 className="text-xl font-black mb-2">هل أعجبك المقال؟</h4>
+                    <p className="text-sm opacity-50 font-medium">شارك الفائدة مع أصدقائك أو تواصل معي مباشرة</p>
                   </div>
                   
                   <div className="flex flex-wrap items-center justify-center gap-4">
-                    {/* Direct Email Contact */}
-                    <a 
-                      href={`mailto:${CONTACT_EMAIL}?subject=بخصوص مقال: ${selectedPost.title}`}
-                      className="w-14 h-14 rounded-2xl bg-emerald-500 text-black hover:bg-emerald-400 hover:scale-110 transition-all flex items-center justify-center shadow-lg shadow-emerald-500/20 group"
-                      title="تواصل معي بالبريد"
-                    >
-                      <Mail size={24} className="group-hover:rotate-12 transition-transform" />
-                    </a>
-
-                    <div className="w-[1px] h-10 bg-emerald-500/20 mx-2 hidden md:block"></div>
-
-                    {/* Facebook Share */}
-                    <a 
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-2xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all flex items-center justify-center shadow-lg"
-                      title="فايسبوك"
-                    >
-                      <Facebook size={24} fill="currentColor" />
-                    </a>
-
-                    {/* Twitter / X Share */}
-                    <a 
-                      href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(selectedPost.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-2xl bg-black text-white hover:bg-zinc-800 transition-all flex items-center justify-center shadow-lg border border-white/5"
-                      title="تويتر / X"
-                    >
-                      <Twitter size={24} fill="currentColor" />
-                    </a>
-
-                    {/* Pinterest Share */}
-                    <a 
-                      href={`https://pinterest.com/pin/create/button/?url=${encodeURIComponent(window.location.href)}&media=${encodeURIComponent(selectedPost.image)}&description=${encodeURIComponent(selectedPost.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-2xl bg-[#E60023]/10 text-[#E60023] hover:bg-[#E60023] hover:text-white transition-all flex items-center justify-center shadow-lg"
-                      title="بنتريس"
-                    >
-                      <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
-                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.965 1.406-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.261 7.929-7.261 4.162 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>
-                      </svg>
-                    </a>
-
-                    {/* WhatsApp Share */}
-                    <a 
-                      href={`https://wa.me/?text=${encodeURIComponent(selectedPost.title + " " + window.location.href)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center shadow-lg"
-                      title="واتساب"
-                    >
-                      <MessageCircle size={24} fill="currentColor" />
-                    </a>
-
-                    {/* Copy Link */}
-                    <button 
-                      onClick={copyToClipboard}
-                      className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center shadow-lg relative overflow-hidden ${
-                        copied ? 'bg-emerald-500 text-black' : 'bg-zinc-900 text-white hover:bg-emerald-500 hover:text-black border border-white/5'
-                      }`}
-                      title="نسخ الرابط"
-                    >
-                      {copied ? <CheckCircle2 size={24} /> : <Copy size={24} />}
-                    </button>
+                    <a href={`mailto:${CONTACT_EMAIL}?subject=بخصوص مقال: ${selectedPost.title}`} className="w-14 h-14 rounded-2xl bg-emerald-500 text-black hover:bg-emerald-400 transition-all flex items-center justify-center shadow-lg"><Mail size={24} /></a>
+                    <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition-all flex items-center justify-center shadow-lg"><Facebook size={24} fill="currentColor" /></a>
+                    <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black text-white hover:bg-zinc-800 transition-all flex items-center justify-center shadow-lg border border-white/5"><Twitter size={24} fill="currentColor" /></a>
+                    <a href={`https://wa.me/?text=${encodeURIComponent(selectedPost.title + " " + window.location.href)}`} target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center shadow-lg"><MessageCircle size={24} fill="currentColor" /></a>
+                    <button onClick={copyToClipboard} className={`w-14 h-14 rounded-2xl transition-all flex items-center justify-center shadow-lg ${copied ? 'bg-emerald-500 text-black' : 'bg-zinc-900 text-white hover:bg-emerald-500 hover:text-black'}`}>{copied ? <CheckCircle2 size={24} /> : <Copy size={24} />}</button>
                   </div>
                 </div>
              </section>
@@ -360,6 +312,7 @@ const App: React.FC = () => {
           <AdminPanel 
             posts={posts} 
             isDark={isDark} 
+            analytics={analytics}
             onNewPost={() => setView('editor')} 
             onEditPost={(id) => { setEditingPostId(id); setView('editor'); }}
             onDeletePost={(id) => {

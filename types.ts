@@ -17,6 +17,14 @@ export interface AdSenseConfig {
   isEnabled: boolean;
 }
 
+export interface AnalyticsData {
+  totalViews: number;
+  liveVisitors: number;
+  dailyEarnings: number[];
+  ctr: string;
+  cpc: string;
+}
+
 export type View = 'home' | 'post' | 'admin' | 'editor' | 'login' | 'adsense-settings' | 'security-settings';
 
 export interface ThemeContextType {

@@ -1,16 +1,17 @@
 
 import React from 'react';
 import { View } from '../types.ts';
-import { Moon, Sun, LayoutDashboard, Zap } from 'lucide-react';
+import { Moon, Sun, LayoutDashboard, Zap, Users } from 'lucide-react';
 
 interface NavigationProps {
   isDark: boolean;
   toggleTheme: () => void;
   setView: (view: View) => void;
   currentView: View;
+  liveVisitors?: number;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, setView, currentView }) => {
+export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, setView, currentView, liveVisitors = 0 }) => {
   return (
     <div className="fixed top-8 left-0 right-0 z-50 px-6 flex justify-center">
       <nav className="glass-nav px-8 py-4 rounded-[2.5rem] shadow-2xl flex items-center justify-between w-full max-w-7xl gap-8 border border-white/10">
@@ -35,7 +36,6 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
           <div className="hidden lg:flex items-center gap-8">
             {[
               { id: 'home', label: 'الرئيسية' },
-              { id: 'morocco', label: 'أخبار المغرب' },
               { id: 'tech', label: 'تقنية' },
               { id: 'self', label: 'تطوير الذات' },
               { id: 'reviews', label: 'تقييم المنتجات' }
@@ -54,29 +54,42 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setView('admin')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[13px] font-black transition-all ${
-              isDark 
-                ? 'bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-emerald-500/20' 
-                : 'bg-black hover:bg-zinc-800 text-white shadow-xl shadow-black/20'
-            }`}
-          >
-            <LayoutDashboard size={18} />
-            <span className="hidden sm:inline">لوحة الإدارة</span>
-          </button>
-          
-          <button 
-            onClick={toggleTheme}
-            className={`p-3 rounded-2xl transition-all border ${
-              isDark 
-                ? 'bg-zinc-900 border-zinc-800 text-emerald-400 hover:bg-zinc-800' 
-                : 'bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50'
-            }`}
-          >
-            {isDark ? <Sun size={22} /> : <Moon size={22} />}
-          </button>
+        <div className="flex items-center gap-6">
+          {/* Live Visitor Indicator */}
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-[11px] font-black text-emerald-500 uppercase tracking-widest">
+              {liveVisitors} متصل الآن
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setView('admin')}
+              className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[13px] font-black transition-all ${
+                isDark 
+                  ? 'bg-zinc-900 hover:bg-zinc-800 text-emerald-400 border border-emerald-500/20' 
+                  : 'bg-black hover:bg-zinc-800 text-white shadow-xl shadow-black/20'
+              }`}
+            >
+              <LayoutDashboard size={18} />
+              <span className="hidden sm:inline">الإدارة</span>
+            </button>
+            
+            <button 
+              onClick={toggleTheme}
+              className={`p-3 rounded-2xl transition-all border ${
+                isDark 
+                  ? 'bg-zinc-900 border-zinc-800 text-emerald-400 hover:bg-zinc-800' 
+                  : 'bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+              }`}
+            >
+              {isDark ? <Sun size={22} /> : <Moon size={22} />}
+            </button>
+          </div>
         </div>
       </nav>
     </div>
