@@ -197,16 +197,14 @@ const App: React.FC = () => {
               <p className="text-xl md:text-2xl max-w-3xl mx-auto opacity-70 font-medium leading-relaxed mb-12 px-4">
                 مدونة احترافية تجمع بين <span className="text-emerald-500 font-bold underline decoration-emerald-200">أخبار المغرب</span>، 
                 عالم <span className="text-emerald-500 font-bold underline decoration-emerald-200">التقنية</span>، 
-                فن <span className="text-emerald-500 font-bold underline decoration-emerald-200">تطوير الذات</span>، 
-                وحيادية <span className="text-emerald-500 font-bold underline decoration-emerald-200">تقييم المنتجات</span>.
+                وحيادية <span className="text-emerald-500 font-bold underline decoration-emerald-200">تطوير الذات</span>.
               </p>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl">
                 {[
                   { icon: Newspaper, label: 'أخبار المغرب', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
                   { icon: Cpu, label: 'تقنية', color: 'bg-zinc-900/10 text-zinc-900 dark:text-emerald-400 border-zinc-900/20 dark:border-emerald-500/20' },
-                  { icon: BookOpen, label: 'تطوير الذات', color: 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' },
-                  { icon: ShoppingBag, label: 'تقييم المنتجات', color: 'bg-black text-white dark:bg-emerald-500 dark:text-black border-transparent' }
+                  { icon: BookOpen, label: 'تطوير الذات', color: 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10' }
                 ].map((cat, i) => (
                   <div key={i} className={`flex flex-col items-center gap-3 p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer hover:scale-105 glass-card ${cat.color}`}>
                     <cat.icon size={32} />

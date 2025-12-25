@@ -36,9 +36,9 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
           <div className="hidden lg:flex items-center gap-8">
             {[
               { id: 'home', label: 'الرئيسية' },
+              { id: 'morocco', label: 'أخبار المغرب' },
               { id: 'tech', label: 'تقنية' },
-              { id: 'self', label: 'تطوير الذات' },
-              { id: 'reviews', label: 'تقييم المنتجات' }
+              { id: 'self', label: 'تطوير الذات' }
             ].map((item) => (
               <button 
                 key={item.id}
@@ -55,7 +55,6 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
         </div>
 
         <div className="flex items-center gap-6">
-          {/* Live Visitor Indicator */}
           <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
