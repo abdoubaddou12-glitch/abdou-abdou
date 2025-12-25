@@ -6,7 +6,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { 
   Plus, Edit2, Trash2, Eye, DollarSign, Settings, ShieldCheck, 
   Users, TrendingUp, MousePointer2, RefreshCw, CheckCircle, 
-  BarChart3, Globe2, ExternalLink, Loader2 
+  BarChart3, Globe2, ExternalLink, Loader2, Zap, Info
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -19,10 +19,11 @@ interface AdminPanelProps {
   onOpenAdSense: () => void;
   onOpenSecurity: () => void;
   onSyncData: () => void;
+  appVersion?: string;
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ 
-  posts, isDark, analytics, onNewPost, onEditPost, onDeletePost, onOpenAdSense, onOpenSecurity, onSyncData 
+  posts, isDark, analytics, onNewPost, onEditPost, onDeletePost, onOpenAdSense, onOpenSecurity, onSyncData, appVersion = "1.8.0"
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [showSyncSuccess, setShowSyncSuccess] = useState(false);
@@ -59,26 +60,37 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto py-10 animate-fade-in px-4">
+      {/* Header with Major Update Button */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
         <div>
           <h1 className="text-5xl font-black mb-3 tracking-tighter italic">مركز التحكم الذكي</h1>
-          <p className={`font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>مرحباً عبدو، هذه بيانات حقيقية مستمدة من نشاط الموقع وتحليلات السوق.</p>
+          <p className={`font-medium ${isDark ? 'text-zinc-500' : 'text-zinc-400'}`}>مرحباً عبدو، هذه بيانات حقيقية وإحصائيات مباشرة لموقعك.</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button 
             onClick={handleSync}
-            className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${
+            className={`px-6 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all shadow-xl ${
               showSyncSuccess 
-                ? 'bg-emerald-500 text-black border-transparent' 
-                : isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'
+                ? 'bg-emerald-500 text-black border-transparent scale-105' 
+                : isDark ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'
             }`}
           >
-            {showSyncSuccess ? <CheckCircle size={20} /> : <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />}
-            {showSyncSuccess ? 'تم التحديث' : 'تحديث البيانات'}
+            {showSyncSuccess ? <CheckCircle size={20} /> : <Zap size={20} className={isSyncing ? 'animate-pulse' : ''} />}
+            {showSyncSuccess ? 'تم التحديث بنجاح' : 'تحديث النظام والمقالات'}
           </button>
+          
           <button onClick={onOpenSecurity} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><ShieldCheck size={20} className="text-emerald-500" />الأمان</button>
           <button onClick={onNewPost} className="bg-emerald-500 hover:bg-emerald-600 text-black px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-2xl shadow-emerald-500/20 transition-all"><Plus size={20} />نشر مقال</button>
         </div>
+      </div>
+
+      {/* Info Banner for Versioning */}
+      <div className={`mb-12 p-4 rounded-2xl flex items-center justify-between border ${isDark ? 'bg-zinc-900/50 border-zinc-800 text-zinc-400' : 'bg-zinc-50 border-zinc-100 text-zinc-600'}`}>
+        <div className="flex items-center gap-3">
+          <Info size={18} className="text-emerald-500" />
+          <span className="text-xs font-bold">إصدار المدونة الحالي: <span className="text-emerald-500">{appVersion}</span></span>
+        </div>
+        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">جميع الأنظمة تعمل بكفاءة</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

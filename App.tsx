@@ -16,7 +16,7 @@ import {
   CheckCircle2, MessageCircle, Mail, Instagram, Users, RefreshCcw
 } from 'lucide-react';
 
-const APP_VERSION = "1.7.0"; // تحديث الإصدار لجلب المقال الجديد تلقائياً
+const APP_VERSION = "1.8.0"; // تحديث الإصدار لفرض ظهور الأزرار الجديدة
 const CONTACT_EMAIL = "abdelghaforbahaddou@gmail.com";
 const DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1611974714851-eb6051612253?auto=format&fit=crop&q=80&w=2000";
 
@@ -71,7 +71,6 @@ const App: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminPassword, setAdminPassword] = useState(DEFAULT_PASSWORD);
-  const [copied, setCopied] = useState(false);
   const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>({
     publisherId: '',
     slotId: '',
@@ -93,11 +92,15 @@ const App: React.FC = () => {
       localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
       return;
     }
+    const savedPosts = localStorage.getItem('blog_posts');
+    let currentPosts = savedPosts ? JSON.parse(savedPosts) : [];
+    
     const updatedPosts = MOCK_POSTS.map(m => {
-      const existing = posts.find(p => p.id === m.id);
+      const existing = currentPosts.find((p: Post) => p.id === m.id);
       return existing ? { ...existing, ...m } : m;
     });
-    const finalPosts = [...updatedPosts, ...posts.filter(p => !MOCK_POSTS.find(m => m.id === p.id))];
+    
+    const finalPosts = [...updatedPosts, ...currentPosts.filter((p: Post) => !MOCK_POSTS.find(m => m.id === p.id))];
     setPosts(finalPosts);
     localStorage.setItem('blog_posts', JSON.stringify(finalPosts));
   };
@@ -178,12 +181,6 @@ const App: React.FC = () => {
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const featuredPost = posts.find(p => p.status === 'published');
 
   return (
@@ -194,13 +191,14 @@ const App: React.FC = () => {
         setView={(v) => v === 'admin' && !isAuthenticated ? setView('login') : setView(v)} 
         currentView={currentView}
         liveVisitors={analytics.liveVisitors}
+        isAuthenticated={isAuthenticated}
       />
       
       {isAuthenticated && (
         <button 
-          onClick={() => { handleSyncData(true); alert('تم تحديث بيانات السيرفر بنجاح!'); }}
-          className="fixed bottom-8 left-8 z-[100] w-14 h-14 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all group"
-          title="تحديث شامل للبيانات"
+          onClick={() => { handleSyncData(true); alert('تمت المزامنة وتحديث البيانات بنجاح!'); }}
+          className="fixed bottom-8 left-8 z-[100] w-14 h-14 bg-emerald-500 text-black rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all group emerald-glow"
+          title="تحديث شامل وسريع"
         >
           <RefreshCcw size={24} className="group-hover:rotate-180 transition-transform duration-500" />
         </button>
@@ -278,6 +276,7 @@ const App: React.FC = () => {
             onOpenAdSense={() => setView('adsense-settings')}
             onOpenSecurity={() => setView('security-settings')}
             onSyncData={() => handleSyncData(true)}
+            appVersion={APP_VERSION}
           />
         )}
         

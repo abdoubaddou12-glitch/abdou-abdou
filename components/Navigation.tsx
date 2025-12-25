@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View } from '../types.ts';
-import { Moon, Sun, LayoutDashboard, Zap, Users } from 'lucide-react';
+import { Moon, Sun, LayoutDashboard, Zap, Users, RefreshCw } from 'lucide-react';
 
 interface NavigationProps {
   isDark: boolean;
@@ -9,9 +9,12 @@ interface NavigationProps {
   setView: (view: View) => void;
   currentView: View;
   liveVisitors?: number;
+  isAuthenticated?: boolean;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, setView, currentView, liveVisitors = 0 }) => {
+export const Navigation: React.FC<NavigationProps> = ({ 
+  isDark, toggleTheme, setView, currentView, liveVisitors = 0, isAuthenticated = false 
+}) => {
   return (
     <div className="fixed top-8 left-0 right-0 z-50 px-6 flex justify-center">
       <nav className="glass-nav px-8 py-4 rounded-[2.5rem] shadow-2xl flex items-center justify-between w-full max-w-7xl gap-8 border border-white/10">
@@ -66,6 +69,20 @@ export const Navigation: React.FC<NavigationProps> = ({ isDark, toggleTheme, set
           </div>
 
           <div className="flex items-center gap-3">
+            {isAuthenticated && (
+              <button 
+                onClick={() => { window.location.reload(); }}
+                className={`p-3 rounded-2xl transition-all border hidden sm:flex ${
+                  isDark 
+                    ? 'bg-zinc-900 border-zinc-800 text-emerald-400 hover:bg-zinc-800' 
+                    : 'bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50'
+                }`}
+                title="تحديث الصفحة"
+              >
+                <RefreshCw size={22} />
+              </button>
+            )}
+
             <button 
               onClick={() => setView('admin')}
               className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[13px] font-black transition-all ${
