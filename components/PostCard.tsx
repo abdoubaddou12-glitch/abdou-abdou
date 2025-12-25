@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Post } from '../types.ts';
+import { Calendar, User, ArrowRight } from 'lucide-react';
 
 interface PostCardProps {
   post: Post;
@@ -12,35 +13,46 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isDark, onClick }) => 
   return (
     <article 
       onClick={() => onClick(post.id)}
-      className={`group cursor-pointer rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border ${isDark ? 'bg-zinc-900 border-zinc-800 hover:border-indigo-500/50' : 'bg-white border-gray-100'}`}
+      className={`blog-card group cursor-pointer rounded-[2rem] overflow-hidden flex flex-col h-full border ${
+        isDark 
+          ? 'bg-zinc-900/50 border-zinc-800 hover:border-indigo-500/30' 
+          : 'bg-white border-zinc-100 shadow-xl shadow-zinc-200/50'
+      }`}
     >
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-64 overflow-hidden">
         <img 
           src={post.image} 
           alt={post.title} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-          {post.category}
+        <div className="absolute top-5 right-5">
+          <span className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-xl">
+            {post.category}
+          </span>
         </div>
       </div>
-      <div className="p-6">
-        <div className="flex items-center text-xs mb-3 text-indigo-500 font-semibold space-x-reverse space-x-3">
-          <span>{post.date}</span>
-          <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-          <span>{post.author}</span>
+      
+      <div className="p-8 flex flex-col flex-grow">
+        <div className="flex items-center gap-4 text-[11px] mb-4 opacity-60 font-bold">
+          <div className="flex items-center gap-1"><Calendar size={12} /> {post.date}</div>
+          <div className="flex items-center gap-1"><User size={12} /> {post.author}</div>
         </div>
-        <h3 className="text-xl font-bold mb-3 group-hover:text-indigo-500 transition-colors leading-tight">
+        
+        <h3 className="text-xl font-black mb-4 leading-snug group-hover:text-indigo-500 transition-colors">
           {post.title}
         </h3>
-        <p className={`text-sm leading-relaxed mb-4 line-clamp-3 ${isDark ? 'text-zinc-400' : 'text-gray-600'}`}>
+        
+        <p className={`text-sm leading-relaxed mb-6 line-clamp-2 ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
           {post.excerpt}
         </p>
-        <div className="flex items-center text-indigo-600 font-bold text-sm">
-          اقرأ المزيد
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 transition-transform group-hover:translate-x-[-4px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+        
+        <div className="mt-auto flex items-center justify-between">
+          <span className="text-indigo-500 font-black text-xs flex items-center gap-2">
+            اكتشف المزيد <ArrowRight size={14} className="group-hover:translate-x-[-4px] transition-transform" />
+          </span>
+          <div className="w-8 h-1 bg-indigo-500/20 rounded-full overflow-hidden">
+            <div className="w-0 group-hover:w-full h-full bg-indigo-500 transition-all duration-500"></div>
+          </div>
         </div>
       </div>
     </article>
