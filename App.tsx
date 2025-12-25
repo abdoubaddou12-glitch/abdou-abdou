@@ -40,17 +40,17 @@ const App: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
-    const savedPosts = localStorage.getItem('blog_posts');
-    if (savedPosts) {
-      const parsed = JSON.parse(savedPosts);
-      if (parsed.length > 0) {
-        setPosts(parsed);
+    try {
+      const savedPosts = localStorage.getItem('blog_posts');
+      if (savedPosts) {
+        const parsed = JSON.parse(savedPosts);
+        setPosts(parsed.length > 0 ? parsed : MOCK_POSTS);
       } else {
         setPosts(MOCK_POSTS);
+        localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
       }
-    } else {
+    } catch (e) {
       setPosts(MOCK_POSTS);
-      localStorage.setItem('blog_posts', JSON.stringify(MOCK_POSTS));
     }
 
     const savedTheme = localStorage.getItem('theme');
@@ -58,20 +58,26 @@ const App: React.FC = () => {
   }, []);
 
   const toggleTheme = () => {
-    setIsDark(!isDark);
-    localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+    const nextTheme = !isDark;
+    setIsDark(nextTheme);
+    localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
   };
 
   const handleSavePost = (newPostData: Partial<Post>) => {
     let updatedPosts;
     if (editingPostId) {
-      updatedPosts = posts.map(p => p.id === editingPostId ? { ...p, ...newPostData } : p);
+      updatedPosts = posts.map(p => p.id === editingPostId ? { ...p, ...newPostData } as Post : p);
     } else {
       const newPost: Post = {
         id: Date.now().toString(),
         author: 'المشرف',
         date: new Date().toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', year: 'numeric' }),
         status: 'published',
+        title: '',
+        excerpt: '',
+        content: '',
+        category: 'تقنية',
+        image: '',
         ...(newPostData as Post)
       };
       updatedPosts = [newPost, ...posts];
@@ -90,36 +96,14 @@ const App: React.FC = () => {
     }
   };
 
-  const renderHome = () => (
-    <div className="max-w-7xl mx-auto px-6 py-12 animate-fade-in">
-      <header className="mb-16 text-center">
-        <div className="inline-block px-4 py-1.5 mb-6 text-sm font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full">
-          مدونة الجيل القادم
-        </div>
-        <h1 className="text-5xl md:text-8xl font-black mb-8 italic tracking-tighter leading-tight">
-          نبني المحتوى <br/> <span className="text-indigo-600">بذكاء.</span>
-        </h1>
-        <p className={`text-xl max-w-2xl mx-auto leading-relaxed ${isDark ? 'text-zinc-400' : 'text-gray-500'}`}>
-          استكشف مقالات معمقة في عالم التكنولوجيا والتصميم، مدعومة بأحدث تقنيات الذكاء الاصطناعي.
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {posts.filter(p => p.status === 'published').map(post => (
-          <PostCard 
-            key={post.id} 
-            post={post} 
-            isDark={isDark} 
-            onClick={(id) => {
-              setSelectedPost(posts.find(p => p.id === id) || null);
-              setView('post');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        ))}
-      </div>
-    </div>
-  );
+  const navigateToPost = (id: string) => {
+    const post = posts.find(p => p.id === id);
+    if (post) {
+      setSelectedPost(post);
+      setView('post');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <Layout isDark={isDark}>
@@ -131,21 +115,35 @@ const App: React.FC = () => {
       />
       
       <main className="min-h-[70vh]">
-        {currentView === 'home' && renderHome()}
+        {currentView === 'home' && (
+          <div className="max-w-7xl mx-auto px-6 py-12 animate-fade-in">
+            <header className="mb-16 text-center">
+              <h1 className="text-5xl md:text-8xl font-black mb-8 italic tracking-tighter leading-tight">
+                نبني المحتوى <br/> <span className="text-indigo-600">بذكاء.</span>
+              </h1>
+              <p className={`text-xl max-w-2xl mx-auto leading-relaxed ${isDark ? 'text-zinc-400' : 'text-gray-500'}`}>
+                اكتشف مقالات معمقة في عالم التكنولوجيا والتصميم، مدعومة بأحدث تقنيات الذكاء الاصطناعي.
+              </p>
+            </header>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.filter(p => p.status === 'published').map(post => (
+                <PostCard key={post.id} post={post} isDark={isDark} onClick={navigateToPost} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {currentView === 'post' && selectedPost && (
           <div className="max-w-4xl mx-auto px-6 py-12 animate-fade-in">
-            <button 
-              onClick={() => setView('home')}
-              className="flex items-center text-indigo-600 font-bold mb-10 hover:translate-x-1 transition-transform"
-            >
+            <button onClick={() => setView('home')} className="flex items-center text-indigo-600 font-bold mb-10 hover:translate-x-1 transition-transform">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 12H5m7 7l-7-7 7-7" />
               </svg>
               العودة للرئيسية
             </button>
             <img src={selectedPost.image} className="w-full h-[300px] md:h-[500px] object-cover rounded-3xl mb-12 shadow-2xl" alt={selectedPost.title} />
-            <div className="flex items-center mb-6 gap-4">
-              <span className="bg-indigo-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">{selectedPost.category}</span>
+            <div className="flex items-center mb-6 gap-4 font-bold">
+              <span className="bg-indigo-600 text-white px-4 py-1 rounded-full text-xs uppercase tracking-widest">{selectedPost.category}</span>
               <span className="text-sm opacity-50">{selectedPost.date}</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-black mb-10 leading-tight tracking-tight">{selectedPost.title}</h1>
@@ -154,6 +152,7 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
+
         {currentView === 'admin' && (
           <AdminPanel 
             posts={posts} 
@@ -163,6 +162,7 @@ const App: React.FC = () => {
             onDeletePost={handleDeletePost}
           />
         )}
+
         {currentView === 'editor' && (
           <PostEditor 
             isDark={isDark}
@@ -174,18 +174,9 @@ const App: React.FC = () => {
       </main>
 
       <footer className={`mt-24 py-16 border-t ${isDark ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-gray-100'}`}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="text-3xl font-black text-indigo-600 italic">مدونتي.</div>
-            <div className="flex gap-8 text-sm font-medium opacity-60">
-              <button className="hover:text-indigo-600">سياسة الخصوصية</button>
-              <button className="hover:text-indigo-600">اتصل بنا</button>
-              <button className="hover:text-indigo-600">الأرشيف</button>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-gray-50 dark:border-zinc-900 text-center text-xs opacity-40">
-            © {new Date().getFullYear()} جميع الحقوق محفوظة لمدونتي الاحترافية. صنع بكل شغف.
-          </div>
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="text-3xl font-black text-indigo-600 italic mb-4">مدونتي.</div>
+          <p className="text-sm opacity-50">© {new Date().getFullYear()} جميع الحقوق محفوظة لمدونتي الاحترافية.</p>
         </div>
       </footer>
     </Layout>
