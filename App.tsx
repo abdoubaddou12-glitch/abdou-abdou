@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Post, View } from './types';
-import { Layout } from './components/Layout';
-import { Navigation } from './components/Navigation';
-import { PostCard } from './components/PostCard';
-import { AdminPanel } from './components/AdminPanel';
-import { PostEditor } from './components/PostEditor';
+import { Post, View } from './types.ts';
+import { Layout } from './components/Layout.tsx';
+import { Navigation } from './components/Navigation.tsx';
+import { PostCard } from './components/PostCard.tsx';
+import { AdminPanel } from './components/AdminPanel.tsx';
+import { PostEditor } from './components/PostEditor.tsx';
 
 const MOCK_POSTS: Post[] = [
   {
@@ -135,7 +135,7 @@ const App: React.FC = () => {
         {currentView === 'post' && selectedPost && (
           <div className="max-w-4xl mx-auto px-6 py-12 animate-fade-in">
             <button onClick={() => setView('home')} className="flex items-center text-indigo-600 font-bold mb-10 hover:translate-x-1 transition-transform">
-              العودة للرئيسية →
+              العودة للرئيسية ←
             </button>
             <img src={selectedPost.image} className="w-full h-[300px] md:h-[500px] object-cover rounded-3xl mb-12 shadow-2xl" alt={selectedPost.title} />
             <div className="flex items-center mb-6 gap-4 font-bold">

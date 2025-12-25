@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Post } from '../types';
-import { generatePostContent } from '../services/geminiService';
+import { Post } from '../types.ts';
+import { generatePostContent } from '../services/geminiService.ts';
 
 interface PostEditorProps {
   post?: Post;

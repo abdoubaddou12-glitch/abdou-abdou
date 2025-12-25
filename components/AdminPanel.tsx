@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Post } from '../types';
+import { Post } from '../types.ts';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface AdminPanelProps {
