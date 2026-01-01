@@ -1,6 +1,6 @@
 {
-  "name": "Storehalal Convert & Blog",
-  "description": "المنصة الرسمية لـ Storehalal على الدومين storehalal.shop - تحويل صور ومدونة تقنية.",
+  "name": "Storehalal Convert",
+  "description": "الأداة الاحترافية لتحويل ومعالجة الصور في المتصفح بخصوصية تامة.",
   "requestFramePermissions": [
     "camera"
   ]
