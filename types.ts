@@ -1,27 +1,21 @@
 
-export interface ImageFile {
+export type View = 'home' | 'admin' | 'login';
+
+export interface AdSenseConfig {
+  isEnabled: boolean;
+  publisherId: string;
+  slotId: string;
+}
+
+export interface ImageConversion {
   id: string;
-  name: string;
-  size: number;
-  type: string;
-  preview: string;
+  timestamp: number;
+  format: string;
+  originalSize: number;
+  resultSize: number;
 }
 
-export interface ConversionSettings {
-  format: 'webp' | 'jpeg' | 'png';
-  quality: number;
-  width?: number;
-  height?: number;
-}
-
-export type ConversionStatus = 'idle' | 'processing' | 'completed' | 'error';
-
-/**
- * Types for Abdou Web Admin and Navigation
- */
-
-export type View = 'home' | 'admin' | 'editor' | 'adsense' | 'security';
-
+// Added Post interface to fix import errors in PostCard and PostEditor
 export interface Post {
   id: string;
   title: string;
@@ -33,16 +27,11 @@ export interface Post {
   status: string;
 }
 
+// Added AnalyticsData interface to fix import errors in AdminPanel
 export interface AnalyticsData {
   totalViews: number;
   liveVisitors: number;
   dailyEarnings: number[];
   ctr: string;
   cpc: string;
-}
-
-export interface AdSenseConfig {
-  isEnabled: boolean;
-  publisherId: string;
-  slotId: string;
 }
