@@ -4,7 +4,8 @@ import {
   Upload, Download, Trash2, Sliders, Image as ImageIcon, 
   Loader2, CheckCircle, RefreshCw, Maximize2, Minimize2,
   Lock, Unlock, Palette, RotateCw, FlipHorizontal, FlipVertical,
-  Type, Info, Settings2
+  Type, Info, Settings2, Crop, ShieldCheck, Square, Circle, 
+  Layers, Ghost, Frame, Save
 } from 'lucide-react';
 
 interface ConverterProps {
@@ -12,24 +13,36 @@ interface ConverterProps {
   isDark: boolean;
 }
 
+type SettingsTab = 'transform' | 'filters' | 'output';
+
 export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<SettingsTab>('transform');
+  
+  // Settings State
   const [format, setFormat] = useState<'webp' | 'png' | 'jpeg'>('webp');
   const [quality, setQuality] = useState(85);
-  
-  // Resizing and Filters
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
-  const [originalAspectRatio, setOriginalAspectRatio] = useState<number>(1);
   const [lockAspectRatio, setLockAspectRatio] = useState(true);
-  const [isGrayscale, setIsGrayscale] = useState(false);
+  const [originalAspectRatio, setOriginalAspectRatio] = useState<number>(1);
   
-  // Advanced Download Options
-  const [rotation, setRotation] = useState(0); // 0, 90, 180, 270
+  // Transform & Shape
+  const [rotation, setRotation] = useState(0);
   const [flipH, setFlipH] = useState(false);
   const [flipV, setFlipV] = useState(false);
+  const [isCircle, setIsCircle] = useState(false);
+  
+  // Filters & Effects
+  const [isGrayscale, setIsGrayscale] = useState(false);
+  const [watermark, setWatermark] = useState('');
+  const [padding, setPadding] = useState(0);
+  const [borderColor, setBorderColor] = useState('#10b981');
+
+  // Output Settings
   const [customFilename, setCustomFilename] = useState('');
+  const [stripMetadata, setStripMetadata] = useState(true);
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -55,16 +68,7 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) =>
 
   const handleWidthChange = (val: number) => {
     setWidth(val);
-    if (lockAspectRatio) {
-      setHeight(Math.round(val / originalAspectRatio));
-    }
-  };
-
-  const handleHeightChange = (val: number) => {
-    setHeight(val);
-    if (lockAspectRatio) {
-      setWidth(Math.round(val * originalAspectRatio));
-    }
+    if (lockAspectRatio) setHeight(Math.round(val / originalAspectRatio));
   };
 
   const handleConvert = async () => {
@@ -75,37 +79,51 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) =>
     img.src = preview;
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      
-      // Determine canvas dimensions based on rotation
       const isRotated = rotation === 90 || rotation === 270;
-      const targetWidth = width || img.width;
-      const targetHeight = height || img.height;
       
-      canvas.width = isRotated ? targetHeight : targetWidth;
-      canvas.height = isRotated ? targetWidth : targetHeight;
+      const baseWidth = width || img.width;
+      const baseHeight = height || img.height;
+      
+      // Calculate final canvas size including padding
+      const finalWidth = (isRotated ? baseHeight : baseWidth) + (padding * 2);
+      const finalHeight = (isRotated ? baseWidth : baseHeight) + (padding * 2);
+      
+      canvas.width = finalWidth;
+      canvas.height = finalHeight;
       
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Move origin to center for rotation/flip
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        
-        // Apply rotation
-        ctx.rotate((rotation * Math.PI) / 180);
-        
-        // Apply flips
-        const scaleX = flipH ? -1 : 1;
-        const scaleY = flipV ? -1 : 1;
-        ctx.scale(scaleX, scaleY);
-        
-        // Apply Grayscale filter
-        if (isGrayscale) {
-          ctx.filter = 'grayscale(100%)';
+        // 1. Draw Background/Border
+        if (padding > 0) {
+          ctx.fillStyle = borderColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
+
+        // 2. Prepare Clipping for Circle Shape
+        if (isCircle) {
+          ctx.beginPath();
+          ctx.arc(canvas.width / 2, canvas.height / 2, Math.min(baseWidth, baseHeight) / 2, 0, Math.PI * 2);
+          ctx.clip();
+        }
+
+        // 3. Transform and Draw Image
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
         
-        // Draw the image centered
-        ctx.drawImage(img, -targetWidth / 2, -targetHeight / 2, targetWidth, targetHeight);
+        if (isGrayscale) ctx.filter = 'grayscale(100%)';
+        
+        ctx.drawImage(img, -baseWidth / 2, -baseHeight / 2, baseWidth, baseHeight);
+        ctx.restore();
+
+        // 4. Draw Watermark
+        if (watermark) {
+          ctx.font = `${Math.max(20, baseWidth / 20)}px Tajawal`;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+          ctx.textAlign = 'center';
+          ctx.fillText(watermark, canvas.width / 2, canvas.height - 40);
+        }
       }
       
       const dataUrl = canvas.toDataURL(`image/${format}`, quality / 100);
@@ -119,217 +137,178 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) =>
     if (!result) return;
     const link = document.createElement('a');
     link.href = result;
-    const finalName = customFilename || `storehalal-convert-${Date.now()}`;
-    link.download = `${finalName}.${format}`;
+    link.download = `${customFilename || 'image'}.${format}`;
     link.click();
   };
 
-  const reset = () => {
-    setSelectedImage(null);
-    setPreview(null);
-    setResult(null);
-    setIsGrayscale(false);
-    setRotation(0);
-    setFlipH(false);
-    setFlipV(false);
-  };
-
-  const toggleRotation = () => {
-    setRotation((prev) => (prev + 90) % 360);
-  };
-
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-6xl mx-auto space-y-8">
       {!preview ? (
         <div 
           onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
-          className={`emerald-card p-20 border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all group ${isDark ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'bg-white border-emerald-500/30 hover:border-emerald-500 shadow-sm'}`}
+          className={`emerald-card p-24 border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all group ${isDark ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'bg-white border-emerald-500/30 hover:border-emerald-500 shadow-sm'}`}
         >
           <input type="file" ref={fileInputRef} hidden onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} accept="image/*" />
-          <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-2xl ${isDark ? 'bg-emerald-500/10 text-emerald-500 shadow-emerald-500/10' : 'bg-emerald-50 text-emerald-600 shadow-emerald-500/5'}`}>
-            <Upload size={32} />
+          <div className="w-24 h-24 rounded-[2.5rem] bg-emerald-500/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-all text-emerald-500">
+            <Upload size={40} />
           </div>
-          <h2 className="text-2xl font-black mb-4">اسحب الصورة هنا أو اضغط للرفع</h2>
-          <p className={`font-bold uppercase tracking-widest text-xs italic ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>JPG, PNG, WebP هي الصيغ المدعومة</p>
+          <h2 className="text-3xl font-black mb-3">ابدأ معالجة صورك الآن</h2>
+          <p className="opacity-40 font-bold uppercase tracking-widest text-xs">ادعم جودة موقعك بتحويل الصور لـ WebP</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-slide-up items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-slide-up">
           
-          {/* Preview Section */}
-          <div className={`lg:col-span-5 emerald-card p-6 overflow-hidden ${!isDark && 'bg-white'}`}>
-            <div className={`relative aspect-square rounded-2xl overflow-hidden border transition-all ${isDark ? 'border-white/5 bg-zinc-900' : 'border-zinc-100 bg-zinc-50'}`}>
-              <div 
-                className="w-full h-full flex items-center justify-center transition-all duration-300"
-                style={{ 
-                  transform: `rotate(${rotation}deg) scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
-                  filter: isGrayscale ? 'grayscale(100%)' : 'none'
-                }}
-              >
-                <img src={preview} className="max-w-full max-h-full object-contain" alt="Original" />
-              </div>
-              
-              <div className="absolute top-4 right-4 flex gap-2">
-                <button onClick={reset} className="p-3 bg-red-500/20 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                  <Trash2 size={16} />
+          {/* Left: Interactive Preview */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className={`emerald-card p-6 ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
+              <div className={`relative aspect-square rounded-3xl overflow-hidden border ${isDark ? 'border-white/5 bg-zinc-900' : 'border-zinc-100 bg-zinc-50'}`}>
+                <div 
+                  className={`w-full h-full flex items-center justify-center transition-all duration-500 ${isCircle ? 'rounded-full overflow-hidden' : ''}`}
+                  style={{ 
+                    transform: `rotate(${rotation}deg) scaleX(${flipH ? -1 : 1}) scaleY(${flipV ? -1 : 1})`,
+                    filter: isGrayscale ? 'grayscale(100%)' : 'none',
+                    backgroundColor: padding > 0 ? borderColor : 'transparent',
+                    padding: `${padding / 4}px` // Preview scaling
+                  }}
+                >
+                  <img src={preview} className="max-w-full max-h-full object-contain" alt="Preview" />
+                </div>
+                {watermark && (
+                  <div className="absolute bottom-10 left-0 right-0 text-center text-white/40 font-black text-xl pointer-events-none uppercase tracking-widest">
+                    {watermark}
+                  </div>
+                )}
+                <button onClick={() => setSelectedImage(null)} className="absolute top-4 right-4 p-3 bg-red-500 text-white rounded-2xl hover:scale-110 transition-all shadow-lg">
+                  <Trash2 size={18} />
                 </button>
               </div>
-              
-              <div className="absolute bottom-4 left-4 flex gap-2">
-                <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl text-[10px] font-black border border-white/10 uppercase tracking-widest text-white">معاينة التعديلات</div>
+
+              <div className="mt-8 grid grid-cols-3 gap-3">
+                 <PreviewStat label="الحجم" value={`${(selectedImage!.size / 1024).toFixed(0)} KB`} isDark={isDark} />
+                 <PreviewStat label="العرض" value={`${width}px`} isDark={isDark} />
+                 <PreviewStat label="الارتفاع" value={`${height}px`} isDark={isDark} />
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4">
-               <div className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
-                 <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>حجم الملف</p>
-                 <p className="font-black">{(selectedImage!.size / 1024).toFixed(1)} KB</p>
-               </div>
-               <div className={`p-4 rounded-xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
-                 <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>أبعاد الصورة</p>
-                 <p className="font-black">{width}x{height}</p>
-               </div>
-            </div>
-
-            <div className="mt-6 space-y-4">
-               <label className={`text-[10px] font-black uppercase tracking-widest pr-1 ${isDark ? 'opacity-40' : 'text-zinc-400'}`}>أدوات التحرير السريع</label>
-               <div className="flex gap-2">
-                 <button onClick={toggleRotation} className={`flex-grow p-4 rounded-xl border flex items-center justify-center gap-2 font-black text-[10px] transition-all ${isDark ? 'bg-white/5 border-white/10 hover:bg-emerald-500/10 hover:text-emerald-500' : 'bg-zinc-100 border-zinc-200 hover:bg-emerald-50 text-zinc-600 hover:text-emerald-600'}`}>
-                   <RotateCw size={14} /> تدوير {rotation}°
-                 </button>
-                 <button onClick={() => setFlipH(!flipH)} className={`p-4 rounded-xl border flex items-center justify-center transition-all ${flipH ? 'bg-emerald-500 text-black border-transparent' : isDark ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
-                   <FlipHorizontal size={14} />
-                 </button>
-                 <button onClick={() => setFlipV(!flipV)} className={`p-4 rounded-xl border flex items-center justify-center transition-all ${flipV ? 'bg-emerald-500 text-black border-transparent' : isDark ? 'bg-white/5 border-white/10' : 'bg-zinc-100 border-zinc-200 text-zinc-600'}`}>
-                   <FlipVertical size={14} />
-                 </button>
-               </div>
+            <div className={`emerald-card p-6 flex items-center justify-between ${!isDark && 'bg-white'}`}>
+              <span className="text-xs font-black uppercase tracking-widest opacity-40">أدوات الشكل السريع</span>
+              <div className="flex gap-2">
+                <button onClick={() => setIsCircle(!isCircle)} className={`p-4 rounded-xl transition-all ${isCircle ? 'bg-emerald-500 text-black' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                  <Circle size={18} />
+                </button>
+                <button onClick={() => { setRotation((rotation + 90) % 360) }} className="p-4 rounded-xl bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-black transition-all">
+                  <RotateCw size={18} />
+                </button>
+                <button onClick={() => setFlipH(!flipH)} className={`p-4 rounded-xl transition-all ${flipH ? 'bg-emerald-500 text-black' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                  <FlipHorizontal size={18} />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Settings Section */}
-          <div className={`lg:col-span-7 emerald-card p-8 flex flex-col h-full ${!isDark && 'bg-white'}`}>
-            <div className="space-y-8 flex-grow">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <Settings2 className="text-emerald-500" size={20} />
-                  <h3 className="text-xl font-black italic tracking-tighter">إعدادات التحميل الاحترافية</h3>
-                </div>
-                <div className="hidden sm:flex items-center gap-2 text-[9px] font-bold opacity-30 uppercase tracking-widest">
-                  <Info size={12} /> معالجة فورية بدون سيرفر
-                </div>
-              </div>
+          {/* Right: Tabbed Settings */}
+          <div className={`lg:col-span-7 emerald-card p-10 flex flex-col min-h-[600px] ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
+            {/* Tabs Header */}
+            <div className="flex gap-1 p-1.5 rounded-2xl bg-black/20 mb-10">
+              <TabBtn active={activeTab === 'transform'} onClick={() => setActiveTab('transform')} icon={<Maximize2 size={16}/>} label="الأبعاد والشكل" />
+              <TabBtn active={activeTab === 'filters'} onClick={() => setActiveTab('filters')} icon={<Palette size={16}/>} label="الفلاتر والمؤثرات" />
+              <TabBtn active={activeTab === 'output'} onClick={() => setActiveTab('output')} icon={<Save size={16}/>} label="إعدادات الملف" />
+            </div>
 
-              {/* Custom Filename */}
-              <div className="space-y-4 p-6 rounded-2xl border bg-emerald-500/5 border-emerald-500/10">
-                <label className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                  <Type size={14} /> اسم الملف المخصص
-                </label>
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    value={customFilename}
-                    onChange={(e) => setCustomFilename(e.target.value)}
-                    placeholder="أدخل اسم الملف..."
-                    className={`w-full px-6 py-4 rounded-xl border font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all ${isDark ? 'bg-black/40 border-white/10 text-white' : 'bg-white border-zinc-200 text-zinc-900'}`}
-                  />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black opacity-20">.{format}</div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Dimensions Input */}
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center pr-1">
-                    <label className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-40' : 'text-zinc-400'}`}>تغيير المقاس (Px)</label>
-                    <button onClick={() => setLockAspectRatio(!lockAspectRatio)} className="text-emerald-500 flex items-center gap-1 text-[9px] font-black">
-                      {lockAspectRatio ? <Lock size={12} /> : <Unlock size={12} className="opacity-40" />}
-                      {lockAspectRatio ? 'مقفل' : 'حر'}
+            <div className="flex-grow">
+              {activeTab === 'transform' && (
+                <div className="space-y-8 animate-slide-up">
+                  <div className="grid grid-cols-2 gap-6">
+                    <InputField label="العرض (Width)" value={width} onChange={(v) => handleWidthChange(v)} isDark={isDark} />
+                    <InputField label="الارتفاع (Height)" value={height} onChange={(v) => setHeight(v)} isDark={isDark} disabled={lockAspectRatio} />
+                  </div>
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
+                    <span className="text-xs font-black uppercase tracking-widest text-emerald-500">قفل النسبة والتناسب</span>
+                    <button onClick={() => setLockAspectRatio(!lockAspectRatio)} className={`p-2 rounded-lg transition-all ${lockAspectRatio ? 'text-emerald-500' : 'text-zinc-500'}`}>
+                      {lockAspectRatio ? <Lock size={20}/> : <Unlock size={20}/>}
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="relative">
-                      <input 
-                        type="number" value={width} onChange={(e) => handleWidthChange(parseInt(e.target.value) || 0)}
-                        className={`w-full px-4 py-4 rounded-xl border font-bold text-center outline-none focus:border-emerald-500 transition-all ${isDark ? 'bg-black/40 border-white/10' : 'bg-zinc-50 border-zinc-200'}`}
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black opacity-20">W</span>
-                    </div>
-                    <div className="relative">
-                      <input 
-                        type="number" value={height} onChange={(e) => handleHeightChange(parseInt(e.target.value) || 0)}
-                        className={`w-full px-4 py-4 rounded-xl border font-bold text-center outline-none focus:border-emerald-500 transition-all ${isDark ? 'bg-black/40 border-white/10' : 'bg-zinc-50 border-zinc-200'}`}
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black opacity-20">H</span>
-                    </div>
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">هوامش الصورة (Padding)</label>
+                    <input type="range" min="0" max="200" value={padding} onChange={(e) => setPadding(Number(e.target.value))} className="w-full accent-emerald-500 h-1.5 bg-zinc-800 rounded-full appearance-none" />
+                    {padding > 0 && (
+                      <div className="flex gap-2">
+                        {['#10b981', '#ffffff', '#000000', '#f43f5e', '#3b82f6'].map(c => (
+                          <button key={c} onClick={() => setBorderColor(c)} className={`w-8 h-8 rounded-full border-2 ${borderColor === c ? 'border-white scale-110' : 'border-transparent'}`} style={{backgroundColor: c}} />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
+              )}
 
-                {/* Format Selection */}
-                <div className="space-y-4">
-                  <label className={`text-[10px] font-black uppercase tracking-widest pr-1 ${isDark ? 'opacity-40' : 'text-zinc-400'}`}>الصيغة النهائية</label>
-                  <div className="flex gap-2">
-                    {['webp', 'png', 'jpeg'].map((f) => (
-                      <button 
-                        key={f}
-                        onClick={() => setFormat(f as any)}
-                        className={`flex-grow py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${format === f ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : isDark ? 'bg-white/5 opacity-40 hover:opacity-100 border border-white/5' : 'bg-zinc-100 text-zinc-500 border border-zinc-200 hover:bg-zinc-200'}`}
-                      >
+              {activeTab === 'filters' && (
+                <div className="space-y-8 animate-slide-up">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">العلامة المائية (نص)</label>
+                    <input 
+                      type="text" value={watermark} onChange={(e) => setWatermark(e.target.value)}
+                      placeholder="مثال: Storehalal.shop"
+                      className={`w-full px-6 py-4 rounded-2xl border outline-none font-bold ${isDark ? 'bg-black/40 border-white/5 text-white' : 'bg-zinc-50 border-zinc-200 text-zinc-900'}`}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => setIsGrayscale(!isGrayscale)}
+                    className={`w-full py-5 rounded-2xl border font-black text-sm transition-all flex items-center justify-center gap-3 ${isGrayscale ? 'bg-emerald-500 text-black border-transparent' : 'bg-emerald-500/5 text-emerald-500 border-emerald-500/20'}`}
+                  >
+                    <Ghost size={20} /> وضع الأبيض والأسود (Grayscale)
+                  </button>
+                </div>
+              )}
+
+              {activeTab === 'output' && (
+                <div className="space-y-8 animate-slide-up">
+                   <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">تعديل اسم الملف</label>
+                    <input 
+                      type="text" value={customFilename} onChange={(e) => setCustomFilename(e.target.value)}
+                      className={`w-full px-6 py-4 rounded-2xl border outline-none font-bold ${isDark ? 'bg-black/40 border-white/5 text-white' : 'bg-zinc-50 border-zinc-200 text-zinc-900'}`}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['webp', 'png', 'jpeg'].map(f => (
+                      <button key={f} onClick={() => setFormat(f as any)} className={`py-4 rounded-xl font-black text-xs uppercase transition-all ${format === f ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-500 hover:bg-zinc-700'}`}>
                         {f}
                       </button>
                     ))}
                   </div>
-                </div>
-              </div>
-
-              {/* Quality & Effects */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center pr-1">
-                    <label className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-40' : 'text-zinc-400'}`}>جودة الضغط (Quality)</label>
-                    <span className="text-emerald-500 font-black text-sm">{quality}%</span>
+                  <div className="flex items-center justify-between p-5 rounded-2xl bg-zinc-900/50 border border-white/5">
+                    <div className="flex items-center gap-3">
+                      <ShieldCheck className="text-emerald-500" size={20} />
+                      <span className="text-xs font-bold">إزالة بيانات EXIF (الخصوصية القصوى)</span>
+                    </div>
+                    <button onClick={() => setStripMetadata(!stripMetadata)} className={`w-10 h-5 rounded-full transition-all relative ${stripMetadata ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
+                      <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${stripMetadata ? 'right-6' : 'right-1'}`} />
+                    </button>
                   </div>
-                  <input 
-                    type="range" min="10" max="100" value={quality}
-                    onChange={(e) => setQuality(Number(e.target.value))}
-                    className="w-full accent-emerald-500 h-1.5 bg-emerald-500/10 rounded-full appearance-none cursor-pointer"
-                  />
                 </div>
-                
-                <div className="pt-4 md:pt-0">
-                  <button 
-                    onClick={() => setIsGrayscale(!isGrayscale)}
-                    className={`w-full py-4 rounded-xl border transition-all flex items-center justify-center gap-3 text-xs font-black uppercase tracking-widest ${isGrayscale ? 'bg-emerald-500 text-black border-transparent shadow-lg shadow-emerald-500/20' : isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-zinc-100 border-zinc-200 hover:bg-zinc-200 text-zinc-600'}`}
-                  >
-                    <Palette size={16} /> فلاتر: {isGrayscale ? 'أبيض وأسود' : 'الألوان الأصلية'}
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
 
-            <div className="pt-12">
+            <div className="mt-12">
               {!result ? (
                 <button 
                   onClick={handleConvert}
                   disabled={isProcessing}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-5 rounded-2xl font-black shadow-2xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3 group"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-6 rounded-3xl font-black text-lg shadow-2xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-4 group"
                 >
-                  {isProcessing ? <Loader2 size={24} className="animate-spin" /> : <RefreshCw size={24} className="group-hover:rotate-180 transition-transform duration-500" />}
-                  تطبيق الإعدادات والتحويل
+                  {isProcessing ? <Loader2 className="animate-spin" /> : <RefreshCw className="group-hover:rotate-180 transition-transform duration-700" />}
+                  بدء المعالجة الذكية
                 </button>
               ) : (
-                <div className="space-y-4 animate-slide-up">
+                <div className="space-y-4">
                   <button 
                     onClick={handleDownload}
-                    className={`w-full py-6 rounded-2xl font-black shadow-2xl transition-all flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] ${isDark ? 'bg-white text-black shadow-white/5' : 'bg-zinc-900 text-white shadow-zinc-900/10'}`}
+                    className="w-full bg-white text-black py-6 rounded-3xl font-black text-lg shadow-2xl transition-all flex items-center justify-center gap-4 hover:scale-[1.02]"
                   >
-                    <Download size={28} /> تحميل الملف المحول
+                    <Download size={24} /> تحميل بنسخة {format.toUpperCase()}
                   </button>
-                  <div className="flex items-center justify-center gap-3 text-emerald-500 py-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">جاهز للاستخدام الفوري</span>
-                  </div>
+                  <p className="text-center text-[10px] font-black text-emerald-500 uppercase tracking-widest animate-pulse">تمت المعالجة بنجاح!</p>
                 </div>
               )}
             </div>
@@ -339,3 +318,30 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) =>
     </div>
   );
 };
+
+const PreviewStat = ({ label, value, isDark }: { label: string, value: string, isDark: boolean }) => (
+  <div className={`p-4 rounded-2xl border text-center ${isDark ? 'bg-black/40 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
+    <p className="text-[8px] font-black uppercase tracking-widest opacity-30 mb-1">{label}</p>
+    <p className="text-sm font-black italic">{value}</p>
+  </div>
+);
+
+const TabBtn = ({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: any, label: string }) => (
+  <button 
+    onClick={onClick}
+    className={`flex-grow flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${active ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500 hover:text-white'}`}
+  >
+    {icon} <span className="hidden md:inline">{label}</span>
+  </button>
+);
+
+const InputField = ({ label, value, onChange, isDark, disabled = false }: any) => (
+  <div className="space-y-2">
+    <label className="text-[10px] font-black uppercase tracking-widest opacity-40 pr-2">{label}</label>
+    <input 
+      type="number" value={value} onChange={(e) => onChange(Number(e.target.value))}
+      disabled={disabled}
+      className={`w-full px-6 py-4 rounded-2xl border outline-none font-black text-center transition-all ${disabled ? 'opacity-20 cursor-not-allowed' : ''} ${isDark ? 'bg-black/40 border-white/5 text-white focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:border-emerald-500'}`}
+    />
+  </div>
+);
