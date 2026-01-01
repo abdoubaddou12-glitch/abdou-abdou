@@ -5,7 +5,8 @@ import {
   BarChart3, Lock, CheckCircle, Link as LinkIcon, 
   Image as ImageIcon, Download, Sliders, Zap,
   Sun, Moon, ArrowLeft, History, ShieldCheck,
-  HardDrive, ZapOff, Trash2
+  HardDrive, ZapOff, Trash2, Facebook, Twitter, 
+  MessageCircle, Send, Linkedin
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -53,15 +54,18 @@ export default function App() {
   };
 
   const analytics: AnalyticsData = {
-    totalViews: totalConverted, // نستخدمها هنا كعدد عمليات التحويل
+    totalViews: totalConverted,
     liveVisitors: Math.floor(Math.random() * 10) + 1,
-    dailyEarnings: [totalConverted * 0.1, totalConverted * 0.15, totalConverted * 0.05, totalConverted * 0.2], // افتراضي
-    ctr: `${(totalSavedMB).toFixed(1)} MB`, // نستخدمها لعرض المساحة الموفرة
+    dailyEarnings: [totalConverted * 0.1, totalConverted * 0.15, totalConverted * 0.05, totalConverted * 0.2],
+    ctr: `${(totalSavedMB).toFixed(1)} MB`,
     cpc: 'High'
   };
 
+  const siteUrl = "https://storehalal.shop";
+  const shareText = "أداة Storehalal Convert الرائعة لتحويل الصور وتغيير مقاساتها فوراً في المتصفح! جربها الآن:";
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(siteUrl);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
@@ -157,7 +161,7 @@ export default function App() {
               <ArrowLeft size={16} /> العودة للمحول
             </button>
             <AdminPanel 
-              posts={[]} // لا توجد مقالات الآن
+              posts={[]}
               isDark={isDark}
               analytics={analytics}
               onNewPost={() => {}} 
@@ -174,15 +178,73 @@ export default function App() {
       {/* Footer */}
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <span className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
-          <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Browser-Based Image Toolkit</p>
-          <div className="mt-8 flex justify-center gap-6">
-             <button onClick={copyToClipboard} className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${copySuccess ? 'text-emerald-500' : 'opacity-40 hover:opacity-100'}`}>
-               <LinkIcon size={14} /> {copySuccess ? 'تم النسخ!' : 'نسخ رابط الأداة'}
-             </button>
+          <div className="mb-8">
+            <span className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
+            <p className={`text-[10px] font-bold uppercase tracking-widest mt-2 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Browser-Based Image Toolkit</p>
           </div>
-          <div className={`mt-12 pt-8 border-t text-[10px] font-bold uppercase tracking-widest ${isDark ? 'border-white/5 opacity-10' : 'border-zinc-100 text-zinc-300'}`}>
-            جميع الحقوق محفوظة © {new Date().getFullYear()} Storehalal.shop
+
+          <div className="space-y-6">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">شارك الأداة مع أصدقائك</h4>
+            <div className="flex justify-center flex-wrap gap-4">
+               <SocialShareBtn 
+                 href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`}
+                 icon={<MessageCircle size={20} />} 
+                 label="واتساب"
+                 color="hover:bg-green-500"
+                 isDark={isDark}
+               />
+               <SocialShareBtn 
+                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`}
+                 icon={<Facebook size={20} />} 
+                 label="فيسبوك"
+                 color="hover:bg-blue-600"
+                 isDark={isDark}
+               />
+               <SocialShareBtn 
+                 href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareText)}`}
+                 icon={<Twitter size={20} />} 
+                 label="تويتر"
+                 color="hover:bg-sky-500"
+                 isDark={isDark}
+               />
+               <SocialShareBtn 
+                 href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(siteUrl)}`}
+                 icon={<Linkedin size={20} />} 
+                 label="لينكد إن"
+                 color="hover:bg-blue-700"
+                 isDark={isDark}
+               />
+               <SocialShareBtn 
+                 href={`https://t.me/share/url?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareText)}`}
+                 icon={<Send size={20} />} 
+                 label="تليجرام"
+                 color="hover:bg-sky-600"
+                 isDark={isDark}
+               />
+               <button 
+                 onClick={copyToClipboard} 
+                 className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all group relative ${
+                   copySuccess 
+                    ? 'bg-emerald-500 border-transparent text-black shadow-lg shadow-emerald-500/40' 
+                    : isDark ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'
+                 }`}
+               >
+                 {copySuccess ? <CheckCircle size={20} /> : <LinkIcon size={20} />}
+                 <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-black text-white text-[8px] font-black rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity uppercase tracking-widest whitespace-nowrap">
+                    {copySuccess ? 'تم النسخ!' : 'نسخ الرابط'}
+                 </span>
+               </button>
+            </div>
+          </div>
+
+          <div className={`mt-16 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-6 ${isDark ? 'border-white/5' : 'border-zinc-100'}`}>
+            <p className={`text-[9px] font-bold uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
+              جميع الحقوق محفوظة © {new Date().getFullYear()} Storehalal.shop
+            </p>
+            <div className={`flex gap-8 text-[9px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
+               <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-colors">المحول الذكي</button>
+               <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className="hover:text-emerald-500 transition-colors">لوحة الأداء</button>
+            </div>
           </div>
         </div>
       </footer>
@@ -198,4 +260,22 @@ const FeatureCard = ({ icon, title, desc, isDark }: any) => (
     <h3 className="text-xl font-black mb-4 italic">{title}</h3>
     <p className="text-sm font-medium opacity-40 leading-relaxed">{desc}</p>
   </div>
+);
+
+const SocialShareBtn = ({ href, icon, label, color, isDark }: any) => (
+  <a 
+    href={href} 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all group relative ${
+      isDark 
+        ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white hover:border-transparent` 
+        : `bg-emerald-50 border-emerald-200 text-emerald-600 ${color} hover:text-white hover:border-transparent`
+    }`}
+  >
+    {icon}
+    <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-black text-white text-[8px] font-black rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity uppercase tracking-widest whitespace-nowrap">
+      {label}
+    </span>
+  </a>
 );
