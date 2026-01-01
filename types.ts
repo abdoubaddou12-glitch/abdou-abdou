@@ -1,20 +1,36 @@
 
+export interface ImageFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  preview: string;
+}
+
+export interface ConversionSettings {
+  format: 'webp' | 'jpeg' | 'png';
+  quality: number;
+  width?: number;
+  height?: number;
+}
+
+export type ConversionStatus = 'idle' | 'processing' | 'completed' | 'error';
+
+/**
+ * Types for Abdou Web Admin and Navigation
+ */
+
+export type View = 'home' | 'admin' | 'editor' | 'adsense' | 'security';
+
 export interface Post {
   id: string;
   title: string;
+  category: string;
+  date: string;
   excerpt: string;
   content: string;
-  date: string;
-  author: string;
-  category: string;
   image: string;
-  status: 'published' | 'draft';
-}
-
-export interface AdSenseConfig {
-  publisherId: string;
-  slotId: string;
-  isEnabled: boolean;
+  status: string;
 }
 
 export interface AnalyticsData {
@@ -25,9 +41,8 @@ export interface AnalyticsData {
   cpc: string;
 }
 
-export type View = 'home' | 'post' | 'admin' | 'editor' | 'login' | 'adsense-settings' | 'security-settings';
-
-export interface ThemeContextType {
-  isDark: boolean;
-  toggleTheme: () => void;
+export interface AdSenseConfig {
+  isEnabled: boolean;
+  publisherId: string;
+  slotId: string;
 }

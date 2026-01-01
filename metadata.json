@@ -1,8 +1,7 @@
 {
-  "name": "عبدو ويب | The Emerald Dark",
-  "description": "منصة عبدو ويب الفاخرة لأخبار التكنولوجيا وأخبار المغرب بالأسود والزمردي.",
+  "name": "Emerald Convert Pro",
+  "description": "منصة احترافية ومجانية لتحويل مقاسات وصيغ الصور بخصوصية تامة وسرعة خيالية.",
   "requestFramePermissions": [
-    "camera",
-    "microphone"
+    "camera"
   ]
 }
