@@ -13,3 +13,15 @@ export interface AnalyticsData {
   ctr: string;
   cpc: string;
 }
+
+// Added Post interface to resolve missing export errors in components
+export interface Post {
+  id: string;
+  title: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  status: string;
+  image: string;
+  date: string;
+}

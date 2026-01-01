@@ -6,7 +6,7 @@ import {
   Image as ImageIcon, Download, Sliders, Zap,
   Sun, Moon, ArrowLeft, ShieldCheck,
   HardDrive, Trash2, Facebook, Twitter, 
-  MessageCircle, Send, Linkedin
+  MessageCircle, Send, Linkedin, Mail, Share2
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -62,7 +62,8 @@ export default function App() {
   };
 
   const siteUrl = "https://storehalal.shop";
-  const shareText = "أداة Storehalal Convert الرائعة لتحويل الصور وتغيير مقاساتها فوراً في المتصفح! جربها الآن:";
+  const shareTitle = "Storehalal Convert | أداة تحويل الصور الاحترافية";
+  const shareText = "أداة Storehalal Convert الرائعة لتحويل الصور وتغيير مقاساتها فوراً في المتصفح بخصوصية تامة! جربها الآن:";
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(siteUrl);
@@ -170,6 +171,7 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
+      {/* Footer & Social Sharing */}
       <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="mb-10 md:mb-12">
@@ -179,31 +181,67 @@ export default function App() {
             <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>
           </div>
 
-          <div className="flex justify-center flex-wrap gap-3 md:gap-5 mb-10">
-               <SocialShareBtn 
-                 href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`}
-                 icon={<MessageCircle size={22} />} 
-                 label="واتساب"
-                 color="hover:bg-green-500"
-                 isDark={isDark}
-               />
-               <SocialShareBtn 
-                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`}
-                 icon={<Facebook size={22} />} 
-                 label="فيسبوك"
-                 color="hover:bg-blue-600"
-                 isDark={isDark}
-               />
-               <button 
-                 onClick={copyToClipboard} 
-                 className={`w-11 h-11 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all group relative ${
-                   copySuccess 
-                    ? 'bg-emerald-500 border-transparent text-black shadow-lg shadow-emerald-500/40' 
-                    : isDark ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'
-                 }`}
-               >
-                 {copySuccess ? <CheckCircle size={22} /> : <LinkIcon size={22} />}
-               </button>
+          <div className="flex flex-col items-center gap-6 mb-16">
+            <div className="flex items-center gap-2 mb-2">
+              <Share2 size={16} className="text-emerald-500" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">شارك الأداة مع أصدقائك</span>
+            </div>
+            
+            <div className="flex justify-center flex-wrap gap-3 md:gap-4 max-w-2xl">
+                 <SocialShareBtn 
+                   href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`}
+                   icon={<MessageCircle size={22} />} 
+                   color="hover:bg-[#25D366]"
+                   isDark={isDark}
+                   label="WhatsApp"
+                 />
+                 <SocialShareBtn 
+                   href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`}
+                   icon={<Facebook size={22} />} 
+                   color="hover:bg-[#1877F2]"
+                   isDark={isDark}
+                   label="Facebook"
+                 />
+                 <SocialShareBtn 
+                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(siteUrl)}`}
+                   icon={<Twitter size={22} />} 
+                   color="hover:bg-[#000000]"
+                   isDark={isDark}
+                   label="X / Twitter"
+                 />
+                 <SocialShareBtn 
+                   href={`https://t.me/share/url?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareText)}`}
+                   icon={<Send size={22} />} 
+                   color="hover:bg-[#0088cc]"
+                   isDark={isDark}
+                   label="Telegram"
+                 />
+                 <SocialShareBtn 
+                   href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(siteUrl)}`}
+                   icon={<Linkedin size={22} />} 
+                   color="hover:bg-[#0A66C2]"
+                   isDark={isDark}
+                   label="LinkedIn"
+                 />
+                 <SocialShareBtn 
+                   href={`mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareText + " " + siteUrl)}`}
+                   icon={<Mail size={22} />} 
+                   color="hover:bg-[#EA4335]"
+                   isDark={isDark}
+                   label="Email"
+                 />
+                 <button 
+                   onClick={copyToClipboard} 
+                   title="نسخ الرابط"
+                   className={`w-12 h-12 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all group relative ${
+                     copySuccess 
+                      ? 'bg-emerald-500 border-transparent text-black shadow-lg shadow-emerald-500/40 scale-110' 
+                      : isDark ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black hover:border-transparent' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white hover:border-transparent'
+                   }`}
+                 >
+                   {copySuccess ? <CheckCircle size={22} /> : <LinkIcon size={22} />}
+                 </button>
+            </div>
           </div>
 
           <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-8 ${isDark ? 'border-white/5' : 'border-zinc-100'}`}>
@@ -232,6 +270,14 @@ const FeatureCard = ({ icon, title, desc, isDark }: any) => (
   </div>
 );
 
-const SocialShareBtn = ({ href, icon, label, color, isDark }: any) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className={`w-11 h-11 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all ${isDark ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white` : `bg-emerald-50 border-emerald-200 text-emerald-600 ${color} hover:text-white`}`}>{icon}</a>
+const SocialShareBtn = ({ href, icon, color, isDark, label }: any) => (
+  <a 
+    href={href} 
+    target="_blank" 
+    rel="noopener noreferrer" 
+    title={label}
+    className={`w-12 h-12 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 ${isDark ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white hover:border-transparent` : `bg-emerald-50 border-emerald-200 text-emerald-600 ${color} hover:text-white hover:border-transparent`}`}
+  >
+    {icon}
+  </a>
 );
