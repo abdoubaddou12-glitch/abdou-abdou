@@ -73,83 +73,89 @@ export default function App() {
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-400 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
-      {/* Navigation */}
-      <nav className="pt-6 md:pt-10 px-4 md:px-6 z-50">
-        <div className={`max-w-6xl mx-auto flex items-center justify-between px-6 py-4 rounded-3xl border ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-emerald-500/20 bg-white/70 shadow-lg'} backdrop-blur-2xl transition-all`}>
-          <div onClick={() => setView('home')} className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-lg shadow-emerald-500/20 group-hover:rotate-180 transition-transform duration-500">
-              <RefreshCw size={20} />
+      {/* Navigation - Sticky on mobile for better UX */}
+      <nav className="fixed top-0 left-0 right-0 z-[100] p-3 md:p-6 lg:pt-10">
+        <div className={`max-w-6xl mx-auto flex items-center justify-between px-4 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-[2.5rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
+          <div onClick={() => setView('home')} className="flex items-center gap-2 md:gap-3 cursor-pointer group">
+            <div className="w-9 h-9 md:w-11 md:h-11 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-lg shadow-emerald-500/20 group-hover:rotate-180 transition-transform duration-500">
+              <RefreshCw size={18} className="md:w-6 md:h-6" />
             </div>
-            <span className="text-xl md:text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
+            <span className="text-lg md:text-2xl font-black italic tracking-tighter truncate">Storehalal <span className="text-emerald-500">Convert</span></span>
           </div>
           
-          <div className="flex items-center gap-3">
-             <div className="hidden md:flex items-center gap-4 ml-6 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+          <div className="flex items-center gap-2 md:gap-4">
+             {/* Stats Hidden on small phones to save space */}
+             <div className="hidden sm:flex items-center gap-4 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
                 <div className="flex flex-col items-center">
-                  <span className="text-[8px] font-black opacity-40 uppercase">التحويلات</span>
+                  <span className="text-[7px] md:text-[8px] font-black opacity-40 uppercase">التحويلات</span>
                   <span className="text-xs font-black text-emerald-500">{totalConverted}</span>
                 </div>
                 <div className="w-[1px] h-6 bg-emerald-500/20"></div>
                 <div className="flex flex-col items-center">
-                  <span className="text-[8px] font-black opacity-40 uppercase">توفير مساحة</span>
-                  <span className="text-xs font-black text-emerald-500">{totalSavedMB.toFixed(1)} MB</span>
+                  <span className="text-[7px] md:text-[8px] font-black opacity-40 uppercase">توفير</span>
+                  <span className="text-xs font-black text-emerald-500">{totalSavedMB.toFixed(1)}M</span>
                 </div>
              </div>
 
              <button 
                 onClick={() => setIsDark(!isDark)}
-                aria-label="تبديل الوضع الليلي والنهاري"
-                className={`p-3 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500 hover:bg-zinc-800' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100'}`}
+                aria-label="تبديل الوضع"
+                className={`p-2.5 md:p-3.5 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500 hover:bg-zinc-800' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100'}`}
              >
-                {isDark ? <Sun size={20} /> : <Moon size={20} />}
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
              </button>
 
              <button 
                onClick={() => setView(isAuthenticated ? 'admin' : 'login')}
                aria-label="لوحة التحكم"
-               className={`p-3 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}
+               className={`p-2.5 md:p-3.5 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}
              >
-               <LayoutDashboard size={20} />
+               <LayoutDashboard size={18} />
              </button>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto w-full px-4 md:px-6 pt-16 pb-20 flex-grow">
+      {/* Main Content - Added padding top to account for fixed nav */}
+      <main className="max-w-6xl mx-auto w-full px-4 md:px-8 pt-28 md:pt-40 pb-20 flex-grow">
         {view === 'home' && (
-          <div className="animate-slide-up space-y-24">
-            <section className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-8">
+          <div className="animate-slide-up space-y-16 md:space-y-32">
+            <section className="text-center px-2">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 md:mb-10">
                 <Zap size={14} className="text-emerald-500" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية وآمنة</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية وآمنة تماماً</span>
               </div>
-              <h1 className="text-5xl md:text-8xl font-black italic mb-6 text-glow leading-tight">حول صورك لـ WebP <br/><span className="text-emerald-500">بجودة احترافية.</span></h1>
-              <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-12 ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
-                استخدم Storehalal Convert لتحويل الصور وتغيير مقاساتها مجاناً. أداة سريعة، آمنة، وتعمل كلياً في متصفحك لضمان خصوصيتك الكاملة.
+              
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black italic mb-6 md:mb-8 text-glow leading-[1.1] tracking-tighter">
+                تحويل الصور لـ WebP <br className="hidden sm:block" />
+                <span className="text-emerald-500">بجودة احترافية.</span>
+              </h1>
+              
+              <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-10 md:mb-16 px-4 text-sm md:text-lg ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
+                استخدم Storehalal Convert لتحويل الصور وتغيير مقاساتها مجاناً وبدون رفعها لأي سيرفر. خصوصيتك هي محركنا الأساسي في كل سطر برمجنا به هذه الأداة.
               </p>
               
               <Converter onConversion={handleConversionSuccess} isDark={isDark} />
             </section>
 
-            {/* Features Grid */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12">
+            {/* Features Grid - Improved for all screens */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-10 pt-10">
                <FeatureCard 
-                icon={<ShieldCheck size={24}/>} 
+                icon={<ShieldCheck size={28}/>} 
                 title="خصوصية 100%" 
-                desc="صورك لا تغادر جهازك أبداً. تتم المعالجة محلياً في المتصفح." 
+                desc="صورك لا تغادر جهازك أبداً. تتم المعالجة محلياً في المتصفح باستخدام تقنيات حديثة." 
                 isDark={isDark} 
                />
                <FeatureCard 
-                icon={<Zap size={24}/>} 
+                icon={<Zap size={28}/>} 
                 title="أرشفة أسرع" 
-                desc="صيغة WebP تحسن سرعة موقعك وتساعدك في تصدر نتائج البحث." 
+                desc="صيغة WebP تحسن سرعة موقعك بنسبة كبيرة وتساعدك في تصدر نتائج البحث بجدارة." 
                 isDark={isDark} 
                />
                <FeatureCard 
-                icon={<ImageIcon size={24}/>} 
-                title="تحكم كامل" 
-                desc="أدوات هندسية لقص وتدوير وتغيير مقاسات الصور بدقة عالية." 
+                icon={<ImageIcon size={28}/>} 
+                title="تحكم هندسي" 
+                desc="أدوات دقيقة لقص وتدوير وتغيير مقاسات الصور بدقة عالية مع الحفاظ على الألوان." 
                 isDark={isDark} 
                />
             </section>
@@ -160,8 +166,8 @@ export default function App() {
 
         {view === 'admin' && isAuthenticated && (
           <div className="animate-slide-up">
-            <button onClick={() => setView('home')} className="flex items-center gap-2 mb-8 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
-              <ArrowLeft size={16} /> العودة للمحول
+            <button onClick={() => setView('home')} className="flex items-center gap-2 mb-10 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
+              <ArrowLeft size={16} /> العودة للمحول الذكي
             </button>
             <AdminPanel 
               posts={[]}
@@ -180,48 +186,50 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
-      {/* Footer */}
-      <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
+      {/* Footer - Optimized spacing and layout */}
+      <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="mb-8">
-            <h2 onClick={() => setView('home')} className="text-2xl font-black italic tracking-tighter cursor-pointer">Storehalal <span className="text-emerald-500">Convert</span></h2>
-            <p className={`text-[10px] font-bold uppercase tracking-widest mt-2 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>
+          <div className="mb-10 md:mb-12">
+            <h2 onClick={() => setView('home')} className="text-2xl md:text-3xl font-black italic tracking-tighter cursor-pointer inline-block">
+              Storehalal <span className="text-emerald-500">Convert</span>
+            </h2>
+            <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>
           </div>
 
-          <div className="space-y-6">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">شارك الأداة لدعمنا</span>
-            <div className="flex justify-center flex-wrap gap-4">
+          <div className="space-y-8">
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">شارك الأداة لدعم استمراريتنا</span>
+            <div className="flex justify-center flex-wrap gap-3 md:gap-5">
                <SocialShareBtn 
                  href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`}
-                 icon={<MessageCircle size={20} />} 
+                 icon={<MessageCircle size={22} />} 
                  label="واتساب"
                  color="hover:bg-green-500"
                  isDark={isDark}
                />
                <SocialShareBtn 
                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`}
-                 icon={<Facebook size={20} />} 
+                 icon={<Facebook size={22} />} 
                  label="فيسبوك"
                  color="hover:bg-blue-600"
                  isDark={isDark}
                />
                <SocialShareBtn 
                  href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareText)}`}
-                 icon={<Twitter size={20} />} 
+                 icon={<Twitter size={22} />} 
                  label="تويتر"
                  color="hover:bg-sky-500"
                  isDark={isDark}
                />
                <SocialShareBtn 
                  href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(siteUrl)}`}
-                 icon={<Linkedin size={20} />} 
+                 icon={<Linkedin size={22} />} 
                  label="لينكد إن"
                  color="hover:bg-blue-700"
                  isDark={isDark}
                />
                <SocialShareBtn 
                  href={`https://t.me/share/url?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareText)}`}
-                 icon={<Send size={20} />} 
+                 icon={<Send size={22} />} 
                  label="تليجرام"
                  color="hover:bg-sky-600"
                  isDark={isDark}
@@ -229,13 +237,13 @@ export default function App() {
                <button 
                  onClick={copyToClipboard} 
                  aria-label="نسخ رابط الموقع"
-                 className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all group relative ${
+                 className={`w-11 h-11 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all group relative ${
                    copySuccess 
                     ? 'bg-emerald-500 border-transparent text-black shadow-lg shadow-emerald-500/40' 
                     : isDark ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'
                  }`}
                >
-                 {copySuccess ? <CheckCircle size={20} /> : <LinkIcon size={20} />}
+                 {copySuccess ? <CheckCircle size={22} /> : <LinkIcon size={22} />}
                  <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-black text-white text-[8px] font-black rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity uppercase tracking-widest whitespace-nowrap">
                     {copySuccess ? 'تم النسخ!' : 'نسخ الرابط'}
                  </span>
@@ -243,11 +251,11 @@ export default function App() {
             </div>
           </div>
 
-          <div className={`mt-16 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-6 ${isDark ? 'border-white/5' : 'border-zinc-100'}`}>
-            <p className={`text-[9px] font-bold uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
+          <div className={`mt-16 md:mt-24 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-8 ${isDark ? 'border-white/5' : 'border-zinc-100'}`}>
+            <p className={`text-[10px] font-bold uppercase tracking-widest text-center md:text-right ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
               جميع الحقوق محفوظة © {new Date().getFullYear()} Storehalal.shop
             </p>
-            <div className={`flex gap-8 text-[9px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
+            <div className={`flex flex-wrap justify-center md:justify-end gap-6 md:gap-10 text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
                <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-colors">تحويل الصور</button>
                <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">سياسة الخصوصية</button>
                <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">شروط الخدمة</button>
@@ -261,12 +269,12 @@ export default function App() {
 }
 
 const FeatureCard = ({ icon, title, desc, isDark }: any) => (
-  <div className={`emerald-card p-10 group hover:border-emerald-500/30 transition-all ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
-    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 group-hover:scale-110 transition-transform">
+  <div className={`emerald-card p-8 md:p-12 group hover:border-emerald-500/30 transition-all ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
+    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-8 group-hover:scale-110 transition-transform">
       {icon}
     </div>
-    <h3 className="text-xl font-black mb-4 italic">{title}</h3>
-    <p className="text-sm font-medium opacity-40 leading-relaxed">{desc}</p>
+    <h3 className="text-xl md:text-2xl font-black mb-4 italic tracking-tight">{title}</h3>
+    <p className="text-sm md:text-base font-medium opacity-40 leading-relaxed">{desc}</p>
   </div>
 );
 
@@ -276,7 +284,7 @@ const SocialShareBtn = ({ href, icon, label, color, isDark }: any) => (
     target="_blank" 
     rel="noopener noreferrer"
     aria-label={`مشاركة عبر ${label}`}
-    className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all group relative ${
+    className={`w-11 h-11 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all group relative ${
       isDark 
         ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white hover:border-transparent` 
         : `bg-emerald-50 border-emerald-200 text-emerald-600 ${color} hover:text-white hover:border-transparent`
