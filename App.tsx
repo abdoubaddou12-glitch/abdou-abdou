@@ -26,22 +26,27 @@ export default function App() {
   
   const [adsense, setAdsense] = useState<AdSenseConfig>(() => JSON.parse(localStorage.getItem('as_cfg') || '{"isEnabled":false,"publisherId":"","slotId":""}'));
   
-  // إعدادات Adsterra مع الأكواد التي زودتني بها
+  // الأكواد الخاصة بك - Adsterra Anti-Adblock
+  const MY_ADSTERRA_CODES = {
+    socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
+    popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
+  };
+
   const [adsterra, setAdsterra] = useState<AdsterraConfig>(() => {
     const saved = localStorage.getItem('at_cfg');
     const defaultConfig = {
       isEnabled: true,
-      banner728x90: "", // اترك هذا فارغاً ليقوم المستخدم بوضعه من لوحة التحكم إن أراد بانر إضافي
+      banner728x90: "", 
       banner300x250: "",
-      socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
-      popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
+      socialBar: MY_ADSTERRA_CODES.socialBar,
+      popUnder: MY_ADSTERRA_CODES.popUnder
     };
 
     if (saved) {
       const parsed = JSON.parse(saved);
-      // التأكد من تحديث الأكواد بالأكواد الجديدة حتى لو كان هناك تخزين قديم
-      if (!parsed.socialBar || parsed.socialBar.includes('undefined')) {
-         return defaultConfig;
+      // تحديث تلقائي للأكواد إذا كانت فارغة أو قديمة لضمان التشغيل
+      if (!parsed.socialBar || parsed.socialBar.length < 20) {
+        return { ...parsed, ...MY_ADSTERRA_CODES, isEnabled: true };
       }
       return parsed;
     }
@@ -50,28 +55,33 @@ export default function App() {
 
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // نظام الحقن المباشر في المتصفح لضمان تجاوز الـ Adblock
+  // نظام الحقن المطور لضمان تجاوز مانع الإعلانات وتفعيل السكريبتات
   useEffect(() => {
     if (adsterra.isEnabled) {
-      const injectAdsterraScript = (htmlCode: string, id: string) => {
-        if (!htmlCode) return;
-        if (document.getElementById(id)) return;
+      const injectScriptRobustly = (code: string, id: string) => {
+        if (!code || document.getElementById(id)) return;
 
-        const match = htmlCode.match(/src="([^"]+)"/);
-        if (match && match[1]) {
-          const script = document.createElement('script');
-          script.src = match[1];
-          script.id = id;
-          script.async = true;
-          // إضافة سمة للتعرف على السكريبت كإعلان موثوق
-          script.setAttribute('data-ad-client', 'adsterra');
-          document.head.appendChild(script);
-          console.log(`Adsterra Script Injected: ${id}`);
+        try {
+          // إنشاء حاوية مخفية للسكريبت
+          const container = document.createElement('div');
+          container.id = id;
+          container.style.display = 'none';
+          document.body.appendChild(container);
+
+          // حقن الكود كـ Fragment لضمان تنفيذ الـ JS داخله
+          const range = document.createRange();
+          const fragment = range.createContextualFragment(code);
+          container.appendChild(fragment);
+          
+          console.log(`Adsterra Active: ${id}`);
+        } catch (e) {
+          console.error(`Injection failed for ${id}:`, e);
         }
       };
 
-      injectAdsterraScript(adsterra.socialBar, 'at-social-bar');
-      injectAdsterraScript(adsterra.popUnder, 'at-pop-under');
+      // تنفيذ الحقن للأكواد الأساسية
+      injectScriptRobustly(adsterra.socialBar, 'at-social-bar-layer');
+      injectScriptRobustly(adsterra.popUnder, 'at-popunder-layer');
     }
   }, [adsterra.isEnabled, adsterra.socialBar, adsterra.popUnder]);
 
@@ -107,7 +117,7 @@ export default function App() {
           
           <div className="flex items-center gap-2 md:gap-4">
              <button onClick={() => setIsDark(!isDark)} className={`p-2.5 md:p-3.5 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
-                {isDark ? <Sun size={18} /> : <Sun size={18} className="rotate-180" />}
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
              </button>
              <button 
                onClick={() => setView(isAuthenticated ? 'admin' : 'login')}
@@ -123,7 +133,7 @@ export default function App() {
         {view === 'home' && (
           <div className="animate-slide-up space-y-12">
             
-            {/* إعلان البانر العلوي - يظهر فقط إذا قمت بوضع كود البانر في لوحة التحكم */}
+            {/* إعلان البانر العلوي - يظهر في حال تم وضعه في لوحة التحكم */}
             {adsterra.isEnabled && adsterra.banner728x90 && (
               <AdUnit type="banner" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
             )}
