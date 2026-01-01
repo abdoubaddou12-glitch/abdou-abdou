@@ -1,40 +1,29 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  RefreshCw, LayoutDashboard, Settings, LogOut, 
-  BarChart3, Lock, MessageCircle, Send, Facebook, 
-  Twitter, CheckCircle, Link as LinkIcon, DollarSign,
-  Shield, Image as ImageIcon, Download, Trash2, Sliders, Zap,
-  Sun, Moon
+  RefreshCw, LayoutDashboard, Settings, 
+  BarChart3, Lock, CheckCircle, Link as LinkIcon, 
+  Image as ImageIcon, Download, Sliders, Zap,
+  Sun, Moon, ArrowLeft, History, ShieldCheck,
+  HardDrive, ZapOff, Trash2
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
-import { SecuritySettings } from './components/SecuritySettings.tsx';
-import { AdSenseSettings } from './components/AdSenseSettings.tsx';
-import { AdSense } from './components/AdSense.tsx';
 import { Converter } from './components/Converter.tsx';
-import { AdSenseConfig } from './types.ts';
+import { AdminPanel } from './components/AdminPanel.tsx';
+import { View, AnalyticsData } from './types.ts';
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'login' | 'admin'>('home');
-  const [adminTab, setAdminTab] = useState<'stats' | 'security' | 'adsense'>('stats');
+  const [view, setView] = useState<View>('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme_mode');
     return saved ? saved === 'dark' : true;
   });
   
-  // Stats for the tool
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
+  const [totalSavedMB, setTotalSavedMB] = useState(() => Number(localStorage.getItem('total_saved_mb')) || 0);
+  const [adminPassword] = useState(() => localStorage.getItem('emerald_admin_pass') || 'abdou2024');
   
-  // Admin Secrets
-  const [adminPassword, setAdminPassword] = useState(() => localStorage.getItem('emerald_admin_pass') || 'abdou2024');
-  
-  // AdSense Config
-  const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>(() => {
-    const saved = localStorage.getItem('emerald_adsense_config');
-    return saved ? JSON.parse(saved) : { isEnabled: false, publisherId: '', slotId: '' };
-  });
-
   const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
@@ -45,7 +34,9 @@ export default function App() {
       document.body.classList.add('light-mode');
       localStorage.setItem('theme_mode', 'light');
     }
-  }, [isDark]);
+    localStorage.setItem('total_converted', totalConverted.toString());
+    localStorage.setItem('total_saved_mb', totalSavedMB.toString());
+  }, [isDark, totalConverted, totalSavedMB]);
 
   const handleAdminLogin = (pass: string) => {
     if (pass === adminPassword) {
@@ -56,10 +47,17 @@ export default function App() {
     return false;
   };
 
-  const handleConversionComplete = () => {
-    const newVal = totalConverted + 1;
-    setTotalConverted(newVal);
-    localStorage.setItem('total_converted', newVal.toString());
+  const handleConversionSuccess = (savedKB: number) => {
+    setTotalConverted(prev => prev + 1);
+    setTotalSavedMB(prev => prev + (savedKB / 1024));
+  };
+
+  const analytics: AnalyticsData = {
+    totalViews: totalConverted, // نستخدمها هنا كعدد عمليات التحويل
+    liveVisitors: Math.floor(Math.random() * 10) + 1,
+    dailyEarnings: [totalConverted * 0.1, totalConverted * 0.15, totalConverted * 0.05, totalConverted * 0.2], // افتراضي
+    ctr: `${(totalSavedMB).toFixed(1)} MB`, // نستخدمها لعرض المساحة الموفرة
+    cpc: 'High'
   };
 
   const copyToClipboard = () => {
@@ -67,9 +65,6 @@ export default function App() {
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
-
-  const shareUrl = encodeURIComponent("https://storehalal.shop");
-  const shareText = encodeURIComponent("أفضل أداة لتحويل الصور مجاناً وبخصوصية تامة:");
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-400 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
@@ -84,6 +79,18 @@ export default function App() {
           </div>
           
           <div className="flex items-center gap-3">
+             <div className="hidden md:flex items-center gap-4 ml-6 px-4 py-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                <div className="flex flex-col items-center">
+                  <span className="text-[8px] font-black opacity-40 uppercase">التحويلات</span>
+                  <span className="text-xs font-black text-emerald-500">{totalConverted}</span>
+                </div>
+                <div className="w-[1px] h-6 bg-emerald-500/20"></div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[8px] font-black opacity-40 uppercase">توفير مساحة</span>
+                  <span className="text-xs font-black text-emerald-500">{totalSavedMB.toFixed(1)} MB</span>
+                </div>
+             </div>
+
              <button 
                 onClick={() => setIsDark(!isDark)}
                 className={`p-3 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500 hover:bg-zinc-800' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100'}`}
@@ -91,40 +98,54 @@ export default function App() {
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
              </button>
 
-             {isAuthenticated && (
-               <button 
-                 onClick={() => setView('admin')}
-                 className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500 hover:text-black transition-all"
-               >
-                 <LayoutDashboard size={20} />
-               </button>
-             )}
-             
-             <div className={`hidden sm:flex px-4 py-2 rounded-full border items-center gap-2 ${isDark ? 'bg-emerald-500/5 border-emerald-500/10' : 'bg-emerald-50 border-emerald-200'}`}>
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'text-emerald-500' : 'text-emerald-600'}`}>نشط الآن</span>
-             </div>
+             <button 
+               onClick={() => setView(isAuthenticated ? 'admin' : 'login')}
+               className={`p-3 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}
+             >
+               <LayoutDashboard size={20} />
+             </button>
           </div>
         </div>
       </nav>
 
+      {/* Main Content */}
       <main className="max-w-6xl mx-auto w-full px-4 md:px-6 pt-16 pb-20 flex-grow">
         {view === 'home' && (
-          <div className="animate-slide-up">
-            <div className="text-center mb-16">
-              <h1 className="text-5xl md:text-8xl font-black italic mb-6 text-glow leading-tight">حول صورك <br/><span className="text-emerald-500">بخصوصية تامة.</span></h1>
-              <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>أداة احترافية لتحويل صيغ الصور (WebP, JPG, PNG) مجاناً. المعالجة تتم في متصفحك ولا نطلع على ملفاتك أبداً.</p>
-            </div>
-            
-            <AdSense config={adsenseConfig} isDark={isDark} className="mb-12" />
+          <div className="animate-slide-up space-y-24">
+            <section className="text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-8">
+                <Zap size={14} className="text-emerald-500" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية في المتصفح</span>
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black italic mb-6 text-glow leading-tight">مركز تحويل الصور <br/><span className="text-emerald-500">فائق السرعة.</span></h1>
+              <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-12 ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
+                قم بتحويل وتغيير مقاسات صورك بضغطة واحدة. نحن لا نرفع صورك إلى أي خادم، خصوصيتك هي الأولوية.
+              </p>
+              
+              <Converter onConversion={handleConversionSuccess} isDark={isDark} />
+            </section>
 
-            <Converter onConversion={handleConversionComplete} isDark={isDark} />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
-               <FeatureCard icon={<Shield size={24}/>} title="أمان مطلق" desc="لا يتم رفع الصور إلى أي سيرفر، كل شيء يتم محلياً." isDark={isDark} />
-               <FeatureCard icon={<Zap size={24}/>} title="سرعة فائقة" desc="تحويل فوري بضغطة زر واحدة بفضل تقنيات الويب الحديثة." isDark={isDark} />
-               <FeatureCard icon={<Sliders size={24}/>} title="تحكم كامل" desc="اختر الجودة والمقاس المناسب لاحتياجاتك بدقة." isDark={isDark} />
-            </div>
+            {/* Features Grid */}
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12">
+               <FeatureCard 
+                icon={<ShieldCheck size={24}/>} 
+                title="خصوصية 100%" 
+                desc="تتم جميع العمليات داخل متصفحك مباشرة دون الحاجة لرفع الصور." 
+                isDark={isDark} 
+               />
+               <FeatureCard 
+                icon={<Zap size={24}/>} 
+                title="أداء WebP" 
+                desc="حول صورك إلى صيغة WebP لتقليل حجم موقعك بنسبة تصل إلى 80%." 
+                isDark={isDark} 
+               />
+               <FeatureCard 
+                icon={<ImageIcon size={24}/>} 
+                title="تغيير الأشكال" 
+                desc="قص دائري، تدوير، إضافة علامة مائية، وتحكم كامل في الأبعاد." 
+                isDark={isDark} 
+               />
+            </section>
           </div>
         )}
 
@@ -132,74 +153,35 @@ export default function App() {
 
         {view === 'admin' && isAuthenticated && (
           <div className="animate-slide-up">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-              <div>
-                <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter mb-2">مركز التحكم</h1>
-                <p className={`font-bold uppercase tracking-widest text-[10px] ${isDark ? 'opacity-40' : 'text-zinc-400'}`}>إدارة الأداء، الإعلانات والأمن</p>
-              </div>
-              <div className="flex flex-wrap gap-2 w-full md:w-auto">
-                 <AdminTabBtn active={adminTab === 'stats'} onClick={() => setAdminTab('stats')} icon={<BarChart3 size={16}/>} label="الأداء" isDark={isDark} />
-                 <AdminTabBtn active={adminTab === 'adsense'} onClick={() => setAdminTab('adsense')} icon={<DollarSign size={16}/>} label="الإعلانات" isDark={isDark} />
-                 <AdminTabBtn active={adminTab === 'security'} onClick={() => setAdminTab('security')} icon={<Settings size={16}/>} label="الأمان" isDark={isDark} />
-                 <button onClick={() => { setIsAuthenticated(false); setView('home'); }} className="p-4 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all"><LogOut size={18}/></button>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              {adminTab === 'stats' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  <StatCard label="إجمالي التحويلات" value={totalConverted.toLocaleString()} icon={<RefreshCw size={24} />} isDark={isDark} />
-                  <StatCard label="أرباح أدسنس (تقديرية)" value={`$${(totalConverted * 0.02).toFixed(2)}`} icon={<DollarSign size={24} />} isDark={isDark} />
-                  <StatCard label="حالة الدومين" value="نشط" icon={<CheckCircle size={24} />} isDark={isDark} />
-                </div>
-              )}
-
-              {adminTab === 'adsense' && (
-                <AdSenseSettings 
-                  config={adsenseConfig} 
-                  isDark={isDark} 
-                  onSave={(conf) => { setAdsenseConfig(conf); localStorage.setItem('emerald_adsense_config', JSON.stringify(conf)); setAdminTab('stats'); }} 
-                  onCancel={() => setAdminTab('stats')} 
-                />
-              )}
-
-              {adminTab === 'security' && (
-                <SecuritySettings 
-                  isDark={isDark} 
-                  currentSavedPassword={adminPassword} 
-                  onSave={(pass) => { setAdminPassword(pass); localStorage.setItem('emerald_admin_pass', pass); }} 
-                  onCancel={() => setAdminTab('stats')} 
-                  onForceResetData={() => {}} 
-                />
-              )}
-            </div>
+            <button onClick={() => setView('home')} className="flex items-center gap-2 mb-8 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
+              <ArrowLeft size={16} /> العودة للمحول
+            </button>
+            <AdminPanel 
+              posts={[]} // لا توجد مقالات الآن
+              isDark={isDark}
+              analytics={analytics}
+              onNewPost={() => {}} 
+              onEditPost={() => {}}
+              onDeletePost={() => {}}
+              onOpenAdSense={() => {}}
+              onOpenSecurity={() => {}}
+              onSyncData={() => {}}
+            />
           </div>
         )}
       </main>
 
+      {/* Footer */}
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-12">
-            <div className="text-center lg:text-right">
-              <span className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
-              <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Media Processing</p>
-            </div>
-            
-            <div className="flex gap-4">
-               <SocialBtn href={`https://wa.me/?text=${shareText}%20${shareUrl}`} icon={<MessageCircle size={20} />} isDark={isDark} />
-               <SocialBtn href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} icon={<Facebook size={20} />} isDark={isDark} />
-               <SocialBtn href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`} icon={<Twitter size={20} />} isDark={isDark} />
-               <button onClick={copyToClipboard} className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all ${copySuccess ? 'bg-emerald-500 border-transparent text-black shadow-lg shadow-emerald-500/20' : isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
-                 {copySuccess ? <CheckCircle size={20} /> : <LinkIcon size={20} />}
-               </button>
-            </div>
-
-            <div className={`flex gap-8 text-[11px] font-black uppercase tracking-widest ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>
-               <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-colors">الرئيسية</button>
-               <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className="text-emerald-500 flex items-center gap-2 hover:opacity-80"><Lock size={12} /> لوحة الإدارة</button>
-            </div>
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <span className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
+          <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Browser-Based Image Toolkit</p>
+          <div className="mt-8 flex justify-center gap-6">
+             <button onClick={copyToClipboard} className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${copySuccess ? 'text-emerald-500' : 'opacity-40 hover:opacity-100'}`}>
+               <LinkIcon size={14} /> {copySuccess ? 'تم النسخ!' : 'نسخ رابط الأداة'}
+             </button>
           </div>
-          <div className={`mt-12 pt-8 border-t text-center text-[10px] font-bold uppercase tracking-widest ${isDark ? 'border-white/5 opacity-20' : 'border-zinc-100 text-zinc-300'}`}>
+          <div className={`mt-12 pt-8 border-t text-[10px] font-bold uppercase tracking-widest ${isDark ? 'border-white/5 opacity-10' : 'border-zinc-100 text-zinc-300'}`}>
             جميع الحقوق محفوظة © {new Date().getFullYear()} Storehalal.shop
           </div>
         </div>
@@ -208,37 +190,12 @@ export default function App() {
   );
 }
 
-const FeatureCard = ({ icon, title, desc, isDark }) => (
-  <div className={`emerald-card p-10 group hover:border-emerald-500/40 transition-all ${!isDark && 'bg-white shadow-sm'}`}>
-    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${isDark ? 'bg-emerald-500/10 text-emerald-500' : 'bg-emerald-50 text-emerald-600'}`}>
+const FeatureCard = ({ icon, title, desc, isDark }: any) => (
+  <div className={`emerald-card p-10 group hover:border-emerald-500/30 transition-all ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
+    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 group-hover:scale-110 transition-transform">
       {icon}
     </div>
-    <h3 className="text-lg font-black mb-3">{title}</h3>
-    <p className={`text-sm leading-relaxed ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>{desc}</p>
+    <h3 className="text-xl font-black mb-4 italic">{title}</h3>
+    <p className="text-sm font-medium opacity-40 leading-relaxed">{desc}</p>
   </div>
-);
-
-const AdminTabBtn = ({ active, onClick, icon, label, isDark }) => (
-  <button 
-    onClick={onClick} 
-    className={`px-6 py-4 rounded-2xl font-black text-xs transition-all flex items-center gap-3 ${active ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : isDark ? 'bg-white/5 hover:bg-white/10 opacity-60' : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600'}`}
-  >
-    {icon} {label}
-  </button>
-);
-
-const StatCard = ({ label, value, icon, isDark }) => (
-  <div className={`emerald-card p-10 relative overflow-hidden group ${!isDark && 'bg-white'}`}>
-    <div className="absolute -right-6 -top-6 opacity-5 group-hover:opacity-10 transition-opacity text-emerald-500 scale-[4]">
-      {icon}
-    </div>
-    <div className={`text-[10px] font-black uppercase tracking-widest mb-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>{label}</div>
-    <div className="text-5xl font-black text-emerald-500 tracking-tighter">{value}</div>
-  </div>
-);
-
-const SocialBtn = ({ href, icon, isDark }) => (
-  <a href={href} target="_blank" className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all ${isDark ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-500 hover:text-white'}`}>
-    {icon}
-  </a>
 );
