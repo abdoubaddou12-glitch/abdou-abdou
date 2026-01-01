@@ -134,7 +134,7 @@ export default function App() {
             <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]">
               <RefreshCw size={20} className="font-bold" />
             </div>
-            <span className="text-2xl font-black italic tracking-tighter">Emerald <span className="text-emerald-500">Convert</span></span>
+            <span className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
           </div>
           <div className="hidden md:flex items-center gap-6">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30">آمن • سريع • مجاني</span>
@@ -164,7 +164,7 @@ export default function App() {
                 حول صورك <span className="text-emerald-500">بذكاء.</span>
               </h1>
               <p className="text-xl opacity-40 font-medium max-w-2xl mx-auto leading-relaxed italic">
-                أداة احترافية لتحويل صيغ الصور وتغيير أحجامها في ثوانٍ. جميع المعالجات تتم محلياً في متصفحك لضمان الخصوصية القصوى.
+                أداة احترافية لتحويل صيغ الصور وتغيير أحجامها في ثوانٍ عبر Storehalal. جميع المعالجات تتم محلياً في متصفحك لضمان الخصوصية القصوى.
               </p>
             </div>
 
@@ -254,7 +254,7 @@ export default function App() {
                         {item.status === 'completed' ? (
                           <a 
                             href={item.resultUrl} 
-                            download={`emerald-${item.file.name.split('.')[0]}.${targetFormat}`}
+                            download={`storehalal-${item.file.name.split('.')[0]}.${targetFormat}`}
                             className="p-4 bg-emerald-500 text-black rounded-xl hover:scale-110 transition-all"
                           >
                             <Download size={20} />
@@ -295,7 +295,7 @@ export default function App() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
               <div>
                 <h1 className="text-5xl font-black italic tracking-tighter mb-2">لوحة التحكم</h1>
-                <p className="opacity-40 font-bold uppercase tracking-widest text-[10px]">مركز الإدارة الشامل لـ Emerald Convert</p>
+                <p className="opacity-40 font-bold uppercase tracking-widest text-[10px]">مركز الإدارة الشامل لـ Storehalal Convert</p>
               </div>
               <div className="flex gap-3">
                  <button 
@@ -353,7 +353,7 @@ export default function App() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
             <div className="flex items-center gap-3">
               <RefreshCw size={24} className="text-emerald-500" />
-              <span className="text-xl font-black italic tracking-tighter">Emerald Convert</span>
+              <span className="text-xl font-black italic tracking-tighter">Storehalal Convert</span>
             </div>
             <div className="flex gap-12 text-[10px] font-black uppercase tracking-widest opacity-30">
               <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-all">الرئيسية</button>
@@ -368,7 +368,7 @@ export default function App() {
           </div>
           <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 opacity-10 text-[9px] font-black tracking-[0.4em] uppercase">
             <span>Professional Image Processing Suite</span>
-            <span>© 2024 EMERALD CONVERT. ALL RIGHTS RESERVED.</span>
+            <span>© 2024 STOREHALAL CONVERT. ALL RIGHTS RESERVED.</span>
           </div>
         </div>
       </footer>
