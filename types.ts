@@ -1,5 +1,5 @@
 
-export type View = 'home' | 'admin' | 'login';
+export type View = 'home' | 'admin' | 'login' | 'policies';
 
 export interface AdSenseConfig {
   isEnabled: boolean;
@@ -15,7 +15,6 @@ export interface ImageConversion {
   resultSize: number;
 }
 
-// Added Post interface to fix import errors in PostCard and PostEditor
 export interface Post {
   id: string;
   title: string;
@@ -27,7 +26,6 @@ export interface Post {
   status: string;
 }
 
-// Added AnalyticsData interface to fix import errors in AdminPanel
 export interface AnalyticsData {
   totalViews: number;
   liveVisitors: number;

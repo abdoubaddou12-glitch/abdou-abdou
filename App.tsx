@@ -11,6 +11,7 @@ import {
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
 import { AdminPanel } from './components/AdminPanel.tsx';
+import { Policies } from './components/Policies.tsx';
 import { View, AnalyticsData } from './types.ts';
 
 export default function App() {
@@ -175,13 +176,15 @@ export default function App() {
             />
           </div>
         )}
+
+        {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
       {/* Footer */}
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="mb-8">
-            <h2 className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></h2>
+            <h2 onClick={() => setView('home')} className="text-2xl font-black italic tracking-tighter cursor-pointer">Storehalal <span className="text-emerald-500">Convert</span></h2>
             <p className={`text-[10px] font-bold uppercase tracking-widest mt-2 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>
           </div>
 
@@ -246,6 +249,8 @@ export default function App() {
             </p>
             <div className={`flex gap-8 text-[9px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
                <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-colors">تحويل الصور</button>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">سياسة الخصوصية</button>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">شروط الخدمة</button>
                <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className="hover:text-emerald-500 transition-colors">الأمان</button>
             </div>
           </div>
