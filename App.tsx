@@ -97,6 +97,7 @@ export default function App() {
 
              <button 
                 onClick={() => setIsDark(!isDark)}
+                aria-label="تبديل الوضع الليلي والنهاري"
                 className={`p-3 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500 hover:bg-zinc-800' : 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100'}`}
              >
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
@@ -104,6 +105,7 @@ export default function App() {
 
              <button 
                onClick={() => setView(isAuthenticated ? 'admin' : 'login')}
+               aria-label="لوحة التحكم"
                className={`p-3 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}
              >
                <LayoutDashboard size={20} />
@@ -119,11 +121,11 @@ export default function App() {
             <section className="text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-8">
                 <Zap size={14} className="text-emerald-500" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية في المتصفح</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية وآمنة</span>
               </div>
-              <h1 className="text-5xl md:text-8xl font-black italic mb-6 text-glow leading-tight">مركز تحويل الصور <br/><span className="text-emerald-500">فائق السرعة.</span></h1>
+              <h1 className="text-5xl md:text-8xl font-black italic mb-6 text-glow leading-tight">حول صورك لـ WebP <br/><span className="text-emerald-500">بجودة احترافية.</span></h1>
               <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-12 ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
-                قم بتحويل وتغيير مقاسات صورك بضغطة واحدة. نحن لا نرفع صورك إلى أي خادم، خصوصيتك هي الأولوية.
+                استخدم Storehalal Convert لتحويل الصور وتغيير مقاساتها مجاناً. أداة سريعة، آمنة، وتعمل كلياً في متصفحك لضمان خصوصيتك الكاملة.
               </p>
               
               <Converter onConversion={handleConversionSuccess} isDark={isDark} />
@@ -134,19 +136,19 @@ export default function App() {
                <FeatureCard 
                 icon={<ShieldCheck size={24}/>} 
                 title="خصوصية 100%" 
-                desc="تتم جميع العمليات داخل متصفحك مباشرة دون الحاجة لرفع الصور." 
+                desc="صورك لا تغادر جهازك أبداً. تتم المعالجة محلياً في المتصفح." 
                 isDark={isDark} 
                />
                <FeatureCard 
                 icon={<Zap size={24}/>} 
-                title="أداء WebP" 
-                desc="حول صورك إلى صيغة WebP لتقليل حجم موقعك بنسبة تصل إلى 80%." 
+                title="أرشفة أسرع" 
+                desc="صيغة WebP تحسن سرعة موقعك وتساعدك في تصدر نتائج البحث." 
                 isDark={isDark} 
                />
                <FeatureCard 
                 icon={<ImageIcon size={24}/>} 
-                title="تغيير الأشكال" 
-                desc="قص دائري، تدوير، إضافة علامة مائية، وتحكم كامل في الأبعاد." 
+                title="تحكم كامل" 
+                desc="أدوات هندسية لقص وتدوير وتغيير مقاسات الصور بدقة عالية." 
                 isDark={isDark} 
                />
             </section>
@@ -179,12 +181,12 @@ export default function App() {
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="mb-8">
-            <span className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
-            <p className={`text-[10px] font-bold uppercase tracking-widest mt-2 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Browser-Based Image Toolkit</p>
+            <h2 className="text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></h2>
+            <p className={`text-[10px] font-bold uppercase tracking-widest mt-2 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">شارك الأداة مع أصدقائك</h4>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">شارك الأداة لدعمنا</span>
             <div className="flex justify-center flex-wrap gap-4">
                <SocialShareBtn 
                  href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`}
@@ -223,6 +225,7 @@ export default function App() {
                />
                <button 
                  onClick={copyToClipboard} 
+                 aria-label="نسخ رابط الموقع"
                  className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all group relative ${
                    copySuccess 
                     ? 'bg-emerald-500 border-transparent text-black shadow-lg shadow-emerald-500/40' 
@@ -242,8 +245,8 @@ export default function App() {
               جميع الحقوق محفوظة © {new Date().getFullYear()} Storehalal.shop
             </p>
             <div className={`flex gap-8 text-[9px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
-               <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-colors">المحول الذكي</button>
-               <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className="hover:text-emerald-500 transition-colors">لوحة الأداء</button>
+               <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-colors">تحويل الصور</button>
+               <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className="hover:text-emerald-500 transition-colors">الأمان</button>
             </div>
           </div>
         </div>
@@ -267,6 +270,7 @@ const SocialShareBtn = ({ href, icon, label, color, isDark }: any) => (
     href={href} 
     target="_blank" 
     rel="noopener noreferrer"
+    aria-label={`مشاركة عبر ${label}`}
     className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all group relative ${
       isDark 
         ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white hover:border-transparent` 

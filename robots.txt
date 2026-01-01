@@ -4,4 +4,5 @@ Allow: /
 Disallow: /admin
 Disallow: /login
 
+# Sitemap location
 Sitemap: https://storehalal.shop/sitemap.xml
