@@ -7,6 +7,14 @@ export interface AdSenseConfig {
   slotId: string;
 }
 
+export interface AdsterraConfig {
+  isEnabled: boolean;
+  banner728x90: string; // كود البانر العلوي
+  banner300x250: string; // كود البانر الجانبي
+  socialBar: string; // كود السوشيال بار (Script)
+  popUnder: string; // كود البوب آندر (Script)
+}
+
 export interface AnalyticsData {
   totalViews: number;
   dailyEarnings: number[];
@@ -14,7 +22,6 @@ export interface AnalyticsData {
   cpc: string;
 }
 
-// Added Post interface to resolve missing export errors in components
 export interface Post {
   id: string;
   title: string;
