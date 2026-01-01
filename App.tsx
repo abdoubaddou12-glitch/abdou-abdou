@@ -4,7 +4,8 @@ import {
   Upload, Image as ImageIcon, Download, X, 
   Settings2, Zap, ArrowRight, ShieldCheck, 
   RefreshCw, Layers, CheckCircle, Info, ChevronDown,
-  Lock, LayoutDashboard, Settings, LogOut, Eye, EyeOff, BarChart3, Database
+  Lock, LayoutDashboard, Settings, LogOut, Eye, EyeOff, BarChart3, Database,
+  Share2, Twitter, Facebook, Send, Link as LinkIcon, MessageCircle
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { SecuritySettings } from './components/SecuritySettings.tsx';
@@ -25,6 +26,7 @@ export default function App() {
   const [quality, setQuality] = useState(80);
   const [resizeWidth, setResizeWidth] = useState<number | ''>('');
   const [isProcessingAll, setIsProcessingAll] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Admin States
@@ -124,6 +126,15 @@ export default function App() {
     setAdminPassword(newPass);
     localStorage.setItem('emerald_admin_pass', newPass);
   };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const shareText = encodeURIComponent("أفضل أداة لتحويل الصور وتغيير مقاساتها بخصوصية تامة وسرعة خيالية! جرب Storehalal Convert:");
+  const shareUrl = encodeURIComponent(window.location.href);
 
   return (
     <div className="min-h-screen">
@@ -347,20 +358,70 @@ export default function App() {
         )}
       </main>
 
-      {/* Improved Footer with Admin Access */}
+      {/* Improved Footer with Social Sharing */}
       <footer className="border-t border-emerald-500/10 py-20 bg-black/40">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
-            <div className="flex items-center gap-3">
-              <RefreshCw size={24} className="text-emerald-500" />
-              <span className="text-xl font-black italic tracking-tighter">Storehalal Convert</span>
+            <div className="flex flex-col items-center md:items-start gap-4">
+              <div className="flex items-center gap-3">
+                <RefreshCw size={24} className="text-emerald-500" />
+                <span className="text-xl font-black italic tracking-tighter">Storehalal Convert</span>
+              </div>
+              <p className="text-[11px] opacity-30 font-bold uppercase tracking-widest">تحويل الصور محلياً بكل أمان</p>
             </div>
+
+            {/* Social Share Section */}
+            <div className="flex flex-col items-center gap-6">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">شارك الموقع مع أصدقائك</span>
+              <div className="flex flex-wrap justify-center gap-4">
+                <a 
+                  href={`https://wa.me/?text=${shareText}%20${shareUrl}`} 
+                  target="_blank" 
+                  className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-black hover:scale-110 transition-all shadow-lg shadow-emerald-500/5"
+                  title="مشاركة عبر واتساب"
+                >
+                  <MessageCircle size={20} />
+                </a>
+                <a 
+                  href={`https://t.me/share/url?url=${shareUrl}&text=${shareText}`} 
+                  target="_blank" 
+                  className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-black hover:scale-110 transition-all shadow-lg shadow-emerald-500/5"
+                  title="مشاركة عبر تيليجرام"
+                >
+                  <Send size={20} />
+                </a>
+                <a 
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} 
+                  target="_blank" 
+                  className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-black hover:scale-110 transition-all shadow-lg shadow-emerald-500/5"
+                  title="مشاركة عبر فيسبوك"
+                >
+                  <Facebook size={20} />
+                </a>
+                <a 
+                  href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareText}`} 
+                  target="_blank" 
+                  className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-black hover:scale-110 transition-all shadow-lg shadow-emerald-500/5"
+                  title="مشاركة عبر تويتر"
+                >
+                  <Twitter size={20} />
+                </a>
+                <button 
+                  onClick={copyToClipboard}
+                  className={`w-12 h-12 rounded-full border flex items-center justify-center transition-all shadow-lg ${copySuccess ? 'bg-emerald-500 border-transparent text-black' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-black hover:scale-110 shadow-emerald-500/5'}`}
+                  title="نسخ رابط الموقع"
+                >
+                  {copySuccess ? <CheckCircle size={20} /> : <LinkIcon size={20} />}
+                </button>
+              </div>
+            </div>
+
             <div className="flex gap-12 text-[10px] font-black uppercase tracking-widest opacity-30">
               <button onClick={() => setView('home')} className="hover:text-emerald-500 transition-all">الرئيسية</button>
               <button className="hover:text-emerald-500 transition-all">الخصوصية</button>
               <button 
                 onClick={() => setView(isAuthenticated ? 'admin' : 'login')} 
-                className="flex items-center gap-2 hover:text-emerald-500 transition-all"
+                className="flex items-center gap-2 hover:text-emerald-500 transition-all text-emerald-500/60"
               >
                 <Lock size={12} /> الإدارة
               </button>
@@ -375,13 +436,3 @@ export default function App() {
     </div>
   );
 }
-
-const FeatureCard = ({ icon, title, desc }) => (
-  <div className="emerald-card p-10 border-white/5 hover:border-emerald-500/20 text-center group">
-    <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-8 group-hover:bg-emerald-500 group-hover:text-black transition-all">
-      {icon}
-    </div>
-    <h3 className="text-xl font-black mb-4 tracking-tighter italic">{title}</h3>
-    <p className="text-sm opacity-30 font-medium leading-relaxed">{desc}</p>
-  </div>
-);
