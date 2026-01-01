@@ -3,7 +3,7 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <title>Storehalal Convert | محول الصور الاحترافي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
         color: #ffffff;
         margin: 0;
         overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
       }
 
       .bg-glow {
@@ -35,14 +36,11 @@
         background: rgba(15, 15, 15, 0.6);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(16, 185, 129, 0.1);
-        border-radius: 2.5rem;
+        border-radius: 1.5rem;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
-
-      .drop-zone-active {
-        border-color: var(--emerald);
-        background: rgba(16, 185, 129, 0.05);
-        box-shadow: 0 0 50px rgba(16, 185, 129, 0.1);
+      @media (min-width: 768px) {
+        .emerald-card { border-radius: 2.5rem; }
       }
 
       .text-glow {
@@ -50,12 +48,12 @@
       }
 
       @keyframes slideUp {
-        from { opacity: 0; transform: translateY(30px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .animate-slide-up { animation: slideUp 0.8s ease-out forwards; }
+      .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
 
-      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar { width: 4px; }
       ::-webkit-scrollbar-track { background: #000; }
       ::-webkit-scrollbar-thumb { background: var(--emerald); border-radius: 10px; }
     </style>
