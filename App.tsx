@@ -4,8 +4,8 @@ import {
   RefreshCw, LayoutDashboard, CheckCircle, 
   Link as LinkIcon, Image as ImageIcon, Zap,
   Sun, Moon, ArrowLeft, ShieldCheck,
-  HardDrive, Trash2, Facebook, Twitter, 
-  MessageCircle, Send, Linkedin, Mail, Share2, DollarSign,
+  Facebook, Twitter, 
+  MessageCircle, DollarSign,
   Users, Eye, Activity
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
@@ -14,7 +14,7 @@ import { AdminPanel } from './components/AdminPanel.tsx';
 import { AdSettings } from './components/AdSettings.tsx';
 import { AdUnit } from './components/AdUnit.tsx';
 import { Policies } from './components/Policies.tsx';
-import { View, AnalyticsData, AdSenseConfig, AdsterraConfig } from './types.ts';
+import { View, AdSenseConfig, AdsterraConfig } from './types.ts';
 
 export default function App() {
   const [view, setView] = useState<View>('home');
@@ -31,11 +31,11 @@ export default function App() {
 
   const [adsense, setAdsense] = useState<AdSenseConfig>(() => JSON.parse(localStorage.getItem('as_cfg') || '{"isEnabled":false,"publisherId":"","slotId":""}'));
   
-  // الأكواد الافتراضية الرسمية الخاصة بك لـ Adsterra
+  // الأكواد الافتراضية - لضمان عدم فراغ الحقول
   const DEFAULT_ADSTERRA: AdsterraConfig = {
     isEnabled: true,
-    banner728x90: '<!-- Top Banner -->',
-    banner300x250: '<!-- Mobile Banner -->',
+    banner728x90: '',
+    banner300x250: '',
     socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
     popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
   };
@@ -44,13 +44,7 @@ export default function App() {
     const saved = localStorage.getItem('at_cfg');
     if (saved) {
       const parsed = JSON.parse(saved);
-      // إذا كانت الأكواد الأساسية (Social Bar / Popunder) مفقودة أو فارغة، نستخدم الافتراضي
-      return {
-        ...DEFAULT_ADSTERRA,
-        ...parsed,
-        socialBar: parsed.socialBar && parsed.socialBar.length > 10 ? parsed.socialBar : DEFAULT_ADSTERRA.socialBar,
-        popUnder: parsed.popUnder && parsed.popUnder.length > 10 ? parsed.popUnder : DEFAULT_ADSTERRA.popUnder
-      };
+      return { ...DEFAULT_ADSTERRA, ...parsed };
     }
     return DEFAULT_ADSTERRA;
   });
@@ -63,46 +57,42 @@ export default function App() {
       setTotalVisitors(prev => prev + 1);
       sessionStorage.setItem('v_token', 'true');
     }
-
     const interval = setInterval(() => {
       setOnlineNow(prev => {
         const diff = Math.random() > 0.5 ? 1 : -1;
         return Math.max(5, prev + diff);
       });
     }, 10000);
-
     return () => clearInterval(interval);
   }, []);
 
-  // نظام الحقن للإعلانات (يصلح للحاسوب والهاتف)
+  // حقن الأكواد التلقائية (Social Bar & Popunder) - تعمل في الخلفية ولا تظهر كأزرار
   useEffect(() => {
-    if (adsterra.isEnabled) {
-      const injectScriptRobustly = (code: string, id: string) => {
+    if (adsterra.isEnabled && view === 'home') {
+      const injectScript = (code: string, id: string) => {
         if (!code || code.length < 10) return;
-        
         const existing = document.getElementById(id);
         if (existing) existing.remove();
-
         try {
           const container = document.createElement('div');
           container.id = id;
           container.style.display = 'none';
           document.body.appendChild(container);
-          
           const range = document.createRange();
           const fragment = range.createContextualFragment(code);
           container.appendChild(fragment);
-          console.log(`Ad Injected: ${id}`);
-        } catch (e) { 
-          console.error(`Failed to inject ad ${id}:`, e); 
-        }
+        } catch (e) { console.error(e); }
       };
-
-      // حقن الأكواد المخفية (Social Bar & Popunder)
-      injectScriptRobustly(adsterra.socialBar, 'at-social-bar-layer');
-      injectScriptRobustly(adsterra.popUnder, 'at-popunder-layer');
+      injectScript(adsterra.socialBar, 'at-social-bar-layer');
+      injectScript(adsterra.popUnder, 'at-popunder-layer');
+    } else {
+      // إزالة الإعلانات التلقائية عند الدخول للوحة التحكم لضمان عدم التداخل
+      ['at-social-bar-layer', 'at-popunder-layer'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+      });
     }
-  }, [adsterra.isEnabled, adsterra.socialBar, adsterra.popUnder]);
+  }, [adsterra.isEnabled, adsterra.socialBar, adsterra.popUnder, view]);
 
   useEffect(() => {
     document.body.className = isDark ? '' : 'light-mode';
@@ -159,19 +149,19 @@ export default function App() {
         {view === 'home' && (
           <div className="animate-slide-up space-y-12">
             
-            {/* إعلان البانر العلوي (للحاسوب) */}
-            {adsterra.isEnabled && adsterra.banner728x90 && (
-              <div className="hidden md:block">
-                <AdUnit type="script" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
-              </div>
-            )}
-
-            {/* إعلان البانر المربع (للهواتف) */}
-            {adsterra.isEnabled && adsterra.banner300x250 && (
-              <div className="block md:hidden">
-                <AdUnit type="script" code={adsterra.banner300x250} isDark={isDark} label="إعلان ممول" />
-              </div>
-            )}
+            {/* الإعلان يظهر هنا فقط في الأعلى */}
+            <div className="ad-container-top">
+              {adsterra.isEnabled && adsterra.banner728x90 && (
+                <div className="hidden md:block">
+                  <AdUnit type="script" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
+                </div>
+              )}
+              {adsterra.isEnabled && adsterra.banner300x250 && (
+                <div className="block md:hidden">
+                  <AdUnit type="script" code={adsterra.banner300x250} isDark={isDark} label="إعلان ممول" />
+                </div>
+              )}
+            </div>
 
             <section className="text-center px-2">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 md:mb-10">
@@ -193,13 +183,6 @@ export default function App() {
                <FeatureCard icon={<Zap size={28}/>} title="أرشفة أسرع" desc="صيغة WebP تحسن سرعة موقعك بنسبة كبيرة وتساعدك في تصدر نتائج البحث." isDark={isDark} />
                <FeatureCard icon={<ImageIcon size={28}/>} title="تحكم هندسي" desc="أدوات دقيقة لقص وتدوير وتغيير مقاسات الصور بدقة عالية." isDark={isDark} />
             </section>
-
-            {/* إعلان بانر سفلي للهواتف لزيادة الأرباح */}
-            {adsterra.isEnabled && adsterra.banner300x250 && (
-              <div className="block md:hidden mt-10">
-                <AdUnit type="script" code={adsterra.banner300x250} isDark={isDark} label="إعلان ممول" />
-              </div>
-            )}
           </div>
         )}
 
@@ -256,20 +239,6 @@ export default function App() {
 
       <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <div className="mb-6 flex justify-center gap-8">
-             <div className="text-center">
-                <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-400'}`}>إجمالي الزيارات</p>
-                <p className="text-lg font-black italic text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</p>
-             </div>
-             <div className="text-center">
-                <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-400'}`}>المتواجدون الآن</p>
-                <div className="flex items-center gap-2 justify-center">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <p className="text-lg font-black italic">{onlineNow}</p>
-                </div>
-             </div>
-          </div>
-
           <div className="mb-10">
             <h2 onClick={() => setView('home')} className="text-2xl md:text-3xl font-black italic tracking-tighter cursor-pointer inline-block">Storehalal <span className="text-emerald-500">Convert</span></h2>
             <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>

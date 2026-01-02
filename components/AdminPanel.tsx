@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
 import { AnalyticsData } from '../types.ts';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { 
-  ShieldCheck, TrendingUp, RefreshCw, Zap, 
-  HardDrive, Trash2, Settings2, Save, Users, Eye, Plus, Activity,
+  ShieldCheck, TrendingUp, RefreshCw, 
+  HardDrive, Trash2, Save, Users, Eye, Plus, Activity,
   CloudLightning
 } from 'lucide-react';
 
@@ -44,7 +44,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleHardRefresh = () => {
     if (confirm('سيتم الآن تنظيف ذاكرة المتصفح وإجبار الموقع على التحميل من السيرفر مباشرة. هل أنت متأكد؟')) {
-      // مسح الكاش الخاص بالمتصفح برمجياً للجلسة الحالية
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
           for(let registration of registrations) {
@@ -52,7 +51,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           }
         });
       }
-      // إضافة بارامتر عشوائي للرابط لكسر كاش Cloudflare
       window.location.href = window.location.pathname + '?v=' + Date.now();
     }
   };
@@ -77,7 +75,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       </div>
 
       <div className="animate-slide-up space-y-8 md:space-y-12">
-        {/* صف الإحصائيات الرئيسي */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard title="إجمالي الزوار" value={analytics.totalVisitors.toLocaleString()} icon={<Users size={22} />} isDark={isDark} />
           <StatCard title="إجمالي التحويلات" value={analytics.totalViews.toLocaleString()} icon={<RefreshCw size={22} />} isDark={isDark} />
@@ -85,7 +82,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <StatCard title="حالة النظام" value="نشط" icon={<Activity size={22} />} isDark={isDark} />
         </div>
 
-        {/* قسم التحكم في عدد الزوار */}
         <div className={`p-8 rounded-[2.5rem] border ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-100 shadow-xl'}`}>
            <div className="flex items-center gap-4 mb-6">
               <Eye size={24} className="text-emerald-500" />
