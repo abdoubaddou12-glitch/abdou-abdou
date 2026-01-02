@@ -2,11 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   RefreshCw, LayoutDashboard, CheckCircle, 
-  Link as LinkIcon, Image as ImageIcon, Zap,
-  Sun, Moon, ArrowLeft, ShieldCheck,
-  Facebook, Twitter, 
-  MessageCircle, 
-  Users, Eye, Activity
+  ImageIcon, Zap, Sun, Moon, ArrowLeft, 
+  ShieldCheck, MessageCircle, Facebook, Twitter, Link as LinkIcon,
+  Users, Activity
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -20,8 +18,6 @@ export default function App() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode') !== 'light');
   
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
-  const [totalSavedMB, setTotalSavedMB] = useState(() => Number(localStorage.getItem('total_saved_mb')) || 0);
-  
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
   const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
   const [onlineNow, setOnlineNow] = useState(Math.floor(Math.random() * 15) + 5);
@@ -29,62 +25,44 @@ export default function App() {
   const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
-    const hasVisited = sessionStorage.getItem('v_token');
-    if (!hasVisited) {
-      setTotalVisitors(prev => prev + 1);
-      sessionStorage.setItem('v_token', 'true');
-    }
-    const interval = setInterval(() => {
-      setOnlineNow(prev => {
-        const diff = Math.random() > 0.5 ? 1 : -1;
-        return Math.max(5, prev + diff);
-      });
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     document.body.className = isDark ? '' : 'light-mode';
     localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
     localStorage.setItem('total_converted', totalConverted.toString());
-    localStorage.setItem('total_saved_mb', totalSavedMB.toString());
     localStorage.setItem('total_visitors', totalVisitors.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
-  }, [isDark, totalConverted, totalSavedMB, totalVisitors, baseVisitors]);
+  }, [isDark, totalConverted, totalVisitors, baseVisitors]);
 
   const handleConversionSuccess = (savedKB: number) => {
     setTotalConverted(prev => prev + 1);
-    setTotalSavedMB(prev => prev + (savedKB / 1024));
   };
 
   const siteUrl = "https://storehalal.shop";
-  const shareText = "أداة Storehalal Convert الرائعة لتحويل الصور وتغيير مقاساتها فوراً في المتصفح بخصوصية تامة!";
+  const shareText = "أداة Storehalal Convert الاحترافية لتحويل الصور ومعالجتها فوراً بخصوصية تامة!";
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-400 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
       
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-[100] p-3 md:p-6 lg:pt-10">
-        <div className={`max-w-6xl mx-auto flex items-center justify-between px-4 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-[2.5rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
-          <div onClick={() => {setView('home');}} className="flex items-center gap-2 md:gap-3 cursor-pointer group">
-            <div className="w-9 h-9 md:w-11 md:h-11 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-lg shadow-emerald-500/20 group-hover:rotate-180 transition-transform duration-500">
-              <RefreshCw size={18} />
+      <nav className="fixed top-0 left-0 right-0 z-[100] p-4 md:p-6">
+        <div className={`max-w-6xl mx-auto flex items-center justify-between px-6 py-4 rounded-[2rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
+          <div onClick={() => setView('home')} className="flex items-center gap-3 cursor-pointer group">
+            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-lg shadow-emerald-500/20 group-hover:rotate-180 transition-transform duration-500">
+              <Zap size={20} />
             </div>
-            <span className="text-lg md:text-2xl font-black italic tracking-tighter truncate">Storehalal <span className="text-emerald-500">Convert</span></span>
+            <span className="text-xl md:text-2xl font-black italic tracking-tighter truncate">Storehalal <span className="text-emerald-500">Convert</span></span>
           </div>
           
-          <div className="flex items-center gap-2 md:gap-4">
-             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${isDark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/10 bg-emerald-50'}`}>
+          <div className="flex items-center gap-3">
+             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-[10px] font-black uppercase tracking-widest text-emerald-500">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-emerald-500">{onlineNow} متواجد الآن</span>
+                {onlineNow} متواجد الآن
              </div>
-
-             <button onClick={() => setIsDark(!isDark)} className={`p-2.5 md:p-3.5 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
+             <button onClick={() => setIsDark(!isDark)} className={`p-3 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
              </button>
              <button 
                onClick={() => setView(isAuthenticated ? 'admin' : 'login')}
-               className={`p-2.5 md:p-3.5 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black shadow-lg' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}
+               className={`p-3 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black shadow-lg' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}
              >
                <LayoutDashboard size={18} />
              </button>
@@ -92,28 +70,28 @@ export default function App() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto w-full px-4 md:px-8 pt-28 md:pt-40 pb-20 flex-grow">
+      <main className="max-w-6xl mx-auto w-full px-6 pt-32 pb-20 flex-grow">
         {view === 'home' && (
-          <div className="animate-slide-up space-y-12">
-            <section className="text-center px-2">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 md:mb-10">
+          <div className="animate-slide-up space-y-20">
+            <section className="text-center pt-10">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-8">
                 <Zap size={14} className="text-emerald-500" />
-                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية وآمنة تماماً</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة محلية 100%</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black italic mb-6 md:mb-8 text-glow leading-[1.1] tracking-tighter">
-                أداة تحويل الصور <br className="hidden sm:block" />
+              <h1 className="text-5xl md:text-8xl font-black italic mb-8 text-glow leading-tight tracking-tighter">
+                تحويل الصور <br />
                 <span className="text-emerald-500">بجودة هندسية.</span>
               </h1>
-              <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-10 md:mb-16 px-4 text-sm md:text-lg ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
-                تحويل الصور وتغيير مقاساتها مجاناً وبدون رفعها لأي سيرفر. نستخدم تقنيات الويب الحديثة لضمان بقاء بياناتك على جهازك.
+              <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-16 text-lg ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
+                الأداة الأكثر أماناً لتحويل مقاسات وصيغ صورك مباشرة في المتصفح. لا يتم رفع أي ملفات لسيرفراتنا، خصوصيتك هي أولويتنا.
               </p>
               <Converter onConversion={handleConversionSuccess} isDark={isDark} />
             </section>
 
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-10 pt-10">
-               <FeatureCard icon={<ShieldCheck size={28}/>} title="خصوصية 100%" desc="صورك لا تغادر جهازك أبداً. تتم المعالجة محلياً في المتصفح." isDark={isDark} />
-               <FeatureCard icon={<Zap size={28}/>} title="أرشفة أسرع" desc="صيغة WebP تحسن سرعة موقعك بنسبة كبيرة وتساعدك في تصدر نتائج البحث." isDark={isDark} />
-               <FeatureCard icon={<ImageIcon size={28}/>} title="تحكم هندسي" desc="أدوات دقيقة لقص وتدوير وتغيير مقاسات الصور بدقة عالية." isDark={isDark} />
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+               <FeatureCard icon={<ShieldCheck size={28}/>} title="أمان مطلق" desc="تتم معالجة الصور داخل جهازك فقط، مما يضمن عدم اطلاع أي طرف ثالث على محتواك." isDark={isDark} />
+               <FeatureCard icon={<Zap size={28}/>} title="سرعة البرق" desc="نستخدم تقنيات الويب الحديثة لضمان تحويل الصور في أجزاء من الثانية." isDark={isDark} />
+               <FeatureCard icon={<ImageIcon size={28}/>} title="دقة عالية" desc="تحكم كامل في الأبعاد، الجودة، والقص للحصول على أفضل نسخة من صورك." isDark={isDark} />
             </section>
           </div>
         )}
@@ -122,28 +100,25 @@ export default function App() {
 
         {view === 'admin' && isAuthenticated && (
           <div className="animate-slide-up space-y-8">
-            <div className="flex justify-between items-center">
-              <button onClick={() => {setView('home');}} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
-                <ArrowLeft size={16} /> العودة للمحول
-              </button>
-            </div>
-
+            <button onClick={() => setView('home')} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
+              <ArrowLeft size={16} /> العودة للمحول
+            </button>
             <AdminPanel 
               isDark={isDark}
               analytics={{
                 totalViews: totalConverted,
                 totalVisitors: totalVisitors + baseVisitors,
                 dailyEarnings: [0],
-                ctr: `${totalSavedMB.toFixed(1)} MB`,
+                ctr: "N/A",
                 cpc: "Active"
               }}
+              posts={[]} // No posts
+              onNewPost={() => {}}
+              onEditPost={() => {}}
+              onDeletePost={() => {}}
               onOpenAdSense={() => {}}
               onOpenSecurity={() => {}} 
               onSyncData={() => {}}
-              posts={[]}
-              onNewPost={() => {}} 
-              onEditPost={() => {}}
-              onDeletePost={() => {}}
               baseVisitors={baseVisitors}
               onUpdateBaseVisitors={(val) => setBaseVisitors(val)}
             />
@@ -153,7 +128,7 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
-      <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
+      <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           <div className="mb-10">
             <h2 onClick={() => setView('home')} className="text-2xl md:text-3xl font-black italic tracking-tighter cursor-pointer inline-block">Storehalal <span className="text-emerald-500">Convert</span></h2>
@@ -161,10 +136,10 @@ export default function App() {
           </div>
 
           <div className="flex justify-center flex-wrap gap-4 mb-16">
-                 <SocialShareBtn href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`} icon={<MessageCircle size={22} />} color="hover:bg-[#25D366]" isDark={isDark} label="WhatsApp" />
-                 <SocialShareBtn href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`} icon={<Facebook size={22} />} color="hover:bg-[#1877F2]" isDark={isDark} label="Facebook" />
-                 <SocialShareBtn href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(siteUrl)}`} icon={<Twitter size={22} />} color="hover:bg-[#000000]" isDark={isDark} label="X" />
-                 <button onClick={() => { navigator.clipboard.writeText(siteUrl); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000); }} className={`w-12 h-12 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all ${copySuccess ? 'bg-emerald-500 text-black' : 'text-emerald-500 border-emerald-500/20'}`}>
+                 <SocialShareBtn href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + siteUrl)}`} icon={<MessageCircle size={22} />} color="hover:bg-[#25D366]" isDark={isDark} />
+                 <SocialShareBtn href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`} icon={<Facebook size={22} />} color="hover:bg-[#1877F2]" isDark={isDark} />
+                 <SocialShareBtn href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(siteUrl)}`} icon={<Twitter size={22} />} color="hover:bg-[#000000]" isDark={isDark} />
+                 <button onClick={() => { navigator.clipboard.writeText(siteUrl); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000); }} className={`w-14 h-14 rounded-full border flex items-center justify-center transition-all ${copySuccess ? 'bg-emerald-500 text-black' : 'text-emerald-500 border-emerald-500/20'}`}>
                    {copySuccess ? <CheckCircle size={22} /> : <LinkIcon size={22} />}
                  </button>
           </div>
@@ -191,6 +166,6 @@ const FeatureCard = ({ icon, title, desc, isDark }: any) => (
   </div>
 );
 
-const SocialShareBtn = ({ href, icon, color, isDark, label }: any) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" title={label} className={`w-12 h-12 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all ${isDark ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white` : `bg-emerald-50 border-emerald-200 text-emerald-600 ${color} hover:text-white`}`}>{icon}</a>
+const SocialShareBtn = ({ href, icon, color, isDark }: any) => (
+  <a href={href} target="_blank" rel="noopener noreferrer" className={`w-14 h-14 rounded-full border flex items-center justify-center transition-all ${isDark ? `bg-emerald-500/5 border-emerald-500/20 text-emerald-500 ${color} hover:text-white` : `bg-emerald-50 border-emerald-200 text-emerald-600 ${color} hover:text-white`}`}>{icon}</a>
 );

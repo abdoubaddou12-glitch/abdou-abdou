@@ -4,7 +4,7 @@ import { AnalyticsData } from '../types.ts';
 import { AreaChart, Area, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { 
   ShieldCheck, TrendingUp, RefreshCw, 
-  HardDrive, Trash2, Save, Users, Eye, Plus, Activity,
+  Trash2, Save, Users, Eye, Plus, Activity,
   CloudLightning
 } from 'lucide-react';
 
@@ -27,31 +27,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 }) => {
   const [tempBase, setTempBase] = useState(baseVisitors);
 
-  const chartData = analytics.dailyEarnings.map((val, i) => ({
-    name: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء'][i],
-    conversions: val * 10
-  }));
-
-  const handleClearHistory = () => {
-    if (confirm('هل تريد تصفير كافة إحصائيات النظام؟')) {
-      localStorage.setItem('total_converted', '0');
-      localStorage.setItem('total_saved_mb', '0');
-      localStorage.setItem('total_visitors', '0');
-      localStorage.setItem('base_visitors', '0');
-      window.location.reload();
+  const handleHardRefresh = () => {
+    if (confirm('سيتم الآن تنظيف الكاش وإجبار الموقع على التحديث من السيرفر. سيؤدي هذا لمزامنة النسخة بين الهاتف والحاسوب.')) {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+      }
+      window.location.href = window.location.pathname + '?v=' + Date.now();
     }
   };
 
-  const handleHardRefresh = () => {
-    if (confirm('سيتم الآن تنظيف ذاكرة المتصفح وإجبار الموقع على التحميل من السيرفر مباشرة. هل أنت متأكد؟')) {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-          }
-        });
-      }
-      window.location.href = window.location.pathname + '?v=' + Date.now();
+  const handleClearStats = () => {
+    if (confirm('هل أنت متأكد من تصفير إحصائيات النظام؟')) {
+      localStorage.setItem('total_converted', '0');
+      localStorage.setItem('total_visitors', '0');
+      window.location.reload();
     }
   };
 
@@ -60,25 +49,28 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
         <div>
           <h1 className="text-4xl md:text-5xl font-black mb-3 tracking-tighter italic">لوحة التحكم</h1>
-          <p className="text-xs font-bold opacity-30 uppercase tracking-widest">إدارة الأداء والزوار والمحتوى</p>
+          <p className="text-xs font-bold opacity-30 uppercase tracking-widest">مراقبة الأداء والمزامنة الفورية</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button 
             onClick={handleHardRefresh}
-            className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all bg-amber-500/10 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-black`}
+            className="px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all bg-amber-500/10 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-black shadow-lg shadow-amber-500/5"
           >
-            <CloudLightning size={20} /> تحديث قسري للموقع
+            <CloudLightning size={20} /> مزامنة وتحديث (Cloudflare)
           </button>
-          <button onClick={onOpenSecurity} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><ShieldCheck size={20} className="text-emerald-500" />الأمان</button>
-          <button onClick={handleClearHistory} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-4 rounded-2xl font-black flex items-center gap-2 transition-all border border-red-500/20"><Trash2 size={20} />تصفير الإحصائيات</button>
+          <button onClick={onOpenSecurity} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 shadow-lg text-zinc-600'}`}>
+            <ShieldCheck size={20} className="text-emerald-500" /> الأمان
+          </button>
+          <button onClick={handleClearStats} className="px-5 py-4 rounded-2xl font-black flex items-center gap-2 border border-red-500/20 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white transition-all">
+            <Trash2 size={20} /> تصفير
+          </button>
         </div>
       </div>
 
-      <div className="animate-slide-up space-y-8 md:space-y-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="animate-slide-up space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard title="إجمالي الزوار" value={analytics.totalVisitors.toLocaleString()} icon={<Users size={22} />} isDark={isDark} />
           <StatCard title="إجمالي التحويلات" value={analytics.totalViews.toLocaleString()} icon={<RefreshCw size={22} />} isDark={isDark} />
-          <StatCard title="المساحة الموفرة" value={analytics.ctr} icon={<HardDrive size={22} />} isDark={isDark} />
           <StatCard title="حالة النظام" value="نشط" icon={<Activity size={22} />} isDark={isDark} />
         </div>
 
@@ -89,7 +81,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
            </div>
            <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="flex-grow w-full">
-                 <p className="text-xs opacity-40 mb-3 font-bold">يمكنك إضافة عدد "بداية" للزوار ليظهر في الفوتر (الزيارات الوهمية):</p>
+                 <p className="text-xs opacity-40 mb-3 font-bold">إضافة عدد زوار أساسي للفوتر:</p>
                  <div className="relative">
                     <input 
                       type="number" 
@@ -107,23 +99,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <Save size={20} /> حفظ العداد
               </button>
            </div>
-        </div>
-
-        <div className={`p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border ${isDark ? 'bg-zinc-900/50 border-emerald-500/10' : 'bg-white border-zinc-100 shadow-xl'}`}>
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-lg md:text-xl font-black flex items-center gap-3 italic"><TrendingUp size={24} className="text-emerald-500" /> معدل الاستخدام الأسبوعي</h2>
-          </div>
-          <div className="h-64 md:h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs><linearGradient id="colorC" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/></linearGradient></defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#27272a' : '#f3f4f6'} />
-                <XAxis dataKey="name" stroke={isDark ? '#71717a' : '#9ca3af'} fontSize={10} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: isDark ? '#0a0a0a' : '#fff', borderRadius: '16px', border: 'none', fontWeight: 'bold' }} />
-                <Area type="monotone" dataKey="conversions" name="عدد العمليات" stroke="#10b981" strokeWidth={4} fill="url(#colorC)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
         </div>
       </div>
     </div>
