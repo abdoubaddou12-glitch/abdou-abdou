@@ -9,14 +9,15 @@ export interface AdSenseConfig {
 
 export interface AdsterraConfig {
   isEnabled: boolean;
-  banner728x90: string; // كود البانر العلوي
-  banner300x250: string; // كود البانر الجانبي
-  socialBar: string; // كود السوشيال بار (Script)
-  popUnder: string; // كود البوب آندر (Script)
+  banner728x90: string;
+  banner300x250: string;
+  socialBar: string;
+  popUnder: string;
 }
 
 export interface AnalyticsData {
   totalViews: number;
+  totalVisitors: number; // الحقل الجديد للزوار
   dailyEarnings: number[];
   ctr: string;
   cpc: string;

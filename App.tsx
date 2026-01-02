@@ -5,7 +5,8 @@ import {
   Link as LinkIcon, Image as ImageIcon, Zap,
   Sun, Moon, ArrowLeft, ShieldCheck,
   HardDrive, Trash2, Facebook, Twitter, 
-  MessageCircle, Send, Linkedin, Mail, Share2, DollarSign
+  MessageCircle, Send, Linkedin, Mail, Share2, DollarSign,
+  Users, Eye, Activity
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -24,9 +25,13 @@ export default function App() {
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
   const [totalSavedMB, setTotalSavedMB] = useState(() => Number(localStorage.getItem('total_saved_mb')) || 0);
   
+  // نظام تتبع الزوار
+  const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
+  const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
+  const [onlineNow, setOnlineNow] = useState(Math.floor(Math.random() * 15) + 5);
+
   const [adsense, setAdsense] = useState<AdSenseConfig>(() => JSON.parse(localStorage.getItem('as_cfg') || '{"isEnabled":false,"publisherId":"","slotId":""}'));
   
-  // الأكواد الخاصة بك - Adsterra Anti-Adblock
   const MY_ADSTERRA_CODES = {
     socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
     popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
@@ -41,10 +46,8 @@ export default function App() {
       socialBar: MY_ADSTERRA_CODES.socialBar,
       popUnder: MY_ADSTERRA_CODES.popUnder
     };
-
     if (saved) {
       const parsed = JSON.parse(saved);
-      // تحديث تلقائي للأكواد إذا كانت فارغة أو قديمة لضمان التشغيل
       if (!parsed.socialBar || parsed.socialBar.length < 20) {
         return { ...parsed, ...MY_ADSTERRA_CODES, isEnabled: true };
       }
@@ -55,31 +58,40 @@ export default function App() {
 
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // نظام الحقن المطور لضمان تجاوز مانع الإعلانات وتفعيل السكريبتات
+  // تحديث الزوار عند الدخول
+  useEffect(() => {
+    const hasVisited = sessionStorage.getItem('v_token');
+    if (!hasVisited) {
+      setTotalVisitors(prev => prev + 1);
+      sessionStorage.setItem('v_token', 'true');
+    }
+
+    // محاكاة تغير عدد المتواجدين الآن
+    const interval = setInterval(() => {
+      setOnlineNow(prev => {
+        const diff = Math.random() > 0.5 ? 1 : -1;
+        return Math.max(5, prev + diff);
+      });
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // نظام الحقن للإعلانات
   useEffect(() => {
     if (adsterra.isEnabled) {
       const injectScriptRobustly = (code: string, id: string) => {
         if (!code || document.getElementById(id)) return;
-
         try {
-          // إنشاء حاوية مخفية للسكريبت
           const container = document.createElement('div');
           container.id = id;
           container.style.display = 'none';
           document.body.appendChild(container);
-
-          // حقن الكود كـ Fragment لضمان تنفيذ الـ JS داخله
           const range = document.createRange();
           const fragment = range.createContextualFragment(code);
           container.appendChild(fragment);
-          
-          console.log(`Adsterra Active: ${id}`);
-        } catch (e) {
-          console.error(`Injection failed for ${id}:`, e);
-        }
+        } catch (e) { console.error(e); }
       };
-
-      // تنفيذ الحقن للأكواد الأساسية
       injectScriptRobustly(adsterra.socialBar, 'at-social-bar-layer');
       injectScriptRobustly(adsterra.popUnder, 'at-popunder-layer');
     }
@@ -92,7 +104,9 @@ export default function App() {
     localStorage.setItem('at_cfg', JSON.stringify(adsterra));
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('total_saved_mb', totalSavedMB.toString());
-  }, [isDark, adsense, adsterra, totalConverted, totalSavedMB]);
+    localStorage.setItem('total_visitors', totalVisitors.toString());
+    localStorage.setItem('base_visitors', baseVisitors.toString());
+  }, [isDark, adsense, adsterra, totalConverted, totalSavedMB, totalVisitors, baseVisitors]);
 
   const handleConversionSuccess = (savedKB: number) => {
     setTotalConverted(prev => prev + 1);
@@ -116,6 +130,12 @@ export default function App() {
           </div>
           
           <div className="flex items-center gap-2 md:gap-4">
+             {/* مؤشر المتواجدون الآن في الهيدر (اختياري) */}
+             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${isDark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/10 bg-emerald-50'}`}>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-emerald-500">{onlineNow} متواجد الآن</span>
+             </div>
+
              <button onClick={() => setIsDark(!isDark)} className={`p-2.5 md:p-3.5 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
              </button>
@@ -132,8 +152,6 @@ export default function App() {
       <main className="max-w-6xl mx-auto w-full px-4 md:px-8 pt-28 md:pt-40 pb-20 flex-grow">
         {view === 'home' && (
           <div className="animate-slide-up space-y-12">
-            
-            {/* إعلان البانر العلوي - يظهر في حال تم وضعه في لوحة التحكم */}
             {adsterra.isEnabled && adsterra.banner728x90 && (
               <AdUnit type="banner" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
             )}
@@ -143,16 +161,13 @@ export default function App() {
                 <Zap size={14} className="text-emerald-500" />
                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-500">معالجة فورية وآمنة تماماً</span>
               </div>
-              
               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black italic mb-6 md:mb-8 text-glow leading-[1.1] tracking-tighter">
                 أداة تحويل الصور <br className="hidden sm:block" />
                 <span className="text-emerald-500">بجودة هندسية.</span>
               </h1>
-              
               <p className={`max-w-2xl mx-auto italic font-medium leading-relaxed mb-10 md:mb-16 px-4 text-sm md:text-lg ${isDark ? 'opacity-40' : 'text-zinc-500'}`}>
                 تحويل الصور وتغيير مقاساتها مجاناً وبدون رفعها لأي سيرفر. نستخدم تقنيات الويب الحديثة لضمان بقاء بياناتك على جهازك.
               </p>
-              
               <Converter onConversion={handleConversionSuccess} isDark={isDark} />
             </section>
 
@@ -193,6 +208,7 @@ export default function App() {
                 isDark={isDark}
                 analytics={{
                   totalViews: totalConverted,
+                  totalVisitors: totalVisitors + baseVisitors,
                   dailyEarnings: [0],
                   ctr: `${totalSavedMB.toFixed(1)} MB`,
                   cpc: "Active"
@@ -204,8 +220,8 @@ export default function App() {
                 onNewPost={() => {}} 
                 onEditPost={() => {}}
                 onDeletePost={() => {}}
-                baseVisitors={0}
-                onUpdateBaseVisitors={() => {}}
+                baseVisitors={baseVisitors}
+                onUpdateBaseVisitors={(val) => setBaseVisitors(val)}
               />
             )}
           </div>
@@ -216,6 +232,21 @@ export default function App() {
 
       <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
+          {/* مؤشر الزوار العام في الفوتر */}
+          <div className="mb-6 flex justify-center gap-8">
+             <div className="text-center">
+                <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-400'}`}>إجمالي الزيارات</p>
+                <p className="text-lg font-black italic text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</p>
+             </div>
+             <div className="text-center">
+                <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-400'}`}>المتواجدون الآن</p>
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <p className="text-lg font-black italic">{onlineNow}</p>
+                </div>
+             </div>
+          </div>
+
           <div className="mb-10">
             <h2 onClick={() => setView('home')} className="text-2xl md:text-3xl font-black italic tracking-tighter cursor-pointer inline-block">Storehalal <span className="text-emerald-500">Convert</span></h2>
             <p className={`text-[10px] font-bold uppercase tracking-widest mt-3 ${isDark ? 'opacity-30' : 'text-zinc-400'}`}>Professional Image SEO Toolkit</p>
