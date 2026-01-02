@@ -25,40 +25,39 @@ export default function App() {
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
   const [totalSavedMB, setTotalSavedMB] = useState(() => Number(localStorage.getItem('total_saved_mb')) || 0);
   
-  // نظام تتبع الزوار
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
   const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
   const [onlineNow, setOnlineNow] = useState(Math.floor(Math.random() * 15) + 5);
 
   const [adsense, setAdsense] = useState<AdSenseConfig>(() => JSON.parse(localStorage.getItem('as_cfg') || '{"isEnabled":false,"publisherId":"","slotId":""}'));
   
-  const MY_ADSTERRA_CODES = {
+  // الأكواد الافتراضية لضمان عملها دوماً
+  const DEFAULT_ADSTERRA = {
+    isEnabled: true,
+    banner728x90: '',
+    banner300x250: '',
     socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
     popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
   };
 
   const [adsterra, setAdsterra] = useState<AdsterraConfig>(() => {
     const saved = localStorage.getItem('at_cfg');
-    const defaultConfig = {
-      isEnabled: true,
-      banner728x90: "", 
-      banner300x250: "",
-      socialBar: MY_ADSTERRA_CODES.socialBar,
-      popUnder: MY_ADSTERRA_CODES.popUnder
-    };
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (!parsed.socialBar || parsed.socialBar.length < 20) {
-        return { ...parsed, ...MY_ADSTERRA_CODES, isEnabled: true };
-      }
-      return parsed;
+      // التأكد من ملء الأكواد الناقصة من القيم الافتراضية
+      return {
+        ...DEFAULT_ADSTERRA,
+        ...parsed,
+        // إذا كانت الأكواد فارغة في التخزين، استخدم الافتراضي
+        socialBar: parsed.socialBar || DEFAULT_ADSTERRA.socialBar,
+        popUnder: parsed.popUnder || DEFAULT_ADSTERRA.popUnder
+      };
     }
-    return defaultConfig;
+    return DEFAULT_ADSTERRA;
   });
 
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // تحديث الزوار عند الدخول
   useEffect(() => {
     const hasVisited = sessionStorage.getItem('v_token');
     if (!hasVisited) {
@@ -66,7 +65,6 @@ export default function App() {
       sessionStorage.setItem('v_token', 'true');
     }
 
-    // محاكاة تغير عدد المتواجدين الآن
     const interval = setInterval(() => {
       setOnlineNow(prev => {
         const diff = Math.random() > 0.5 ? 1 : -1;
@@ -81,7 +79,11 @@ export default function App() {
   useEffect(() => {
     if (adsterra.isEnabled) {
       const injectScriptRobustly = (code: string, id: string) => {
-        if (!code || document.getElementById(id)) return;
+        if (!code) return;
+        // حذف النسخة القديمة إذا وجدت لتحديث الكود
+        const old = document.getElementById(id);
+        if (old) old.remove();
+
         try {
           const container = document.createElement('div');
           container.id = id;
@@ -130,7 +132,6 @@ export default function App() {
           </div>
           
           <div className="flex items-center gap-2 md:gap-4">
-             {/* مؤشر المتواجدون الآن في الهيدر (اختياري) */}
              <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${isDark ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/10 bg-emerald-50'}`}>
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-emerald-500">{onlineNow} متواجد الآن</span>
@@ -232,7 +233,6 @@ export default function App() {
 
       <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          {/* مؤشر الزوار العام في الفوتر */}
           <div className="mb-6 flex justify-center gap-8">
              <div className="text-center">
                 <p className={`text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-400'}`}>إجمالي الزيارات</p>

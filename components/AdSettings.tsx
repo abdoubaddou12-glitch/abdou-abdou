@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { AdSenseConfig, AdsterraConfig } from '../types.ts';
-import { Layout, Save, X, Globe, DollarSign, Terminal } from 'lucide-react';
+import { Layout, Save, X, Globe, DollarSign, Terminal, RotateCcw } from 'lucide-react';
 
 interface AdSettingsProps {
   adsense: AdSenseConfig;
@@ -16,17 +16,38 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
   const [atConfig, setAtConfig] = useState<AdsterraConfig>({ ...adsterra });
   const [activeTab, setActiveTab] = useState<'adsense' | 'adsterra'>('adsterra');
 
+  const handleRestoreDefaults = () => {
+    if (confirm('هل تريد استعادة أكواد Adsterra الافتراضية؟ سيؤدي ذلك لمسح أي أكواد مخصصة قمت بإضافتها.')) {
+      setAtConfig({
+        ...atConfig,
+        socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
+        popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
+      });
+    }
+  };
+
   return (
     <div className="animate-slide-up">
       <div className={`emerald-card p-6 md:p-10 ${isDark ? 'border-emerald-500/10' : 'bg-white shadow-2xl'}`}>
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center">
-            <DollarSign size={24} />
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center">
+              <DollarSign size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black italic">إعدادات الربح</h3>
+              <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">إدارة شبكات الإعلانات</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-black italic">إعدادات الربح</h3>
-            <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">إدارة شبكات الإعلانات</p>
-          </div>
+          
+          {activeTab === 'adsterra' && (
+            <button 
+              onClick={handleRestoreDefaults}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-emerald-500 transition-all text-[10px] font-black uppercase tracking-widest"
+            >
+              <RotateCcw size={14} /> استعادة الافتراضي
+            </button>
+          )}
         </div>
 
         <div className="flex gap-2 p-1.5 rounded-2xl bg-black/10 mb-8">
@@ -52,10 +73,10 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
             </div>
             
             <div className="grid grid-cols-1 gap-6">
-              <CodeArea label="بانر علوي (728x90)" value={atConfig.banner728x90} onChange={(v) => setAtConfig({...atConfig, banner728x90: v})} isDark={isDark} />
-              <CodeArea label="بانر جانبي/مربع (300x250)" value={atConfig.banner300x250} onChange={(v) => setAtConfig({...atConfig, banner300x250: v})} isDark={isDark} />
-              <CodeArea label="سكريبت Social Bar" value={atConfig.socialBar} onChange={(v) => setAtConfig({...atConfig, socialBar: v})} isDark={isDark} />
-              <CodeArea label="سكريبت Popunder" value={atConfig.popUnder} onChange={(v) => setAtConfig({...atConfig, popUnder: v})} isDark={isDark} />
+              <CodeArea label="بانر علوي (728x90)" value={atConfig.banner728x90} onChange={(v) => setAtConfig({...atConfig, banner728x90: v})} isDark={isDark} placeholder="أدخل كود البانر 728x90..." />
+              <CodeArea label="بانر جانبي/مربع (300x250)" value={atConfig.banner300x250} onChange={(v) => setAtConfig({...atConfig, banner300x250: v})} isDark={isDark} placeholder="أدخل كود البانر 300x250..." />
+              <CodeArea label="سكريبت Social Bar" value={atConfig.socialBar} onChange={(v) => setAtConfig({...atConfig, socialBar: v})} isDark={isDark} placeholder="كود Social Bar..." />
+              <CodeArea label="سكريبت Popunder" value={atConfig.popUnder} onChange={(v) => setAtConfig({...atConfig, popUnder: v})} isDark={isDark} placeholder="كود Popunder..." />
             </div>
           </div>
         ) : (
@@ -88,18 +109,18 @@ const Toggle = ({ enabled, onToggle }: any) => (
   </button>
 );
 
-const CodeArea = ({ label, value, onChange, isDark }: any) => (
+const CodeArea = ({ label, value, onChange, isDark, placeholder }: any) => (
   <div className="space-y-2">
     <label className="text-[10px] font-black uppercase tracking-widest opacity-40 pr-2 flex items-center gap-2">
       <Terminal size={12} /> {label}
     </label>
     <textarea 
       rows={3}
-      value={value}
+      value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       dir="ltr"
-      className={`w-full px-4 py-3 rounded-xl border text-[10px] font-mono outline-none transition-all ${isDark ? 'bg-black/50 border-white/5 focus:border-emerald-500' : 'bg-gray-50 border-zinc-200'}`}
-      placeholder="إلصق كود السكريبت هنا..."
+      className={`w-full px-4 py-3 rounded-xl border text-[10px] font-mono outline-none transition-all ${isDark ? 'bg-black/50 border-white/5 focus:border-emerald-500' : 'bg-gray-50 border-zinc-200 focus:border-emerald-500'}`}
+      placeholder={placeholder || "إلصق كود السكريبت هنا..."}
     />
   </div>
 );
@@ -107,6 +128,6 @@ const CodeArea = ({ label, value, onChange, isDark }: any) => (
 const InputField = ({ label, value, onChange, isDark }: any) => (
   <div className="space-y-2">
     <label className="text-[10px] font-black uppercase tracking-widest opacity-40 pr-2">{label}</label>
-    <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className={`w-full px-6 py-4 rounded-xl border font-bold ${isDark ? 'bg-black border-white/10' : 'bg-white'}`} />
+    <input type="text" value={value || ''} onChange={(e) => onChange(e.target.value)} className={`w-full px-6 py-4 rounded-xl border font-bold ${isDark ? 'bg-black border-white/10' : 'bg-white border-zinc-200'}`} />
   </div>
 );
