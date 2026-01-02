@@ -5,20 +5,17 @@ import {
   Link as LinkIcon, Image as ImageIcon, Zap,
   Sun, Moon, ArrowLeft, ShieldCheck,
   Facebook, Twitter, 
-  MessageCircle, DollarSign,
+  MessageCircle, 
   Users, Eye, Activity
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
 import { AdminPanel } from './components/AdminPanel.tsx';
-import { AdSettings } from './components/AdSettings.tsx';
-import { AdUnit } from './components/AdUnit.tsx';
 import { Policies } from './components/Policies.tsx';
-import { View, AdSenseConfig, AdsterraConfig } from './types.ts';
+import { View } from './types.ts';
 
 export default function App() {
   const [view, setView] = useState<View>('home');
-  const [showAdSettings, setShowAdSettings] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode') !== 'light');
   
@@ -28,26 +25,6 @@ export default function App() {
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
   const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
   const [onlineNow, setOnlineNow] = useState(Math.floor(Math.random() * 15) + 5);
-
-  const [adsense, setAdsense] = useState<AdSenseConfig>(() => JSON.parse(localStorage.getItem('as_cfg') || '{"isEnabled":false,"publisherId":"","slotId":""}'));
-  
-  // الأكواد الافتراضية - لضمان عدم فراغ الحقول
-  const DEFAULT_ADSTERRA: AdsterraConfig = {
-    isEnabled: true,
-    banner728x90: '',
-    banner300x250: '',
-    socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
-    popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
-  };
-
-  const [adsterra, setAdsterra] = useState<AdsterraConfig>(() => {
-    const saved = localStorage.getItem('at_cfg');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return { ...DEFAULT_ADSTERRA, ...parsed };
-    }
-    return DEFAULT_ADSTERRA;
-  });
 
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -66,44 +43,14 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // حقن الأكواد التلقائية (Social Bar & Popunder) - تعمل في الخلفية ولا تظهر كأزرار
-  useEffect(() => {
-    if (adsterra.isEnabled && view === 'home') {
-      const injectScript = (code: string, id: string) => {
-        if (!code || code.length < 10) return;
-        const existing = document.getElementById(id);
-        if (existing) existing.remove();
-        try {
-          const container = document.createElement('div');
-          container.id = id;
-          container.style.display = 'none';
-          document.body.appendChild(container);
-          const range = document.createRange();
-          const fragment = range.createContextualFragment(code);
-          container.appendChild(fragment);
-        } catch (e) { console.error(e); }
-      };
-      injectScript(adsterra.socialBar, 'at-social-bar-layer');
-      injectScript(adsterra.popUnder, 'at-popunder-layer');
-    } else {
-      // إزالة الإعلانات التلقائية عند الدخول للوحة التحكم لضمان عدم التداخل
-      ['at-social-bar-layer', 'at-popunder-layer'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.remove();
-      });
-    }
-  }, [adsterra.isEnabled, adsterra.socialBar, adsterra.popUnder, view]);
-
   useEffect(() => {
     document.body.className = isDark ? '' : 'light-mode';
     localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
-    localStorage.setItem('as_cfg', JSON.stringify(adsense));
-    localStorage.setItem('at_cfg', JSON.stringify(adsterra));
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('total_saved_mb', totalSavedMB.toString());
     localStorage.setItem('total_visitors', totalVisitors.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
-  }, [isDark, adsense, adsterra, totalConverted, totalSavedMB, totalVisitors, baseVisitors]);
+  }, [isDark, totalConverted, totalSavedMB, totalVisitors, baseVisitors]);
 
   const handleConversionSuccess = (savedKB: number) => {
     setTotalConverted(prev => prev + 1);
@@ -119,7 +66,7 @@ export default function App() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-[100] p-3 md:p-6 lg:pt-10">
         <div className={`max-w-6xl mx-auto flex items-center justify-between px-4 md:px-8 py-3 md:py-4 rounded-2xl md:rounded-[2.5rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
-          <div onClick={() => {setView('home'); setShowAdSettings(false);}} className="flex items-center gap-2 md:gap-3 cursor-pointer group">
+          <div onClick={() => {setView('home');}} className="flex items-center gap-2 md:gap-3 cursor-pointer group">
             <div className="w-9 h-9 md:w-11 md:h-11 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-lg shadow-emerald-500/20 group-hover:rotate-180 transition-transform duration-500">
               <RefreshCw size={18} />
             </div>
@@ -148,21 +95,6 @@ export default function App() {
       <main className="max-w-6xl mx-auto w-full px-4 md:px-8 pt-28 md:pt-40 pb-20 flex-grow">
         {view === 'home' && (
           <div className="animate-slide-up space-y-12">
-            
-            {/* الإعلان يظهر هنا فقط في الأعلى */}
-            <div className="ad-container-top">
-              {adsterra.isEnabled && adsterra.banner728x90 && (
-                <div className="hidden md:block">
-                  <AdUnit type="script" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
-                </div>
-              )}
-              {adsterra.isEnabled && adsterra.banner300x250 && (
-                <div className="block md:hidden">
-                  <AdUnit type="script" code={adsterra.banner300x250} isDark={isDark} label="إعلان ممول" />
-                </div>
-              )}
-            </div>
-
             <section className="text-center px-2">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 md:mb-10">
                 <Zap size={14} className="text-emerald-500" />
@@ -191,46 +123,30 @@ export default function App() {
         {view === 'admin' && isAuthenticated && (
           <div className="animate-slide-up space-y-8">
             <div className="flex justify-between items-center">
-              <button onClick={() => {setView('home'); setShowAdSettings(false);}} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
+              <button onClick={() => {setView('home');}} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
                 <ArrowLeft size={16} /> العودة للمحول
-              </button>
-              <button 
-                onClick={() => setShowAdSettings(!showAdSettings)}
-                className={`px-6 py-3 rounded-xl font-black text-xs flex items-center gap-2 border transition-all ${showAdSettings ? 'bg-emerald-500 text-black border-transparent' : 'border-emerald-500/20 text-emerald-500'}`}
-              >
-                <DollarSign size={16} /> إعدادات الربح
               </button>
             </div>
 
-            {showAdSettings ? (
-              <AdSettings 
-                adsense={adsense} 
-                adsterra={adsterra} 
-                isDark={isDark} 
-                onSave={({adsense: as, adsterra: at}) => { setAdsense(as); setAdsterra(at); setShowAdSettings(false); }}
-                onCancel={() => setShowAdSettings(false)}
-              />
-            ) : (
-              <AdminPanel 
-                isDark={isDark}
-                analytics={{
-                  totalViews: totalConverted,
-                  totalVisitors: totalVisitors + baseVisitors,
-                  dailyEarnings: [0],
-                  ctr: `${totalSavedMB.toFixed(1)} MB`,
-                  cpc: "Active"
-                }}
-                onOpenAdSense={() => setShowAdSettings(true)}
-                onOpenSecurity={() => {}} 
-                onSyncData={() => {}}
-                posts={[]}
-                onNewPost={() => {}} 
-                onEditPost={() => {}}
-                onDeletePost={() => {}}
-                baseVisitors={baseVisitors}
-                onUpdateBaseVisitors={(val) => setBaseVisitors(val)}
-              />
-            )}
+            <AdminPanel 
+              isDark={isDark}
+              analytics={{
+                totalViews: totalConverted,
+                totalVisitors: totalVisitors + baseVisitors,
+                dailyEarnings: [0],
+                ctr: `${totalSavedMB.toFixed(1)} MB`,
+                cpc: "Active"
+              }}
+              onOpenAdSense={() => {}}
+              onOpenSecurity={() => {}} 
+              onSyncData={() => {}}
+              posts={[]}
+              onNewPost={() => {}} 
+              onEditPost={() => {}}
+              onDeletePost={() => {}}
+              baseVisitors={baseVisitors}
+              onUpdateBaseVisitors={(val) => setBaseVisitors(val)}
+            />
           </div>
         )}
 

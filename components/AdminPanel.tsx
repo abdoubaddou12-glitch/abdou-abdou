@@ -67,10 +67,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             onClick={handleHardRefresh}
             className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all bg-amber-500/10 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-black`}
           >
-            <CloudLightning size={20} /> تحديث قسري (Cloudflare)
+            <CloudLightning size={20} /> تحديث قسري للموقع
           </button>
           <button onClick={onOpenSecurity} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><ShieldCheck size={20} className="text-emerald-500" />الأمان</button>
-          <button onClick={handleClearHistory} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-4 rounded-2xl font-black flex items-center gap-2 transition-all border border-red-500/20"><Trash2 size={20} />تصفير النظام</button>
+          <button onClick={handleClearHistory} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-4 rounded-2xl font-black flex items-center gap-2 transition-all border border-red-500/20"><Trash2 size={20} />تصفير الإحصائيات</button>
         </div>
       </div>
 

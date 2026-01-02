@@ -1,23 +1,9 @@
 
 export type View = 'home' | 'admin' | 'login' | 'policies';
 
-export interface AdSenseConfig {
-  isEnabled: boolean;
-  publisherId: string;
-  slotId: string;
-}
-
-export interface AdsterraConfig {
-  isEnabled: boolean;
-  banner728x90: string;
-  banner300x250: string;
-  socialBar: string;
-  popUnder: string;
-}
-
 export interface AnalyticsData {
   totalViews: number;
-  totalVisitors: number; // الحقل الجديد للزوار
+  totalVisitors: number;
   dailyEarnings: number[];
   ctr: string;
   cpc: string;
@@ -32,4 +18,20 @@ export interface Post {
   status: string;
   image: string;
   date: string;
+}
+
+// Fix: Added missing AdSenseConfig interface to resolve import errors in AdSense components
+export interface AdSenseConfig {
+  isEnabled: boolean;
+  publisherId: string;
+  slotId: string;
+}
+
+// Fix: Added missing AdsterraConfig interface to resolve import errors in AdSettings component
+export interface AdsterraConfig {
+  isEnabled: boolean;
+  socialBar: string;
+  popUnder: string;
+  banner728x90: string;
+  banner300x250: string;
 }
