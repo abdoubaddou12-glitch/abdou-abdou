@@ -31,11 +31,11 @@ export default function App() {
 
   const [adsense, setAdsense] = useState<AdSenseConfig>(() => JSON.parse(localStorage.getItem('as_cfg') || '{"isEnabled":false,"publisherId":"","slotId":""}'));
   
-  // الأكواد الافتراضية لضمان عملها دوماً
-  const DEFAULT_ADSTERRA = {
+  // الأكواد الافتراضية الرسمية الخاصة بك لـ Adsterra
+  const DEFAULT_ADSTERRA: AdsterraConfig = {
     isEnabled: true,
-    banner728x90: '',
-    banner300x250: '',
+    banner728x90: '<!-- Top Banner -->',
+    banner300x250: '<!-- Mobile Banner -->',
     socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
     popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
   };
@@ -44,13 +44,12 @@ export default function App() {
     const saved = localStorage.getItem('at_cfg');
     if (saved) {
       const parsed = JSON.parse(saved);
-      // التأكد من ملء الأكواد الناقصة من القيم الافتراضية
+      // إذا كانت الأكواد الأساسية (Social Bar / Popunder) مفقودة أو فارغة، نستخدم الافتراضي
       return {
         ...DEFAULT_ADSTERRA,
         ...parsed,
-        // إذا كانت الأكواد فارغة في التخزين، استخدم الافتراضي
-        socialBar: parsed.socialBar || DEFAULT_ADSTERRA.socialBar,
-        popUnder: parsed.popUnder || DEFAULT_ADSTERRA.popUnder
+        socialBar: parsed.socialBar && parsed.socialBar.length > 10 ? parsed.socialBar : DEFAULT_ADSTERRA.socialBar,
+        popUnder: parsed.popUnder && parsed.popUnder.length > 10 ? parsed.popUnder : DEFAULT_ADSTERRA.popUnder
       };
     }
     return DEFAULT_ADSTERRA;
@@ -75,25 +74,31 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // نظام الحقن للإعلانات
+  // نظام الحقن للإعلانات (يصلح للحاسوب والهاتف)
   useEffect(() => {
     if (adsterra.isEnabled) {
       const injectScriptRobustly = (code: string, id: string) => {
-        if (!code) return;
-        // حذف النسخة القديمة إذا وجدت لتحديث الكود
-        const old = document.getElementById(id);
-        if (old) old.remove();
+        if (!code || code.length < 10) return;
+        
+        const existing = document.getElementById(id);
+        if (existing) existing.remove();
 
         try {
           const container = document.createElement('div');
           container.id = id;
           container.style.display = 'none';
           document.body.appendChild(container);
+          
           const range = document.createRange();
           const fragment = range.createContextualFragment(code);
           container.appendChild(fragment);
-        } catch (e) { console.error(e); }
+          console.log(`Ad Injected: ${id}`);
+        } catch (e) { 
+          console.error(`Failed to inject ad ${id}:`, e); 
+        }
       };
+
+      // حقن الأكواد المخفية (Social Bar & Popunder)
       injectScriptRobustly(adsterra.socialBar, 'at-social-bar-layer');
       injectScriptRobustly(adsterra.popUnder, 'at-popunder-layer');
     }
@@ -153,8 +158,19 @@ export default function App() {
       <main className="max-w-6xl mx-auto w-full px-4 md:px-8 pt-28 md:pt-40 pb-20 flex-grow">
         {view === 'home' && (
           <div className="animate-slide-up space-y-12">
+            
+            {/* إعلان البانر العلوي (للحاسوب) */}
             {adsterra.isEnabled && adsterra.banner728x90 && (
-              <AdUnit type="banner" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
+              <div className="hidden md:block">
+                <AdUnit type="script" code={adsterra.banner728x90} isDark={isDark} label="إعلان ممول" />
+              </div>
+            )}
+
+            {/* إعلان البانر المربع (للهواتف) */}
+            {adsterra.isEnabled && adsterra.banner300x250 && (
+              <div className="block md:hidden">
+                <AdUnit type="script" code={adsterra.banner300x250} isDark={isDark} label="إعلان ممول" />
+              </div>
             )}
 
             <section className="text-center px-2">
@@ -177,6 +193,13 @@ export default function App() {
                <FeatureCard icon={<Zap size={28}/>} title="أرشفة أسرع" desc="صيغة WebP تحسن سرعة موقعك بنسبة كبيرة وتساعدك في تصدر نتائج البحث." isDark={isDark} />
                <FeatureCard icon={<ImageIcon size={28}/>} title="تحكم هندسي" desc="أدوات دقيقة لقص وتدوير وتغيير مقاسات الصور بدقة عالية." isDark={isDark} />
             </section>
+
+            {/* إعلان بانر سفلي للهواتف لزيادة الأرباح */}
+            {adsterra.isEnabled && adsterra.banner300x250 && (
+              <div className="block md:hidden mt-10">
+                <AdUnit type="script" code={adsterra.banner300x250} isDark={isDark} label="إعلان ممول" />
+              </div>
+            )}
           </div>
         )}
 

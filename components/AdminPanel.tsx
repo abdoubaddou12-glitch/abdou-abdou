@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { AnalyticsData } from '../types.ts';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-// Fix: Added Activity to the lucide-react icons imports
 import { 
   ShieldCheck, TrendingUp, RefreshCw, Zap, 
-  HardDrive, Trash2, Settings2, Save, Users, Eye, Plus, Activity
+  HardDrive, Trash2, Settings2, Save, Users, Eye, Plus, Activity,
+  CloudLightning
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -42,6 +42,21 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleHardRefresh = () => {
+    if (confirm('سيتم الآن تنظيف ذاكرة المتصفح وإجبار الموقع على التحميل من السيرفر مباشرة. هل أنت متأكد؟')) {
+      // مسح الكاش الخاص بالمتصفح برمجياً للجلسة الحالية
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+          }
+        });
+      }
+      // إضافة بارامتر عشوائي للرابط لكسر كاش Cloudflare
+      window.location.href = window.location.pathname + '?v=' + Date.now();
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto py-10 animate-fade-in px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
@@ -50,6 +65,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <p className="text-xs font-bold opacity-30 uppercase tracking-widest">إدارة الأداء والزوار والمحتوى</p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <button 
+            onClick={handleHardRefresh}
+            className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all bg-amber-500/10 border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-black`}
+          >
+            <CloudLightning size={20} /> تحديث قسري (Cloudflare)
+          </button>
           <button onClick={onOpenSecurity} className={`px-5 py-4 rounded-2xl font-black flex items-center gap-2 border transition-all ${isDark ? 'border-zinc-800 hover:bg-zinc-900 text-emerald-400' : 'border-zinc-200 hover:bg-white text-zinc-600 shadow-lg'}`}><ShieldCheck size={20} className="text-emerald-500" />الأمان</button>
           <button onClick={handleClearHistory} className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-4 rounded-2xl font-black flex items-center gap-2 transition-all border border-red-500/20"><Trash2 size={20} />تصفير النظام</button>
         </div>

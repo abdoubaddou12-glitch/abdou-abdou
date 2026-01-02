@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdSenseConfig, AdsterraConfig } from '../types.ts';
-import { Layout, Save, X, Globe, DollarSign, Terminal, RotateCcw } from 'lucide-react';
+import { Layout, Save, X, Globe, DollarSign, Terminal, RotateCcw, AlertTriangle } from 'lucide-react';
 
 interface AdSettingsProps {
   adsense: AdSenseConfig;
@@ -17,9 +17,10 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
   const [activeTab, setActiveTab] = useState<'adsense' | 'adsterra'>('adsterra');
 
   const handleRestoreDefaults = () => {
-    if (confirm('هل تريد استعادة أكواد Adsterra الافتراضية؟ سيؤدي ذلك لمسح أي أكواد مخصصة قمت بإضافتها.')) {
+    if (confirm('هل تريد استعادة أكواد Adsterra الافتراضية؟ سيتم تفعيل Social Bar و Popunder التلقائي.')) {
       setAtConfig({
         ...atConfig,
+        isEnabled: true,
         socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
         popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
       });
@@ -43,9 +44,9 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
           {activeTab === 'adsterra' && (
             <button 
               onClick={handleRestoreDefaults}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-emerald-500 transition-all text-[10px] font-black uppercase tracking-widest"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-black transition-all text-[10px] font-black uppercase tracking-widest"
             >
-              <RotateCcw size={14} /> استعادة الافتراضي
+              <RotateCcw size={14} /> استعادة الأكواد الافتراضية
             </button>
           )}
         </div>
@@ -67,16 +68,40 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
 
         {activeTab === 'adsterra' ? (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-              <span className="text-sm font-bold">تفعيل Adsterra</span>
+            <div className="flex items-center justify-between p-5 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+              <div className="flex items-center gap-3">
+                <Globe size={18} className="text-emerald-500" />
+                <span className="text-sm font-bold">تفعيل شبكة Adsterra</span>
+              </div>
               <Toggle enabled={atConfig.isEnabled} onToggle={() => setAtConfig({...atConfig, isEnabled: !atConfig.isEnabled})} />
+            </div>
+
+            <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-start gap-3">
+              <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+              <p className="text-[10px] font-medium opacity-60 leading-relaxed">
+                تنبيه: أكواد Social Bar و Popunder تعمل تلقائياً في الخلفية. البانرات (728x90 و 300x250) يجب أن تكون أكواد HTML/Script صالحة لتظهر في الموقع.
+              </p>
             </div>
             
             <div className="grid grid-cols-1 gap-6">
-              <CodeArea label="بانر علوي (728x90)" value={atConfig.banner728x90} onChange={(v) => setAtConfig({...atConfig, banner728x90: v})} isDark={isDark} placeholder="أدخل كود البانر 728x90..." />
-              <CodeArea label="بانر جانبي/مربع (300x250)" value={atConfig.banner300x250} onChange={(v) => setAtConfig({...atConfig, banner300x250: v})} isDark={isDark} placeholder="أدخل كود البانر 300x250..." />
-              <CodeArea label="سكريبت Social Bar" value={atConfig.socialBar} onChange={(v) => setAtConfig({...atConfig, socialBar: v})} isDark={isDark} placeholder="كود Social Bar..." />
-              <CodeArea label="سكريبت Popunder" value={atConfig.popUnder} onChange={(v) => setAtConfig({...atConfig, popUnder: v})} isDark={isDark} placeholder="كود Popunder..." />
+              <CodeArea 
+                label="بانر علوي للحاسوب (728x90)" 
+                value={atConfig.banner728x90} 
+                onChange={(v) => setAtConfig({...atConfig, banner728x90: v})} 
+                isDark={isDark} 
+                placeholder="إلصق كود البانر 728x90 هنا..." 
+              />
+              <CodeArea 
+                label="بانر للهاتف (300x250) - هام جداً" 
+                value={atConfig.banner300x250} 
+                onChange={(v) => setAtConfig({...atConfig, banner300x250: v})} 
+                isDark={isDark} 
+                placeholder="إلصق كود البانر 300x250 هنا..." 
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <CodeArea label="سكريبت Social Bar" value={atConfig.socialBar} onChange={(v) => setAtConfig({...atConfig, socialBar: v})} isDark={isDark} />
+                <CodeArea label="سكريبت Popunder" value={atConfig.popUnder} onChange={(v) => setAtConfig({...atConfig, popUnder: v})} isDark={isDark} />
+              </div>
             </div>
           </div>
         ) : (
@@ -94,7 +119,7 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
 
         <div className="flex gap-4 mt-10">
           <button onClick={() => onSave({ adsense: asConfig, adsterra: atConfig })} className="flex-grow bg-emerald-500 hover:bg-emerald-600 text-black py-5 rounded-2xl font-black shadow-xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-3">
-            <Save size={20} /> حفظ التغييرات
+            <Save size={20} /> حفظ وتفعيل الإعلانات
           </button>
           <button onClick={onCancel} className="px-8 bg-zinc-800 text-white py-5 rounded-2xl font-black hover:bg-zinc-700 transition-all">إلغاء</button>
         </div>
@@ -119,8 +144,8 @@ const CodeArea = ({ label, value, onChange, isDark, placeholder }: any) => (
       value={value || ''}
       onChange={(e) => onChange(e.target.value)}
       dir="ltr"
-      className={`w-full px-4 py-3 rounded-xl border text-[10px] font-mono outline-none transition-all ${isDark ? 'bg-black/50 border-white/5 focus:border-emerald-500' : 'bg-gray-50 border-zinc-200 focus:border-emerald-500'}`}
-      placeholder={placeholder || "إلصق كود السكريبت هنا..."}
+      className={`w-full px-4 py-3 rounded-xl border text-[10px] font-mono outline-none transition-all ${isDark ? 'bg-black/50 border-white/5 focus:border-emerald-500 text-zinc-300' : 'bg-gray-50 border-zinc-200 focus:border-emerald-500'}`}
+      placeholder={placeholder || "إلصق الكود هنا..."}
     />
   </div>
 );
