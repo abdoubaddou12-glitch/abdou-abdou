@@ -12,6 +12,7 @@ import { Policies } from './components/Policies.tsx';
 import { SecuritySettings } from './components/SecuritySettings.tsx';
 import { AdSettings } from './components/AdSettings.tsx';
 import { AdUnit } from './components/AdUnit.tsx';
+import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdSenseConfig, AdsterraConfig } from './types.ts';
 
 export default function App() {
@@ -97,6 +98,9 @@ export default function App() {
                 isDark={isDark}
                 adCode={adsterraConfig.isEnabled ? adsterraConfig.banner300x250 : ''}
               />
+
+              {/* Social Share Section - Placed directly under the converter */}
+              <SocialShare isDark={isDark} />
             </section>
 
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

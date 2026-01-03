@@ -2,8 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { 
   Upload, Download, Trash2, Maximize2, 
-  Loader2, RefreshCw, Lock, Unlock, Palette, Save, Ghost,
-  Share2, Twitter, Facebook, MessageCircle, Send, Copy, Check
+  Loader2, RefreshCw, Lock, Unlock, Palette, Save, Ghost
 } from 'lucide-react';
 import { AdUnit } from './AdUnit.tsx';
 
@@ -30,7 +29,6 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [resultSize, setResultSize] = useState<number>(0);
-  const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
@@ -82,22 +80,6 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
     link.download = `storehalal-convert.${format}`;
     link.click();
   };
-
-  const shareUrl = "https://storehalal.shop/";
-  const shareText = "أفضل أداة مجانية لتحويل الصور لـ WebP و AVIF بسرعة فائقة! 🚀";
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const socialLinks = [
-    { name: 'واتساب', icon: <MessageCircle size={20} />, url: `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`, color: 'bg-[#25D366]' },
-    { name: 'فيسبوك', icon: <Facebook size={20} />, url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, color: 'bg-[#1877F2]' },
-    { name: 'X', icon: <Twitter size={20} />, url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, color: 'bg-[#000000]' },
-    { name: 'تيليجرام', icon: <Send size={20} />, url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, color: 'bg-[#0088cc]' },
-  ];
 
   const savingsPercent = selectedImage ? Math.max(0, Math.round(((selectedImage.size - resultSize) / selectedImage.size) * 100)) : 0;
 
@@ -170,7 +152,7 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
               )}
             </div>
 
-            <div className="mt-10 space-y-8 border-b border-emerald-500/10 pb-10">
+            <div className="mt-10 space-y-8">
               {!result ? (
                 <button 
                   onClick={handleConvert}
@@ -191,36 +173,6 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
                   <button onClick={() => setResult(null)} className="w-full py-2 text-[9px] font-black uppercase text-zinc-500 tracking-[0.3em] hover:text-emerald-500 transition-colors">تحويل صورة جديدة</button>
                 </div>
               )}
-            </div>
-
-            {/* Social Share Section - Highly Visible Now */}
-            <div className="mt-8">
-               <div className="text-center mb-6">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">شارك الموقع وادعمنا</span>
-               </div>
-               <div className="flex flex-wrap justify-center gap-3">
-                  {socialLinks.map((social) => (
-                    <a 
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex-grow sm:flex-grow-0 px-6 py-4 rounded-2xl flex items-center justify-center gap-3 text-white font-black text-xs transition-all hover:scale-105 active:scale-95 ${social.color} shadow-lg shadow-black/10`}
-                    >
-                      {social.icon}
-                      <span className="hidden sm:inline">{social.name}</span>
-                    </a>
-                  ))}
-                  <button 
-                    onClick={copyToClipboard}
-                    className={`flex-grow sm:flex-grow-0 px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-black text-xs transition-all border ${
-                      isDark ? 'bg-zinc-800 border-zinc-700 text-emerald-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                    } hover:scale-105 active:scale-95`}
-                  >
-                    {copied ? <Check size={18} /> : <Copy size={18} />}
-                    <span>{copied ? 'تم النسخ!' : 'نسخ الرابط'}</span>
-                  </button>
-               </div>
             </div>
           </div>
         </div>
