@@ -9,15 +9,12 @@ interface AdUnitProps {
   label?: string;
 }
 
-export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = "", label = "إعلان ممول" }) => {
+export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = "", label = "محتوى مدعوم" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (type === 'script' && code && containerRef.current) {
-      // تنظيف الحاوية قبل الحقن
       containerRef.current.innerHTML = "";
-      
-      // استخراج السكريبت من الكود المنسوخ
       const range = document.createRange();
       const documentFragment = range.createContextualFragment(code);
       containerRef.current.appendChild(documentFragment);
@@ -27,13 +24,17 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
   if (!code) return null;
 
   return (
-    <div className={`flex flex-col items-center justify-center my-8 ${className}`}>
-      <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-20 mb-2">{label}</span>
+    <div className={`flex flex-col items-center justify-center ${className}`}>
+      <div className="flex items-center gap-2 mb-2 opacity-20">
+        <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
+        <span className="text-[7px] font-black uppercase tracking-[0.2em]">{label}</span>
+      </div>
       <div 
         ref={containerRef}
-        className={`w-full flex justify-center overflow-hidden rounded-2xl transition-all ${
-          type === 'banner' ? (isDark ? 'bg-zinc-900/20' : 'bg-gray-50') : ''
+        className={`w-full flex justify-center overflow-hidden rounded-3xl transition-all border ${
+          isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'
         }`}
+        style={{ minHeight: type === 'banner' ? 'auto' : '50px' }}
         dangerouslySetInnerHTML={type === 'banner' ? { __html: code } : undefined}
       />
     </div>

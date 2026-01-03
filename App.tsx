@@ -46,10 +46,19 @@ export default function App() {
     const saved = localStorage.getItem('adsterra_config');
     return saved ? JSON.parse(saved) : { 
       isEnabled: true, 
-      socialBar: '', 
+      socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>', 
       popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
       banner728x90: '', 
-      banner300x250: '' 
+      banner300x250: `<script type="text/javascript">
+	atOptions = {
+		'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+		'format' : 'iframe',
+		'height' : 250,
+		'width' : 300,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
     };
   });
 
@@ -178,6 +187,12 @@ export default function App() {
 
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
+          
+          {/* Social Bar Script Injection - Invisible Container */}
+          {adsterraConfig.isEnabled && adsterraConfig.socialBar && (
+            <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />
+          )}
+
           <div className="mb-12 flex flex-col items-center">
             <div className={`px-6 py-3 rounded-2xl border flex items-center gap-4 ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
                <div className="flex flex-col items-start">
@@ -195,14 +210,24 @@ export default function App() {
             </div>
           </div>
           
-          {/* الإعلان في أسفل الصفحة كما طُلِب */}
-          <div className="mb-10 opacity-80 overflow-hidden rounded-xl">
-             <div dangerouslySetInnerHTML={{ __html: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>' }} />
+          {/* 300x250 Ad Section - Organized and Styled */}
+          <div className="mb-16 flex justify-center">
+             {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
+               <div className="max-w-[300px] w-full">
+                 <AdUnit 
+                   type="script" 
+                   code={adsterraConfig.banner300x250} 
+                   isDark={isDark} 
+                   className="m-0" 
+                 />
+               </div>
+             )}
           </div>
 
           <div className={`flex flex-wrap justify-center gap-6 text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
-               <button onClick={() => setView('policies')} className="hover:text-emerald-500">الخصوصية</button>
-               <button onClick={() => setView('login')} className="hover:text-emerald-500">الإدارة</button>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">الخصوصية</button>
+               <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-colors">الإدارة</button>
+               <span className="opacity-40">© {new Date().getFullYear()} Storehalal</span>
           </div>
         </div>
       </footer>
