@@ -18,8 +18,11 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode') !== 'light');
   
-  // إدارة كلمة السر
-  const [adminPassword, setAdminPassword] = useState(() => localStorage.getItem('admin_password') || 'abdou2024');
+  // نظام كلمة السر المحسن: استعادة من الذاكرة أو استخدام الافتراضية
+  const [adminPassword, setAdminPassword] = useState(() => {
+    const saved = localStorage.getItem('admin_password');
+    return saved && saved.length >= 4 ? saved : 'abdou2024';
+  });
 
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
@@ -52,21 +55,26 @@ export default function App() {
     return () => clearInterval(interval);
   }, [totalVisitors]);
 
+  // تحديث الإعدادات العامة (بدون كلمة السر لمنع التداخل)
   useEffect(() => {
     document.body.className = isDark ? '' : 'light-mode';
     localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
-    localStorage.setItem('admin_password', adminPassword);
-  }, [isDark, totalConverted, baseVisitors, adminPassword]);
+  }, [isDark, totalConverted, baseVisitors]);
 
   const handleConversionSuccess = (savedKB: number) => {
     setTotalConverted(prev => prev + 1);
   };
 
+  // وظيفة الحفظ الفوري لكلمة السر
   const handlePasswordUpdate = (newPass: string) => {
-    setAdminPassword(newPass);
-    setView('admin');
+    if (newPass && newPass.length >= 4) {
+      localStorage.setItem('admin_password', newPass); // حفظ فوري في الذاكرة الدائمة
+      setAdminPassword(newPass); // تحديث الحالة في التطبيق
+      setView('admin');
+      alert('تم تحديث كلمة السر بنجاح وستبقى ثابتة حتى بعد التحديث.');
+    }
   };
 
   const siteUrl = "https://storehalal.shop";
