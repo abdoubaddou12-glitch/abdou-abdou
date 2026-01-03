@@ -4,7 +4,6 @@ import {
   Upload, Download, Trash2, Maximize2, 
   Loader2, RefreshCw, Lock, Unlock, Palette, Save, Ghost
 } from 'lucide-react';
-import { AdUnit } from './AdUnit.tsx';
 
 interface ConverterProps {
   onConversion: (savedKB: number) => void;
@@ -14,7 +13,7 @@ interface ConverterProps {
 
 type SettingsTab = 'transform' | 'filters' | 'output';
 
-export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCode }) => {
+export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<SettingsTab>('transform');
@@ -181,19 +180,6 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
                   </div>
                   
                   <button onClick={handleDownload} className="w-full bg-white text-black py-7 rounded-[2.5rem] font-black text-xl shadow-2xl flex items-center justify-center gap-4 hover:scale-[1.02] transition-all"><Download size={28} /> تحميل الملف المحسّن</button>
-                  
-                  {/* إعلان هادئ يظهر فقط بعد التحويل كنوع من المكافأة البصرية */}
-                  {adCode && (
-                    <div className="pt-4 flex flex-col items-center">
-                      <AdUnit 
-                        type="script" 
-                        code={adCode} 
-                        isDark={isDark} 
-                        className="max-w-[320px]" 
-                        label="مساحة ممولة"
-                      />
-                    </div>
-                  )}
                   
                   <button onClick={() => setResult(null)} className="w-full py-2 text-[10px] font-black uppercase text-zinc-500 tracking-[0.5em] hover:text-emerald-500 transition-colors mt-4">تحويل صورة أخرى</button>
                 </div>

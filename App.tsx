@@ -51,6 +51,11 @@ export default function App() {
     localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
+    
+    if (!sessionStorage.getItem('v_tracked')) {
+        setTotalVisitors(prev => prev + 1);
+        sessionStorage.setItem('v_tracked', 'true');
+    }
   }, [isDark, totalConverted, baseVisitors]);
 
   const handleSaveAds = (configs: { adsense: AdSenseConfig, adsterra: AdsterraConfig }) => {
@@ -93,29 +98,15 @@ export default function App() {
                 <span className="text-emerald-500">بجودة هندسية.</span>
               </h1>
               
-              {/* مساحة إعلانية علوية بتصميم هادئ */}
-              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
-                <div className="mb-20 flex justify-center px-4">
-                  <AdUnit 
-                    type="script" 
-                    code={adsterraConfig.banner300x250} 
-                    isDark={isDark} 
-                    className="max-w-[340px]"
-                    label="مساحة مدعومة"
-                  />
-                </div>
-              )}
-              
               <Converter 
                 onConversion={() => setTotalConverted(prev => prev + 1)} 
                 isDark={isDark}
-                adCode={adsterraConfig.isEnabled ? adsterraConfig.banner300x250 : ''}
               />
 
               <SocialShare isDark={isDark} />
             </section>
 
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-10">
                <FeatureCard icon={<ShieldCheck size={28}/>} title="أمان مطلق" desc="تتم معالجة الصور داخل جهازك فقط ولا يتم رفعها لأي خادم." isDark={isDark} />
                <FeatureCard icon={<Zap size={28}/>} title="سرعة البرق" desc="استخدم تقنيات المتصفح الحديثة لتحويل الصور في أجزاء من الثانية." isDark={isDark} />
                <FeatureCard icon={<ImageIcon size={28}/>} title="دقة عالية" desc="تحكم كامل في الأبعاد، الجودة، وصيغ الجيل القادم مثل WebP و AVIF." isDark={isDark} />
@@ -134,15 +125,11 @@ export default function App() {
               isDark={isDark}
               analytics={{
                 totalViews: totalConverted,
-                totalVisitors: totalVisitors + baseVisitors,
+                totalVisitors: totalVisitors,
                 dailyEarnings: [0],
                 ctr: "N/A",
                 cpc: "Active"
               }}
-              posts={[]} 
-              onNewPost={() => {}}
-              onEditPost={() => {}}
-              onDeletePost={() => {}}
               onOpenAdSense={() => setView('ads')}
               onOpenSecurity={() => setView('security')} 
               onSyncData={() => {}}
@@ -193,16 +180,15 @@ export default function App() {
             </div>
           </div>
           
-          {/* إعلان التذييل بتصميم نظيف */}
-          <div className="mb-20 flex flex-col items-center px-4">
+          {/* الإعلانات تظهر هنا فقط في أسفل الموقع كما طلب المستخدم */}
+          <div className="mb-20 space-y-8 flex flex-col items-center px-4">
+             {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
+                <AdUnit type="script" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="مساحة إعلانية" />
+             )}
+             
              {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
-               <div className="max-w-4xl w-full">
-                 <AdUnit 
-                   type="script" 
-                   code={adsterraConfig.banner728x90} 
-                   isDark={isDark} 
-                   label="محتوى ممول" 
-                 />
+               <div className="max-w-4xl w-full hidden md:block">
+                 <AdUnit type="script" code={adsterraConfig.banner728x90} isDark={isDark} label="محتوى ممول" />
                </div>
              )}
           </div>
@@ -215,7 +201,6 @@ export default function App() {
         </div>
       </footer>
       
-      {/* سكريبتات Adsterra المخفية */}
       {adsterraConfig.isEnabled && (
         <div className="hidden">
            {adsterraConfig.popUnder && <AdUnit type="script" code={adsterraConfig.popUnder} isDark={isDark} />}

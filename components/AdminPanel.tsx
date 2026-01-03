@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { AnalyticsData } from '../types.ts';
 import { 
   ShieldCheck, RefreshCw, 
-  Save, Users, Eye, Activity,
-  DollarSign
+  Eye, Users, DollarSign
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -13,10 +12,6 @@ interface AdminPanelProps {
   onOpenAdSense: () => void;
   onOpenSecurity: () => void;
   onSyncData: () => void;
-  posts: any[];
-  onNewPost: () => void;
-  onEditPost: (id: string) => void;
-  onDeletePost: (id: string) => void;
   baseVisitors: number;
   onUpdateBaseVisitors: (val: number) => void;
 }
@@ -29,8 +24,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   return (
     <div className="max-w-6xl mx-auto py-10 animate-fade-in px-4">
       <div className="flex flex-col gap-6 mb-12 text-center md:text-right">
-          <h1 className="text-4xl md:text-5xl font-black mb-3 tracking-tighter italic">مركز الإدارة</h1>
-          <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">إدارة المحول والأرباح</p>
+          <h1 className="text-4xl md:text-5xl font-black mb-3 tracking-tighter italic text-glow">مركز الإدارة</h1>
+          <p className="text-[10px] font-bold opacity-30 uppercase tracking-widest">إدارة المحول والإعلانات</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -51,14 +46,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           </button>
       </div>
 
-      <div className="animate-slide-up space-y-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard title="إجمالي الزوار" value={analytics.totalVisitors.toLocaleString()} icon={<Users size={22} />} isDark={isDark} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <StatCard title="إجمالي الزوار" value={(analytics.totalVisitors + baseVisitors).toLocaleString()} icon={<Users size={22} />} isDark={isDark} />
           <StatCard title="عمليات التحويل" value={analytics.totalViews.toLocaleString()} icon={<RefreshCw size={22} />} isDark={isDark} />
-          <StatCard title="حالة النظام" value="نشط" icon={<Activity size={22} />} isDark={isDark} />
-        </div>
+      </div>
 
-        <div className={`p-8 rounded-[2.5rem] border ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-100 shadow-xl'}`}>
+      <div className={`p-10 rounded-[2.5rem] border ${isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-100 shadow-xl'}`}>
            <div className="flex items-center gap-4 mb-6">
               <Eye size={24} className="text-emerald-500" />
               <h3 className="text-xl font-black italic">تعديل عداد الزوار الظاهري</h3>
@@ -77,7 +70,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 تحديث العداد
               </button>
            </div>
-        </div>
       </div>
     </div>
   );

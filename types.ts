@@ -23,14 +23,14 @@ export interface AdsterraConfig {
   banner300x250: string;
 }
 
-// Fix: Added missing Post interface used by blog components
+// Added missing Post interface to fix compilation errors in PostCard, PostEditor, BlogSection, and PostView
 export interface Post {
   id: string;
   title: string;
   category: string;
   excerpt: string;
   content: string;
-  date: string;
-  image: string;
   status: 'draft' | 'published';
+  image: string;
+  date: string;
 }
