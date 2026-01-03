@@ -13,67 +13,78 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (code && containerRef.current) {
-      // تنظيف الحاوية قبل الحقن الجديد
-      containerRef.current.innerHTML = "";
-      
-      try {
-        if (type === 'script') {
-          // استخدام Range لخلق DocumentFragment يسمح بتنفيذ السكريبتات
-          const range = document.createRange();
-          const fragment = range.createContextualFragment(code);
+    if (!code || !containerRef.current) return;
+
+    const container = containerRef.current;
+    container.innerHTML = ""; // تنظيف الحاوية
+
+    // وظيفة الحقن الذكي للسكريبتات
+    const executeAds = () => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(code, 'text/html');
+      const elements = Array.from(doc.body.childNodes);
+
+      elements.forEach(node => {
+        if (node.nodeName === 'SCRIPT') {
+          const oldScript = node as HTMLScriptElement;
+          const newScript = document.createElement('script');
           
-          // البحث عن كل السكريبتات داخل الكود المعطى وإعادة إنشائها لضمان تنفيذها
-          const scripts = Array.from(fragment.querySelectorAll('script'));
-          
-          scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-            
-            // نقل الخصائص (src, async, type, etc.)
-            Array.from(oldScript.attributes).forEach(attr => {
-              newScript.setAttribute(attr.name, attr.value);
-            });
-            
-            // نقل المحتوى الداخلي إن وجد
-            if (oldScript.innerHTML) {
-              newScript.innerHTML = oldScript.innerHTML;
-            }
-            
-            // حذف السكريبت القديم من الـ fragment
-            oldScript.parentNode?.removeChild(oldScript);
-            
-            // إضافة السكريبت الجديد للحاوية
-            containerRef.current?.appendChild(newScript);
+          // نسخ جميع الخصائص
+          Array.from(oldScript.attributes).forEach(attr => {
+            newScript.setAttribute(attr.name, attr.value);
           });
 
-          // إضافة بقية المحتوى (HTML)
-          containerRef.current.appendChild(fragment);
+          // معالجة السكريبتات المضمنة (مثل atOptions)
+          if (oldScript.innerHTML) {
+            // تنفيذ كود الـ JS مباشرة في سياق الصفحة
+            try {
+              newScript.innerHTML = oldScript.innerHTML;
+            } catch (e) {
+              console.error("Inline script error", e);
+            }
+          }
+
+          container.appendChild(newScript);
         } else {
-          // للبانرات العادية التي لا تحتوي على سكريبتات
-          containerRef.current.innerHTML = code;
+          // نسخ العناصر غير السكريبت (مثل ins أو div)
+          container.appendChild(node.cloneNode(true));
         }
-      } catch (e) {
-        console.error("Ad Injection Error:", e);
+      });
+      
+      // إذا كان إعلان أدسنس، قم بدفع التحديث
+      if (code.includes('adsbygoogle')) {
+        try {
+          // @ts-ignore
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
       }
-    }
-  }, [code, type, isDark]);
+    };
+
+    // تنفيذ الحقن بعد مهلة قصيرة لضمان استقرار الـ DOM
+    const timer = setTimeout(executeAds, 100);
+    return () => clearTimeout(timer);
+  }, [code, isDark]);
 
   if (!code) return null;
 
   return (
     <div className={`flex flex-col items-center w-full transition-all duration-700 ${className}`}>
-      <div className="flex items-center gap-2 mb-2 opacity-10">
-        <span className="text-[7px] font-black uppercase tracking-[0.5em]">{label}</span>
-      </div>
+      {label && (
+        <div className="flex items-center gap-2 mb-2 opacity-10">
+          <span className="text-[7px] font-black uppercase tracking-[0.5em]">{label}</span>
+        </div>
+      )}
       
       <div 
         ref={containerRef}
-        className={`w-full flex justify-center overflow-hidden rounded-[2rem] transition-all border ${
-          isDark 
+        className={`w-full flex justify-center overflow-hidden transition-all ${
+          type === 'banner' ? 'rounded-[2rem] border min-h-[100px]' : ''
+        } ${
+          type === 'banner' && isDark 
             ? 'bg-zinc-900/40 border-white/5 shadow-inner' 
-            : 'bg-zinc-50 border-zinc-200/50 shadow-sm'
+            : type === 'banner' ? 'bg-zinc-50 border-zinc-200/50 shadow-sm' : ''
         }`}
-        style={{ minHeight: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       />
     </div>
   );
