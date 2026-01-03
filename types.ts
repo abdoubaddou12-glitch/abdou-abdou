@@ -23,14 +23,14 @@ export interface AdsterraConfig {
   banner300x250: string;
 }
 
-// Fix: Added missing Post interface definition to resolve import errors in components/PostCard.tsx and components/PostEditor.tsx
+// Fix: Added missing Post interface used by blog components
 export interface Post {
   id: string;
   title: string;
   category: string;
   excerpt: string;
   content: string;
-  status: 'draft' | 'published';
-  image: string;
   date: string;
+  image: string;
+  status: 'draft' | 'published';
 }

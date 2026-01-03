@@ -93,8 +93,9 @@ export default function App() {
               </h1>
               
               <Converter 
-                onConversion={(kb) => setTotalConverted(prev => prev + 1)} 
-                isDark={isDark} 
+                onConversion={() => setTotalConverted(prev => prev + 1)} 
+                isDark={isDark}
+                adCode={adsterraConfig.isEnabled ? adsterraConfig.banner300x250 : ''}
               />
             </section>
 
@@ -123,7 +124,7 @@ export default function App() {
                 cpc: "Active"
               }}
               posts={[]} 
-              onNewPost={() => {}} // Disabled as no blog
+              onNewPost={() => {}}
               onEditPost={() => {}}
               onDeletePost={() => {}}
               onOpenAdSense={() => setView('ads')}
@@ -176,29 +177,29 @@ export default function App() {
             </div>
           </div>
           
-          {/* Adsterra 300x250 Banner */}
+          {/* Adsterra Bottom Banner */}
           <div className="mb-16 flex flex-col items-center">
-             {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
-               <div className="max-w-[300px] w-full">
+             {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
+               <div className="max-w-4xl w-full">
                  <AdUnit 
                    type="script" 
-                   code={adsterraConfig.banner300x250} 
+                   code={adsterraConfig.banner728x90} 
                    isDark={isDark} 
-                   label="محتوى إعلاني" 
+                   label="محتوى مروج" 
                  />
                </div>
              )}
           </div>
 
           <div className={`flex flex-wrap justify-center gap-6 text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
-               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">السياسات</button>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">سياسة الخصوصية</button>
                <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-colors">الإدارة</button>
                <span className="opacity-40">© {new Date().getFullYear()} Storehalal Convert</span>
           </div>
         </div>
       </footer>
       
-      {/* Popunder and Social Bar Scripts */}
+      {/* Invisible Adsterra Scripts */}
       {adsterraConfig.isEnabled && (
         <>
           {adsterraConfig.popUnder && <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.popUnder }} />}
