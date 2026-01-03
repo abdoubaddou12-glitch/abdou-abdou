@@ -16,85 +16,71 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
     if (!code || !containerRef.current) return;
 
     const container = containerRef.current;
-    container.innerHTML = ""; // تنظيف
+    container.innerHTML = ""; 
 
-    const executeAds = () => {
-      // 1. استخراج خيارات Adsterra (atOptions) إن وجدت لتعريفها عالمياً
-      const atOptionsMatch = code.match(/atOptions\s*=\s*({[\s\S]*?});/);
-      if (atOptionsMatch && atOptionsMatch[1]) {
-        try {
-          // @ts-ignore
-          window.atOptions = new Function(`return ${atOptionsMatch[1]}`)();
-        } catch (e) {
-          console.error("Adsterra Options Fail:", e);
-        }
+    if (type === 'banner') {
+      // استخدام Iframe لضمان عمل سكريبتات Adsterra دون حظر من المتصفح
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '100%';
+      iframe.style.border = 'none';
+      iframe.style.overflow = 'hidden';
+      iframe.scrolling = 'no';
+      iframe.style.minHeight = '100px';
+      
+      container.appendChild(iframe);
+
+      const iframeDoc = iframe.contentWindow?.document;
+      if (iframeDoc) {
+        iframeDoc.open();
+        iframeDoc.write(`
+          <body style="margin:0; padding:0; display:flex; justify-content:center; align-items:center; background:transparent;">
+            ${code}
+            <script>
+              window.onload = function() {
+                // إرسال الارتفاع الحقيقي للحاوية لتجنب الفراغات
+                setTimeout(() => {
+                  parent.postMessage({ height: document.body.scrollHeight, id: '${label}' }, '*');
+                }, 1000);
+              };
+            </script>
+          </body>
+        `);
+        iframeDoc.close();
       }
 
-      // 2. إنشاء محرر DOM مؤقت لتحليل العناصر
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(code, 'text/html');
-      const elements = Array.from(doc.body.childNodes);
-
-      elements.forEach(node => {
-        if (node.nodeName === 'SCRIPT') {
-          const oldScript = node as HTMLScriptElement;
-          const newScript = document.createElement('script');
-          
-          // نسخ الخصائص
-          Array.from(oldScript.attributes).forEach(attr => {
-            newScript.setAttribute(attr.name, attr.value);
-          });
-
-          // نسخ الكود المضمن
-          if (oldScript.innerHTML) {
-            newScript.innerHTML = oldScript.innerHTML;
-          }
-
-          // الحقن المباشر في الصفحة
-          if (type === 'script') {
-            document.head.appendChild(newScript);
-          } else {
-            container.appendChild(newScript);
-          }
-        } else {
-          // نسخ العناصر العادية (مثل divs أو ins)
-          container.appendChild(node.cloneNode(true));
+      const handleResize = (event: MessageEvent) => {
+        if (event.data.id === label) {
+          iframe.style.height = (event.data.height || 250) + 'px';
         }
+      };
+      window.addEventListener('message', handleResize);
+      return () => window.removeEventListener('message', handleResize);
+    } else {
+      // حقن السكريبتات غير المرئية في الـ head مباشرة
+      const div = document.createElement('div');
+      div.innerHTML = code;
+      const scripts = Array.from(div.querySelectorAll('script'));
+      scripts.forEach(oldScript => {
+        const newScript = document.createElement('script');
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.innerHTML = oldScript.innerHTML;
+        document.head.appendChild(newScript);
       });
-
-      // 3. دعم Google AdSense المباشر
-      if (code.includes('adsbygoogle')) {
-        try {
-          // @ts-ignore
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
-      }
-    };
-
-    // مهلة قصيرة لضمان استقرار المتصفح قبل الحقن
-    const timer = setTimeout(executeAds, 500);
-    return () => clearTimeout(timer);
-  }, [code, isDark, type]);
+    }
+  }, [code, label, type]);
 
   if (!code) return null;
 
   return (
-    <div className={`flex flex-col items-center w-full transition-all duration-700 ${className}`}>
+    <div className={`w-full flex flex-col items-center justify-center ${className}`}>
       {label && type === 'banner' && (
-        <div className="flex items-center gap-2 mb-2 opacity-20">
-          <span className="text-[7px] font-black uppercase tracking-[0.5em]">{label}</span>
-        </div>
+        <span className="text-[8px] font-black uppercase opacity-20 mb-2 tracking-[0.3em]">{label}</span>
       )}
-      
       <div 
-        ref={containerRef}
+        ref={containerRef} 
         className={`w-full flex justify-center overflow-hidden transition-all ${
-          type === 'banner' ? 'rounded-[2rem] border min-h-[50px]' : ''
-        } ${
-          type === 'banner' && isDark 
-            ? 'bg-zinc-900/40 border-white/5' 
-            : type === 'banner' ? 'bg-zinc-50 border-zinc-200/50 shadow-sm' : ''
-        }`}
+          type === 'banner' ? 'rounded-2xl border' : ''
+        } ${isDark ? 'border-white/5 bg-white/5' : 'border-black/5 bg-black/5'}`}
       />
     </div>
   );

@@ -5,14 +5,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     
-    <!-- منع التخزين المؤقت بشكل صارم -->
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="Wed, 11 Jan 1984 05:00:00 GMT" />
+    <meta http-equiv="Expires" content="0" />
 
-    <title>Storehalal Pro | المدونة والمحول الذكي</title>
-    <meta name="description" content="أداة Storehalal الاحترافية - النسخة 13.0 المتطورة" />
-
+    <title>Storehalal Pro | النسخة 14.0 المستقرة</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
@@ -21,15 +19,11 @@
         --emerald: #10b981;
         --bg-color: #050505;
         --text-color: #ffffff;
-        --card-bg: rgba(20, 20, 20, 0.8);
-        --border-color: rgba(16, 185, 129, 0.15);
       }
       
       body.light-mode {
         --bg-color: #f8fafc;
         --text-color: #0f172a;
-        --card-bg: rgba(255, 255, 255, 0.95);
-        --border-color: rgba(16, 185, 129, 0.2);
       }
 
       body { 
@@ -38,37 +32,39 @@
         color: var(--text-color);
         margin: 0;
         overflow-x: hidden;
-        transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* تعريف الأنيميشن المفقود الذي كان يسبب اختفاء العناصر */
+      @keyframes slide-up {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .animate-slide-up {
+        animation: slide-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+
+      .animate-fade-in {
+        animation: fade-in 1s ease forwards;
       }
 
       .bg-glow {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: 
-          radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+        background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
         z-index: -1;
-      }
-
-      .emerald-card {
-        background: var(--card-bg);
-        backdrop-filter: blur(25px);
-        border: 1px solid var(--border-color);
-        border-radius: 2rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       }
 
       .text-glow {
         text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
       }
 
-      /* تحسين استجابة الموبايل */
-      @media (max-width: 640px) {
-        .emerald-card { border-radius: 1.5rem; }
-      }
-
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: var(--bg-color); }
+      ::-webkit-scrollbar { width: 5px; }
       ::-webkit-scrollbar-thumb { background: var(--emerald); border-radius: 10px; }
     </style>
 
@@ -90,12 +86,11 @@
   <body>
     <div class="bg-glow"></div>
     <div id="root"></div>
-    <!-- استخدام التوقيت الحالي لكسر الكاش بشكل نهائي -->
     <script type="module">
-      const timestamp = new Date().getTime();
+      const v = "14.0";
       const script = document.createElement('script');
       script.type = 'module';
-      script.src = `./index.tsx?v=13.0&t=${timestamp}`;
+      script.src = `./index.tsx?v=${v}&t=${Date.now()}`;
       document.body.appendChild(script);
     </script>
   </body>
