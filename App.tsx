@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, Zap, Sun, Moon, ArrowLeft, 
-  ShieldCheck, ImageIcon, Settings, Users, Activity, 
-  Lock, DollarSign
+  ShieldCheck, ImageIcon, Users, Lock, DollarSign
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -52,9 +51,9 @@ export default function App() {
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
     
-    if (!sessionStorage.getItem('v_tracked')) {
+    if (!sessionStorage.getItem('v_tracked_v2')) {
         setTotalVisitors(prev => prev + 1);
-        sessionStorage.setItem('v_tracked', 'true');
+        sessionStorage.setItem('v_tracked_v2', 'true');
     }
   }, [isDark, totalConverted, baseVisitors]);
 
@@ -69,33 +68,34 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-400 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
       
-      <nav className="fixed top-0 left-0 right-0 z-[100] p-4 md:p-6">
-        <div className={`max-w-6xl mx-auto flex items-center justify-between px-6 py-4 rounded-[2rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
-          <div onClick={() => setView('home')} className="flex items-center gap-3 cursor-pointer group">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-black shadow-lg group-hover:rotate-180 transition-transform duration-500">
-              <Zap size={20} />
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-[100] p-3 md:p-6">
+        <div className={`max-w-6xl mx-auto flex items-center justify-between px-5 py-3 md:px-6 md:py-4 rounded-2xl md:rounded-[2rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
+          <div onClick={() => setView('home')} className="flex items-center gap-2 md:gap-3 cursor-pointer group">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-500 rounded-lg md:rounded-xl flex items-center justify-center text-black shadow-lg">
+              <Zap size={18} />
             </div>
-            <span className="text-xl md:text-2xl font-black italic tracking-tighter truncate">Storehalal <span className="text-emerald-500">Convert</span></span>
+            <span className="text-lg md:text-2xl font-black italic tracking-tighter">Storehalal <span className="text-emerald-500">Convert</span></span>
           </div>
           
-          <div className="flex items-center gap-3">
-             <button onClick={() => setIsDark(!isDark)} className={`p-3 rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
+          <div className="flex items-center gap-2">
+             <button onClick={() => setIsDark(!isDark)} className={`p-2.5 rounded-lg md:rounded-xl border transition-all ${isDark ? 'bg-zinc-900 border-zinc-800 text-emerald-500' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
              </button>
-             <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className={`p-3 rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black shadow-lg' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}>
+             <button onClick={() => setView(isAuthenticated ? 'admin' : 'login')} className={`p-2.5 rounded-lg md:rounded-xl transition-all ${isAuthenticated ? 'bg-emerald-500 text-black shadow-lg' : isDark ? 'bg-white/5 text-white/40' : 'bg-zinc-100 text-zinc-400'}`}>
                <LayoutDashboard size={18} />
              </button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto w-full px-6 pt-32 pb-20 flex-grow">
+      <main className="max-w-6xl mx-auto w-full px-4 md:px-6 pt-24 md:pt-32 pb-20 flex-grow">
         {view === 'home' && (
-          <div className="animate-slide-up space-y-24">
-            <section className="text-center pt-6">
-              <h1 className="text-5xl md:text-8xl font-black italic mb-12 text-glow leading-tight tracking-tighter">
-                تحويل الصور <br />
-                <span className="text-emerald-500">بجودة هندسية.</span>
+          <div className="animate-slide-up space-y-16 md:space-y-24">
+            <section className="text-center pt-4">
+              <h1 className="text-4xl md:text-8xl font-black italic mb-8 md:mb-12 text-glow leading-tight tracking-tighter">
+                تحويل الصور <br className="hidden md:block" />
+                <span className="text-emerald-500">بجودة احترافية.</span>
               </h1>
               
               <Converter 
@@ -106,10 +106,10 @@ export default function App() {
               <SocialShare isDark={isDark} />
             </section>
 
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-10">
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pb-10">
                <FeatureCard icon={<ShieldCheck size={28}/>} title="أمان مطلق" desc="تتم معالجة الصور داخل جهازك فقط ولا يتم رفعها لأي خادم." isDark={isDark} />
-               <FeatureCard icon={<Zap size={28}/>} title="سرعة البرق" desc="استخدم تقنيات المتصفح الحديثة لتحويل الصور في أجزاء من الثانية." isDark={isDark} />
-               <FeatureCard icon={<ImageIcon size={28}/>} title="دقة عالية" desc="تحكم كامل في الأبعاد، الجودة، وصيغ الجيل القادم مثل WebP و AVIF." isDark={isDark} />
+               <FeatureCard icon={<Zap size={28}/>} title="سرعة البرق" desc="استخدم تقنيات المتصفح الحديثة لتحويل الصور في ثوانٍ." isDark={isDark} />
+               <FeatureCard icon={<ImageIcon size={28}/>} title="دقة عالية" desc="تحكم في الجودة وصيغ الجيل القادم WebP و AVIF." isDark={isDark} />
             </section>
           </div>
         )}
@@ -142,7 +142,7 @@ export default function App() {
         {view === 'security' && isAuthenticated && (
            <div className="animate-slide-up space-y-8">
               <button onClick={() => setView('admin')} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
-                <ArrowLeft size={16} /> العودة للوحة التحكم
+                <ArrowLeft size={16} /> العودة للوحة
               </button>
               <SecuritySettings isDark={isDark} currentSavedPassword={adminPassword} onSave={(p) => {localStorage.setItem('admin_password', p); setAdminPassword(p); setView('admin');}} onCancel={() => setView('admin')} onForceResetData={() => {}} />
            </div>
@@ -151,7 +151,7 @@ export default function App() {
         {view === 'ads' && isAuthenticated && (
            <div className="animate-slide-up space-y-8">
               <button onClick={() => setView('admin')} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
-                <ArrowLeft size={16} /> العودة للوحة التحكم
+                <ArrowLeft size={16} /> العودة للوحة
               </button>
               <AdSettings adsense={adsenseConfig} adsterra={adsterraConfig} isDark={isDark} onSave={handleSaveAds} onCancel={() => setView('admin')} />
            </div>
@@ -160,43 +160,44 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
-      <footer className={`border-t py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
+      {/* Footer Area with Ads */}
+      <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
-          <div className="mb-16 flex flex-col items-center">
-            <div className={`px-8 py-4 rounded-3xl border flex items-center gap-6 ${isDark ? 'bg-white/5 border-white/5 shadow-inner' : 'bg-zinc-50 border-zinc-100'}`}>
-               <div className="flex flex-col items-start">
-                  <span className="text-[9px] font-black uppercase opacity-20 tracking-widest mb-1">إجمالي الزوار</span>
-                  <span className="text-2xl font-black italic tracking-tighter text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</span>
+          <div className="mb-12 flex flex-col items-center">
+            <div className={`px-6 py-3 md:px-8 md:py-4 rounded-2xl md:rounded-3xl border flex items-center gap-4 md:gap-6 ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
+               <div className="flex flex-col items-center">
+                  <span className="text-[8px] md:text-[9px] font-black uppercase opacity-20 tracking-widest mb-1">الزوار</span>
+                  <span className="text-xl md:text-2xl font-black italic text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</span>
                </div>
-               <div className="w-[1px] h-10 bg-emerald-500/10"></div>
-               <div className="flex flex-col items-end text-right">
-                  <span className="text-[9px] font-black uppercase opacity-20 tracking-widest mb-1">المتصلون الآن</span>
-                  <span className="text-2xl font-black italic tracking-tighter flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+               <div className="w-[1px] h-8 md:h-10 bg-emerald-500/10"></div>
+               <div className="flex flex-col items-center">
+                  <span className="text-[8px] md:text-[9px] font-black uppercase opacity-20 tracking-widest mb-1">الآن</span>
+                  <span className="text-xl md:text-2xl font-black italic flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                     {onlineNow}
                   </span>
                </div>
             </div>
           </div>
           
-          {/* الإعلانات تظهر هنا فقط في أسفل الموقع كما طلب المستخدم */}
-          <div className="mb-20 space-y-8 flex flex-col items-center px-4">
+          {/* Ads ONLY at the bottom */}
+          <div className="mb-16 space-y-6 flex flex-col items-center">
              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
-                <AdUnit type="script" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="مساحة إعلانية" />
+                <AdUnit type="script" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[300px]" label="إعلان" />
              )}
              
              {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
                <div className="max-w-4xl w-full hidden md:block">
-                 <AdUnit type="script" code={adsterraConfig.banner728x90} isDark={isDark} label="محتوى ممول" />
+                 <AdUnit type="script" code={adsterraConfig.banner728x90} isDark={isDark} />
                </div>
              )}
           </div>
 
-          <div className={`flex flex-wrap justify-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
-               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-all">سياسة الخصوصية</button>
+          <div className={`flex flex-wrap justify-center gap-6 md:gap-10 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-all">الخصوصية</button>
                <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-all">الإدارة</button>
-               <span className="opacity-40">© {new Date().getFullYear()} Storehalal Convert</span>
+               <span>© {new Date().getFullYear()} Storehalal Convert</span>
           </div>
         </div>
       </footer>
@@ -212,9 +213,9 @@ export default function App() {
 }
 
 const FeatureCard = ({ icon, title, desc, isDark }: any) => (
-  <div className={`emerald-card p-10 group transition-all duration-500 ${!isDark && 'bg-white shadow-xl shadow-zinc-200/40 hover:shadow-2xl'}`}>
-    <div className="w-16 h-16 rounded-[1.5rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-8 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-black transition-all duration-500">{icon}</div>
-    <h3 className="text-2xl font-black mb-4 italic tracking-tight">{title}</h3>
-    <p className="text-sm font-medium opacity-40 leading-relaxed">{desc}</p>
+  <div className={`emerald-card p-8 md:p-10 transition-all duration-500 ${!isDark && 'bg-white shadow-xl shadow-zinc-200/40'}`}>
+    <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 md:mb-8">{icon}</div>
+    <h3 className="text-xl md:text-2xl font-black mb-3 italic tracking-tight">{title}</h3>
+    <p className="text-xs md:text-sm font-medium opacity-40 leading-relaxed">{desc}</p>
   </div>
 );

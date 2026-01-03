@@ -5,57 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     
-    <!-- SEO الأساسي -->
-    <title>Storehalal Convert | أداة تحويل الصور الاحترافية وسيو المواقع</title>
-    <meta name="description" content="أداة Storehalal Convert المجانية لتحويل الصور إلى WebP و AVIF. حسّن سرعة موقعك وتصدر نتائج البحث مع معالجة صور احترافية وآمنة 100% في المتصفح." />
-    <meta name="keywords" content="تحويل الصور, WebP, AVIF, تصغير حجم الصور, سيو الصور, SEO, Storehalal, تحويل مقاسات الصور, أداة تقنية مغربية" />
-    <meta name="author" content="Storehalal" />
-    <link rel="canonical" href="https://storehalal.shop/" />
-
-    <!-- وسوم التواصل الاجتماعي (Open Graph) -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Storehalal Convert | حول صورك بجودة هندسية" />
-    <meta property="og:description" content="أداة احترافية لتحويل ومعالجة الصور في المتصفح بخصوصية تامة وسرعة فائقة." />
-    <meta property="og:image" content="https://storehalal.shop/og-image.jpg" />
-    <meta property="og:url" content="https://storehalal.shop/" />
-    <meta property="og:site_name" content="Storehalal Convert" />
-
-    <!-- وسوم تويتر -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Storehalal Convert | المحول الاحترافي" />
-    <meta name="twitter:description" content="حول صورك إلى صيغ الجيل القادم WebP و AVIF فوراً." />
-    
-    <!-- بيانات Schema.org المهيكلة لجوجل -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Storehalal Convert",
-      "alternateName": "محول ستور حلال",
-      "url": "https://storehalal.shop/",
-      "image": "https://storehalal.shop/logo.png",
-      "description": "أداة ويب احترافية لتحويل الصور ومعالجتها محلياً لضمان الخصوصية وسرعة الأداء.",
-      "applicationCategory": "DesignApplication, MultimediaApplication",
-      "operatingSystem": "All",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "featureList": [
-        "Local Processing",
-        "WebP Conversion",
-        "AVIF Support",
-        "Privacy Focused",
-        "Metadata Stripping"
-      ]
-    }
-    </script>
-
-    <!-- منع التخزين المؤقت لضمان وصول التحديثات فوراً -->
+    <!-- منع التخزين المؤقت (Cache) لضمان تحميل التحديثات على الهاتف فوراً -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+
+    <title>Storehalal Convert | محول الصور الاحترافي</title>
+    <meta name="description" content="أداة Storehalal Convert لتحويل الصور. معالجة سريعة وآمنة 100% في المتصفح." />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -83,6 +39,7 @@
         margin: 0;
         overflow-x: hidden;
         transition: background-color 0.4s ease;
+        -webkit-tap-highlight-color: transparent;
       }
 
       .bg-glow {
@@ -99,7 +56,6 @@
         backdrop-filter: blur(20px);
         border: 1px solid var(--border-color);
         border-radius: 1.5rem;
-        transition: all 0.3s ease;
       }
 
       .text-glow {
@@ -111,9 +67,6 @@
         to { opacity: 1; transform: translateY(0); }
       }
       .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
-
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-thumb { background: var(--emerald); border-radius: 10px; }
     </style>
 
     <script type="importmap">
@@ -125,8 +78,8 @@
     "lucide-react": "https://esm.sh/lucide-react@0.460.0",
     "recharts": "https://esm.sh/recharts@^3.6.0",
     "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
   }
 }
 </script>
@@ -134,6 +87,7 @@
   <body>
     <div class="bg-glow"></div>
     <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
+    <!-- إضافة v=2 لضمان تحميل الملف الجديد على الهاتف -->
+    <script type="module" src="index.tsx?v=2"></script>
   </body>
 </html>
