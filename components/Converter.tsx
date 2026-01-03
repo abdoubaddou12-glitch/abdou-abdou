@@ -7,17 +7,15 @@ import {
   Type, Info, Settings2, ShieldCheck, Square, Circle, 
   Layers, Ghost, Frame, Save, Scissors, Share2, Eye, ShieldAlert
 } from 'lucide-react';
-import { AdUnit } from './AdUnit.tsx';
 
 interface ConverterProps {
   onConversion: (savedKB: number) => void;
   isDark: boolean;
-  adCode?: string; // كود الإعلان المخصص لزر التحميل
 }
 
 type SettingsTab = 'transform' | 'filters' | 'output';
 
-export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCode }) => {
+export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<SettingsTab>('transform');
@@ -34,15 +32,9 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
   const [rotation, setRotation] = useState(0);
   const [flipH, setFlipH] = useState(false);
   const [flipV, setFlipV] = useState(false);
-  const [isCircle, setIsCircle] = useState(false);
-  const [roundedCorners, setRoundedCorners] = useState(0);
-  
-  // Effects & Privacy
-  const [isGrayscale, setIsGrayscale] = useState(false);
-  const [watermark, setWatermark] = useState('');
   const [padding, setPadding] = useState(0);
   const [borderColor, setBorderColor] = useState('#10b981');
-  const [stripMetadata, setStripMetadata] = useState(true);
+  const [isGrayscale, setIsGrayscale] = useState(false);
 
   // Output
   const [customFilename, setCustomFilename] = useState('');
@@ -237,18 +229,11 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
                      <span className="font-bold">{(resultSize/1024).toFixed(1)} KB</span>
                   </div>
                   
-                  {/* الإعلان يظهر هنا فقط عند ظهور زر التحميل */}
-                  {adCode && (
-                    <div className="ad-container-download bg-black/5 rounded-2xl p-2 border border-emerald-500/10">
-                      <AdUnit type="script" code={adCode} isDark={isDark} label="إعلان - اضغط للتحميل" className="m-0" />
-                    </div>
-                  )}
-
                   <button 
                     onClick={handleDownload} 
                     className="w-full bg-white text-black py-6 rounded-[2rem] font-black text-lg shadow-2xl flex items-center justify-center gap-4 hover:scale-[1.02] transition-all"
                   >
-                    <Download size={26} /> تحميل الملف الحاهز
+                    <Download size={26} /> تحميل الملف الجاهز
                   </button>
                   <button onClick={() => setResult(null)} className="w-full py-2 text-[9px] font-black uppercase text-zinc-500 tracking-[0.3em]">تحويل صورة أخرى</button>
                 </div>

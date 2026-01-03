@@ -70,15 +70,6 @@ export default function App() {
     localStorage.setItem('blog_posts', JSON.stringify(posts));
   }, [isDark, totalConverted, baseVisitors, posts]);
 
-  const handlePasswordUpdate = (newPass: string) => {
-    if (newPass && newPass.length >= 4) {
-      localStorage.setItem('admin_password', newPass);
-      setAdminPassword(newPass);
-      setView('admin');
-      alert('تم تحديث كلمة السر.');
-    }
-  };
-
   const handleSaveAds = (configs: { adsense: AdSenseConfig, adsterra: AdsterraConfig }) => {
     setAdsenseConfig(configs.adsense);
     setAdsterraConfig(configs.adsterra);
@@ -123,7 +114,6 @@ export default function App() {
               <Converter 
                 onConversion={(kb) => setTotalConverted(prev => prev + 1)} 
                 isDark={isDark} 
-                adCode={adsterraConfig.isEnabled ? adsterraConfig.popUnder : undefined}
               />
             </section>
 
@@ -153,7 +143,6 @@ export default function App() {
               }}
               posts={posts} 
               onNewPost={() => alert('ميزة المقالات قيد التطوير')}
-              {/* Fix: Removed duplicate onEditPost attribute */}
               onEditPost={() => {}}
               onDeletePost={() => {}}
               onOpenAdSense={() => setView('ads')}
@@ -170,7 +159,7 @@ export default function App() {
               <button onClick={() => setView('admin')} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
                 <ArrowLeft size={16} /> العودة للوحة التحكم
               </button>
-              <SecuritySettings isDark={isDark} currentSavedPassword={adminPassword} onSave={handlePasswordUpdate} onCancel={() => setView('admin')} onForceResetData={() => {}} />
+              <SecuritySettings isDark={isDark} currentSavedPassword={adminPassword} onSave={(p) => {localStorage.setItem('admin_password', p); setAdminPassword(p); setView('admin');}} onCancel={() => setView('admin')} onForceResetData={() => {}} />
            </div>
         )}
 
@@ -189,9 +178,11 @@ export default function App() {
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
-          {/* Social Bar (Floating Script) - Injected at Footer but affects whole page */}
+          {/* Adsterra Social Bar - Floating Script Implementation */}
           {adsterraConfig.isEnabled && adsterraConfig.socialBar && (
-            <div className="social-bar-container" dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />
+            <div className="ad-social-bar hidden">
+              <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} />
+            </div>
           )}
 
           <div className="mb-12 flex flex-col items-center">
@@ -211,7 +202,7 @@ export default function App() {
             </div>
           </div>
           
-          {/* Banner 300x250 - Centered in Footer with professional styling */}
+          {/* Adsterra 300x250 Banner - Centered Footer Ad */}
           <div className="mb-16 flex flex-col items-center">
              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
                <div className="max-w-[300px] w-full">
@@ -219,7 +210,7 @@ export default function App() {
                    type="script" 
                    code={adsterraConfig.banner300x250} 
                    isDark={isDark} 
-                   label="محتوى إعلاني" 
+                   label="محتوى مروج" 
                  />
                </div>
              )}
@@ -232,6 +223,11 @@ export default function App() {
           </div>
         </div>
       </footer>
+      
+      {/* Popunder - Invisible Implementation */}
+      {adsterraConfig.isEnabled && adsterraConfig.popUnder && (
+        <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.popUnder }} />
+      )}
     </div>
   );
 }
