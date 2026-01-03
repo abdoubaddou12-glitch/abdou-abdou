@@ -153,6 +153,7 @@ export default function App() {
               }}
               posts={posts} 
               onNewPost={() => alert('ميزة المقالات قيد التطوير')}
+              {/* Fix: Removed duplicate onEditPost attribute */}
               onEditPost={() => {}}
               onDeletePost={() => {}}
               onOpenAdSense={() => setView('ads')}
@@ -188,9 +189,9 @@ export default function App() {
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
-          {/* Social Bar Script Injection - Invisible Container */}
+          {/* Social Bar (Floating Script) - Injected at Footer but affects whole page */}
           {adsterraConfig.isEnabled && adsterraConfig.socialBar && (
-            <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />
+            <div className="social-bar-container" dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />
           )}
 
           <div className="mb-12 flex flex-col items-center">
@@ -210,15 +211,15 @@ export default function App() {
             </div>
           </div>
           
-          {/* 300x250 Ad Section - Organized and Styled */}
-          <div className="mb-16 flex justify-center">
+          {/* Banner 300x250 - Centered in Footer with professional styling */}
+          <div className="mb-16 flex flex-col items-center">
              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
                <div className="max-w-[300px] w-full">
                  <AdUnit 
                    type="script" 
                    code={adsterraConfig.banner300x250} 
                    isDark={isDark} 
-                   className="m-0" 
+                   label="محتوى إعلاني" 
                  />
                </div>
              )}

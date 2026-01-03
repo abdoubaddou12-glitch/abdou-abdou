@@ -25,13 +25,13 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
 
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
-      <div className="flex items-center gap-2 mb-2 opacity-20">
+      <div className="flex items-center gap-2 mb-3 opacity-10">
         <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-        <span className="text-[7px] font-black uppercase tracking-[0.2em]">{label}</span>
+        <span className="text-[7px] font-black uppercase tracking-[0.3em]">{label}</span>
       </div>
       <div 
         ref={containerRef}
-        className={`w-full flex justify-center overflow-hidden rounded-3xl transition-all border ${
+        className={`w-full flex justify-center overflow-hidden rounded-[2rem] transition-all border shadow-sm ${
           isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'
         }`}
         style={{ minHeight: type === 'banner' ? 'auto' : '50px' }}
