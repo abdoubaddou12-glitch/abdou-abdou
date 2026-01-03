@@ -18,67 +18,62 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
     const container = containerRef.current;
     container.innerHTML = ""; // تنظيف
 
-    if (type === 'banner') {
-      // تقنية Iframe Bridge: إنشاء بيئة معزولة تماماً للإعلان
-      const iframe = document.createElement('iframe');
-      iframe.style.width = '100%';
-      iframe.style.border = 'none';
-      iframe.style.overflow = 'hidden';
-      iframe.style.display = 'block';
-      iframe.style.margin = '0 auto';
-      iframe.scrolling = 'no';
-      
-      container.appendChild(iframe);
-
-      const iframeDoc = iframe.contentWindow?.document;
-      if (iframeDoc) {
-        iframeDoc.open();
-        // حقن الكود داخل الإطار لضمان تنفيذ document.write
-        iframeDoc.write(`
-          <!DOCTYPE html>
-          <html dir="rtl">
-            <head>
-              <style>
-                body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; background: transparent; }
-              </style>
-            </head>
-            <body>
-              ${code}
-              <script>
-                // محاولة تعديل الارتفاع تلقائياً بعد التحميل
-                window.onload = function() {
-                  setTimeout(function() {
-                    parent.postMessage({ height: document.body.scrollHeight, id: '${label}' }, '*');
-                  }, 500);
-                };
-              </script>
-            </body>
-          </html>
-        `);
-        iframeDoc.close();
+    const executeAds = () => {
+      // 1. استخراج خيارات Adsterra (atOptions) إن وجدت لتعريفها عالمياً
+      const atOptionsMatch = code.match(/atOptions\s*=\s*({[\s\S]*?});/);
+      if (atOptionsMatch && atOptionsMatch[1]) {
+        try {
+          // @ts-ignore
+          window.atOptions = new Function(`return ${atOptionsMatch[1]}`)();
+        } catch (e) {
+          console.error("Adsterra Options Fail:", e);
+        }
       }
 
-      // استماع لتعديل الارتفاع
-      const handleMessage = (event: MessageEvent) => {
-        if (event.data.id === label) {
-          iframe.style.height = (event.data.height || 250) + 'px';
+      // 2. إنشاء محرر DOM مؤقت لتحليل العناصر
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(code, 'text/html');
+      const elements = Array.from(doc.body.childNodes);
+
+      elements.forEach(node => {
+        if (node.nodeName === 'SCRIPT') {
+          const oldScript = node as HTMLScriptElement;
+          const newScript = document.createElement('script');
+          
+          // نسخ الخصائص
+          Array.from(oldScript.attributes).forEach(attr => {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+
+          // نسخ الكود المضمن
+          if (oldScript.innerHTML) {
+            newScript.innerHTML = oldScript.innerHTML;
+          }
+
+          // الحقن المباشر في الصفحة
+          if (type === 'script') {
+            document.head.appendChild(newScript);
+          } else {
+            container.appendChild(newScript);
+          }
+        } else {
+          // نسخ العناصر العادية (مثل divs أو ins)
+          container.appendChild(node.cloneNode(true));
         }
-      };
-      window.addEventListener('message', handleMessage);
-      return () => window.removeEventListener('message', handleMessage);
-    } else {
-      // حقن السكريبتات غير المرئية (Popunder / Social Bar) مباشرة في الـ head
-      const temp = document.createElement('div');
-      temp.innerHTML = code;
-      const scripts = Array.from(temp.querySelectorAll('script'));
-      
-      scripts.forEach(s => {
-        const newScript = document.createElement('script');
-        Array.from(s.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-        if (s.innerHTML) newScript.innerHTML = s.innerHTML;
-        document.head.appendChild(newScript);
       });
-    }
+
+      // 3. دعم Google AdSense المباشر
+      if (code.includes('adsbygoogle')) {
+        try {
+          // @ts-ignore
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      }
+    };
+
+    // مهلة قصيرة لضمان استقرار المتصفح قبل الحقن
+    const timer = setTimeout(executeAds, 500);
+    return () => clearTimeout(timer);
   }, [code, isDark, type]);
 
   if (!code) return null;
@@ -94,7 +89,7 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
       <div 
         ref={containerRef}
         className={`w-full flex justify-center overflow-hidden transition-all ${
-          type === 'banner' ? 'rounded-[2rem] border min-h-[100px]' : ''
+          type === 'banner' ? 'rounded-[2rem] border min-h-[50px]' : ''
         } ${
           type === 'banner' && isDark 
             ? 'bg-zinc-900/40 border-white/5' 
