@@ -1,5 +1,5 @@
 
-export type View = 'home' | 'admin' | 'login' | 'policies' | 'security';
+export type View = 'home' | 'admin' | 'login' | 'policies' | 'security' | 'ads';
 
 export interface AnalyticsData {
   totalViews: number;
