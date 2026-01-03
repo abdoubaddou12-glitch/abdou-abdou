@@ -5,7 +5,7 @@ import {
   ImageIcon, Zap, Sun, Moon, ArrowLeft, 
   ShieldCheck, MessageCircle, Facebook, Twitter, Link as LinkIcon,
   Users, Activity, DollarSign, Newspaper, PlusCircle
-} from 'lucide-center';
+} from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
 import { AdminPanel } from './components/AdminPanel.tsx';
@@ -76,17 +76,12 @@ export default function App() {
     localStorage.setItem('adsense_config', JSON.stringify(configs.adsense));
     localStorage.setItem('adsterra_config', JSON.stringify(configs.adsterra));
     setView('admin');
-    alert('تم الحفظ.');
+    alert('تم الحفظ وتحديث نظام الإعلانات.');
   };
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-400 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
       
-      {/* سكريبتات Adsterra العامة */}
-      {adsterraConfig.isEnabled && adsterraConfig.socialBar && (
-        <div dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />
-      )}
-
       <nav className="fixed top-0 left-0 right-0 z-[100] p-4 md:p-6">
         <div className={`max-w-6xl mx-auto flex items-center justify-between px-6 py-4 rounded-[2rem] border ${isDark ? 'border-emerald-500/10 bg-black/60' : 'border-emerald-500/20 bg-white/80 shadow-xl'} backdrop-blur-2xl transition-all`}>
           <div onClick={() => setView('home')} className="flex items-center gap-3 cursor-pointer group">
@@ -116,7 +111,6 @@ export default function App() {
                 <span className="text-emerald-500">بجودة هندسية.</span>
               </h1>
               
-              {/* المحول مع تمرير كود الإعلان المخصص لزر التحميل */}
               <Converter 
                 onConversion={(kb) => setTotalConverted(prev => prev + 1)} 
                 isDark={isDark} 
@@ -200,6 +194,12 @@ export default function App() {
                </div>
             </div>
           </div>
+          
+          {/* الإعلان في أسفل الصفحة كما طُلِب */}
+          <div className="mb-10 opacity-80 overflow-hidden rounded-xl">
+             <div dangerouslySetInnerHTML={{ __html: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>' }} />
+          </div>
+
           <div className={`flex flex-wrap justify-center gap-6 text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
                <button onClick={() => setView('policies')} className="hover:text-emerald-500">الخصوصية</button>
                <button onClick={() => setView('login')} className="hover:text-emerald-500">الإدارة</button>
