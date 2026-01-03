@@ -18,59 +18,75 @@ export const AdUnit: React.FC<AdUnitProps> = ({ type, code, isDark, className = 
     const container = containerRef.current;
     container.innerHTML = ""; // تنظيف الحاوية
 
-    // وظيفة الحقن الذكي للسكريبتات
-    const executeAds = () => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(code, 'text/html');
-      const elements = Array.from(doc.body.childNodes);
+    const injectAd = () => {
+      try {
+        // 1. استخراج خيارات Adsterra (atOptions) إن وجدت في الكود
+        const atOptionsMatch = code.match(/atOptions\s*=\s*({[\s\S]*?});/);
+        if (atOptionsMatch && atOptionsMatch[1]) {
+          try {
+            // تنفيذ كود الخيارات في سياق الـ window ليكون متاحاً للسكريبت الخارجي
+            // @ts-ignore
+            window.atOptions = new Function(`return ${atOptionsMatch[1]}`)();
+          } catch (e) {
+            console.error("Adsterra Options Parsing Error:", e);
+          }
+        }
 
-      elements.forEach(node => {
-        if (node.nodeName === 'SCRIPT') {
-          const oldScript = node as HTMLScriptElement;
+        // 2. إنشاء محرر DOM مؤقت
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = code;
+        
+        const scripts = Array.from(tempDiv.querySelectorAll('script'));
+        
+        // 3. حقن السكريبتات يدوياً
+        scripts.forEach(oldScript => {
           const newScript = document.createElement('script');
           
-          // نسخ جميع الخصائص
+          // نقل كل الخصائص (src, async, type, etc.)
           Array.from(oldScript.attributes).forEach(attr => {
             newScript.setAttribute(attr.name, attr.value);
           });
 
-          // معالجة السكريبتات المضمنة (مثل atOptions)
+          // نقل المحتوى المضمن (الذي لا يعتمد على src)
           if (oldScript.innerHTML) {
-            // تنفيذ كود الـ JS مباشرة في سياق الصفحة
-            try {
-              newScript.innerHTML = oldScript.innerHTML;
-            } catch (e) {
-              console.error("Inline script error", e);
-            }
+            newScript.innerHTML = oldScript.innerHTML;
           }
 
+          // إضافة السكريبت للـ Container
           container.appendChild(newScript);
-        } else {
-          // نسخ العناصر غير السكريبت (مثل ins أو div)
-          container.appendChild(node.cloneNode(true));
+        });
+
+        // 4. حقن العناصر غير السكريبت (مثل ins أو div الإعلانية)
+        Array.from(tempDiv.childNodes).forEach(node => {
+          if (node.nodeName !== 'SCRIPT') {
+            container.appendChild(node.cloneNode(true));
+          }
+        });
+
+        // 5. دعم إعلانات Google AdSense (دفع التحديث)
+        if (code.includes('adsbygoogle')) {
+          try {
+            // @ts-ignore
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
         }
-      });
-      
-      // إذا كان إعلان أدسنس، قم بدفع التحديث
-      if (code.includes('adsbygoogle')) {
-        try {
-          // @ts-ignore
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
+
+      } catch (err) {
+        console.error("Ad Injection Execution Error:", err);
       }
     };
 
-    // تنفيذ الحقن بعد مهلة قصيرة لضمان استقرار الـ DOM
-    const timer = setTimeout(executeAds, 100);
+    // تنفيذ الحقن بعد التأكد من استقرار الصفحة
+    const timer = setTimeout(injectAd, 300);
     return () => clearTimeout(timer);
-  }, [code, isDark]);
+  }, [code, isDark, type]);
 
   if (!code) return null;
 
   return (
     <div className={`flex flex-col items-center w-full transition-all duration-700 ${className}`}>
       {label && (
-        <div className="flex items-center gap-2 mb-2 opacity-10">
+        <div className="flex items-center gap-2 mb-2 opacity-20">
           <span className="text-[7px] font-black uppercase tracking-[0.5em]">{label}</span>
         </div>
       )}
