@@ -9,17 +9,6 @@ export interface AnalyticsData {
   cpc: string;
 }
 
-export interface Post {
-  id: string;
-  title: string;
-  category: string;
-  date: string;
-  image: string;
-  excerpt: string;
-  content: string;
-  status: 'published' | 'draft';
-}
-
 export interface AdSenseConfig {
   isEnabled: boolean;
   publisherId: string;
@@ -32,4 +21,16 @@ export interface AdsterraConfig {
   popUnder: string;
   banner728x90: string;
   banner300x250: string;
+}
+
+// Fix: Added missing Post interface definition to resolve import errors in components/PostCard.tsx and components/PostEditor.tsx
+export interface Post {
+  id: string;
+  title: string;
+  category: string;
+  excerpt: string;
+  content: string;
+  status: 'draft' | 'published';
+  image: string;
+  date: string;
 }

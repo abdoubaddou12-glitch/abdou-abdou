@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  RefreshCw, LayoutDashboard, CheckCircle, 
-  ImageIcon, Zap, Sun, Moon, ArrowLeft, 
-  ShieldCheck, MessageCircle, Facebook, Twitter, Link as LinkIcon,
-  Users, Activity, DollarSign, Newspaper, PlusCircle
+  LayoutDashboard, Zap, Sun, Moon, ArrowLeft, 
+  ShieldCheck, ImageIcon, Settings, Users, Activity, 
+  Lock, DollarSign
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -13,9 +12,7 @@ import { Policies } from './components/Policies.tsx';
 import { SecuritySettings } from './components/SecuritySettings.tsx';
 import { AdSettings } from './components/AdSettings.tsx';
 import { AdUnit } from './components/AdUnit.tsx';
-import { PostCard } from './components/PostCard.tsx';
-import { PostEditor } from './components/PostEditor.tsx';
-import { View, AdSenseConfig, AdsterraConfig, Post } from './types.ts';
+import { View, AdSenseConfig, AdsterraConfig } from './types.ts';
 
 export default function App() {
   const [view, setView] = useState<View>('home');
@@ -30,12 +27,7 @@ export default function App() {
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
   const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
-  const [onlineNow, setOnlineNow] = useState(12);
-
-  const [posts, setPosts] = useState<Post[]>(() => {
-    const saved = localStorage.getItem('blog_posts');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [onlineNow, setOnlineNow] = useState(Math.floor(Math.random() * 15) + 8);
 
   const [adsenseConfig, setAdsenseConfig] = useState<AdSenseConfig>(() => {
     const saved = localStorage.getItem('adsense_config');
@@ -49,16 +41,7 @@ export default function App() {
       socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>', 
       popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
       banner728x90: '', 
-      banner300x250: `<script type="text/javascript">
-	atOptions = {
-		'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-		'format' : 'iframe',
-		'height' : 250,
-		'width' : 300,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
+      banner300x250: `<script type="text/javascript">atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
     };
   });
 
@@ -67,8 +50,7 @@ export default function App() {
     localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
-    localStorage.setItem('blog_posts', JSON.stringify(posts));
-  }, [isDark, totalConverted, baseVisitors, posts]);
+  }, [isDark, totalConverted, baseVisitors]);
 
   const handleSaveAds = (configs: { adsense: AdSenseConfig, adsterra: AdsterraConfig }) => {
     setAdsenseConfig(configs.adsense);
@@ -76,7 +58,6 @@ export default function App() {
     localStorage.setItem('adsense_config', JSON.stringify(configs.adsense));
     localStorage.setItem('adsterra_config', JSON.stringify(configs.adsterra));
     setView('admin');
-    alert('تم الحفظ وتحديث نظام الإعلانات.');
   };
 
   return (
@@ -118,9 +99,9 @@ export default function App() {
             </section>
 
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-               <FeatureCard icon={<ShieldCheck size={28}/>} title="أمان مطلق" desc="تتم معالجة الصور داخل جهازك فقط." isDark={isDark} />
-               <FeatureCard icon={<Zap size={28}/>} title="سرعة البرق" desc="تحويل الصور في أجزاء من الثانية." isDark={isDark} />
-               <FeatureCard icon={<ImageIcon size={28}/>} title="دقة عالية" desc="تحكم كامل في الأبعاد والجودة." isDark={isDark} />
+               <FeatureCard icon={<ShieldCheck size={28}/>} title="أمان مطلق" desc="تتم معالجة الصور داخل جهازك فقط ولا يتم رفعها لأي خادم." isDark={isDark} />
+               <FeatureCard icon={<Zap size={28}/>} title="سرعة البرق" desc="استخدم تقنيات المتصفح الحديثة لتحويل الصور في أجزاء من الثانية." isDark={isDark} />
+               <FeatureCard icon={<ImageIcon size={28}/>} title="دقة عالية" desc="تحكم كامل في الأبعاد، الجودة، وصيغ الجيل القادم مثل WebP و AVIF." isDark={isDark} />
             </section>
           </div>
         )}
@@ -141,8 +122,8 @@ export default function App() {
                 ctr: "N/A",
                 cpc: "Active"
               }}
-              posts={posts} 
-              onNewPost={() => alert('ميزة المقالات قيد التطوير')}
+              posts={[]} 
+              onNewPost={() => {}} // Disabled as no blog
               onEditPost={() => {}}
               onDeletePost={() => {}}
               onOpenAdSense={() => setView('ads')}
@@ -178,13 +159,6 @@ export default function App() {
       <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
-          {/* Adsterra Social Bar - Floating Script Implementation */}
-          {adsterraConfig.isEnabled && adsterraConfig.socialBar && (
-            <div className="ad-social-bar hidden">
-              <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} />
-            </div>
-          )}
-
           <div className="mb-12 flex flex-col items-center">
             <div className={`px-6 py-3 rounded-2xl border flex items-center gap-4 ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
                <div className="flex flex-col items-start">
@@ -202,7 +176,7 @@ export default function App() {
             </div>
           </div>
           
-          {/* Adsterra 300x250 Banner - Centered Footer Ad */}
+          {/* Adsterra 300x250 Banner */}
           <div className="mb-16 flex flex-col items-center">
              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
                <div className="max-w-[300px] w-full">
@@ -210,23 +184,26 @@ export default function App() {
                    type="script" 
                    code={adsterraConfig.banner300x250} 
                    isDark={isDark} 
-                   label="محتوى مروج" 
+                   label="محتوى إعلاني" 
                  />
                </div>
              )}
           </div>
 
           <div className={`flex flex-wrap justify-center gap-6 text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
-               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">الخصوصية</button>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">السياسات</button>
                <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-colors">الإدارة</button>
-               <span className="opacity-40">© {new Date().getFullYear()} Storehalal</span>
+               <span className="opacity-40">© {new Date().getFullYear()} Storehalal Convert</span>
           </div>
         </div>
       </footer>
       
-      {/* Popunder - Invisible Implementation */}
-      {adsterraConfig.isEnabled && adsterraConfig.popUnder && (
-        <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.popUnder }} />
+      {/* Popunder and Social Bar Scripts */}
+      {adsterraConfig.isEnabled && (
+        <>
+          {adsterraConfig.popUnder && <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.popUnder }} />}
+          {adsterraConfig.socialBar && <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />}
+        </>
       )}
     </div>
   );
