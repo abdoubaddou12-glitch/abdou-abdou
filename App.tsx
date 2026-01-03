@@ -21,14 +21,14 @@ export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode_v3') !== 'light');
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode_v7') !== 'light');
   
   const [adminPassword, setAdminPassword] = useState(() => {
     return localStorage.getItem('admin_password') || 'abdou2024';
   });
 
   const [posts, setPosts] = useState<Post[]>(() => {
-    const saved = localStorage.getItem('blog_posts_v3');
+    const saved = localStorage.getItem('blog_posts_v7');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -38,7 +38,7 @@ export default function App() {
   const [onlineNow] = useState(Math.floor(Math.random() * 20) + 10);
 
   const [adsterraConfig, setAdsterraConfig] = useState<AdsterraConfig>(() => {
-    const saved = localStorage.getItem('adsterra_config_v3');
+    const saved = localStorage.getItem('adsterra_config_v7');
     return saved ? JSON.parse(saved) : { 
       isEnabled: true, 
       socialBar: '', 
@@ -49,16 +49,19 @@ export default function App() {
   });
 
   useEffect(() => {
+    // Console log لليقين من تحميل النسخة الصحيحة
+    console.log("Storehalal System v7.0 Loaded - Ads Locked to Footer");
+    
     document.body.className = isDark ? '' : 'light-mode';
-    localStorage.setItem('theme_mode_v3', isDark ? 'dark' : 'light');
-    localStorage.setItem('blog_posts_v3', JSON.stringify(posts));
+    localStorage.setItem('theme_mode_v7', isDark ? 'dark' : 'light');
+    localStorage.setItem('blog_posts_v7', JSON.stringify(posts));
     localStorage.setItem('total_converted', totalConverted.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
-    localStorage.setItem('adsterra_config_v3', JSON.stringify(adsterraConfig));
+    localStorage.setItem('adsterra_config_v7', JSON.stringify(adsterraConfig));
     
-    if (!sessionStorage.getItem('v_tracked_v3')) {
+    if (!sessionStorage.getItem('v_tracked_v7')) {
         setTotalVisitors(prev => prev + 1);
-        sessionStorage.setItem('v_tracked_v3', 'true');
+        sessionStorage.setItem('v_tracked_v7', 'true');
     }
   }, [isDark, posts, totalConverted, baseVisitors, adsterraConfig]);
 
@@ -106,7 +109,7 @@ export default function App() {
         
         {view === 'home' && (
           <div className="animate-slide-up space-y-32">
-            {/* Hero Section */}
+            {/* Hero Section - NO ADS HERE */}
             <section className="text-center">
               <h1 className="text-5xl md:text-8xl font-black italic mb-12 text-glow leading-tight tracking-tighter">
                 مدونة تقنية <br />
@@ -121,7 +124,7 @@ export default function App() {
               <SocialShare isDark={isDark} />
             </section>
 
-            {/* Blog Section */}
+            {/* Blog Section - NO ADS HERE */}
             <BlogSection 
               posts={posts} 
               isDark={isDark} 
@@ -206,7 +209,7 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
-      {/* Footer مع الإعلانات الحصرية في الأسفل */}
+      {/* Footer - المكان الوحيد لظهور الإعلانات */}
       <footer className={`border-t py-16 md:py-24 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/80' : 'border-zinc-200 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)]'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
@@ -224,11 +227,14 @@ export default function App() {
             </div>
           </div>
           
-          {/* الإعلانات في الأسفل فقط */}
-          <div className="mb-16 space-y-8 flex flex-col items-center">
+          {/* حاوية الإعلانات الحصرية في الأسفل */}
+          <div className="mb-16 space-y-10 flex flex-col items-center">
              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
-                <AdUnit type="script" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان" />
+                <div className="w-full flex justify-center">
+                  <AdUnit type="script" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان" />
+                </div>
              )}
+             
              {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
                <div className="max-w-4xl w-full hidden md:block">
                  <AdUnit type="script" code={adsterraConfig.banner728x90} isDark={isDark} label="مساحة إعلانية" />
@@ -244,7 +250,7 @@ export default function App() {
         </div>
       </footer>
       
-      {/* سكريبتات أدستيرا الخفية */}
+      {/* سكريبتات أدستيرا الخفية (تؤثر على الموقع لكن لا تظهر كعنصر مرئي في الوسط) */}
       {adsterraConfig.isEnabled && (
         <div className="hidden">
            {adsterraConfig.popUnder && <AdUnit type="script" code={adsterraConfig.popUnder} isDark={isDark} />}
