@@ -17,28 +17,30 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
+const VERSION = "11.0";
+
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode_v10') !== 'light');
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode_v11') !== 'light');
   
   const [adminPassword, setAdminPassword] = useState(() => {
-    return localStorage.getItem('admin_password') || 'abdou2024';
+    return localStorage.getItem('admin_password_v11') || 'abdou2024';
   });
 
   const [posts, setPosts] = useState<Post[]>(() => {
-    const saved = localStorage.getItem('blog_posts_v10');
+    const saved = localStorage.getItem('blog_posts_v11');
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
-  const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
-  const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
+  const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted_v11')) || 0);
+  const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors_v11')) || 0);
+  const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors_v11')) || 0);
   const [onlineNow] = useState(Math.floor(Math.random() * 20) + 10);
 
   const [adsterraConfig, setAdsterraConfig] = useState<AdsterraConfig>(() => {
-    const saved = localStorage.getItem('adsterra_config_v10');
+    const saved = localStorage.getItem('adsterra_config_v11');
     return saved ? JSON.parse(saved) : { 
       isEnabled: true, 
       socialBar: '', 
@@ -49,20 +51,21 @@ export default function App() {
   });
 
   useEffect(() => {
-    console.log("Storehalal Engine v10.0 - Advanced Ad Injection Running");
+    console.log(`Storehalal OS v${VERSION} - System Ready`);
     
     document.body.className = isDark ? '' : 'light-mode';
-    localStorage.setItem('theme_mode_v10', isDark ? 'dark' : 'light');
-    localStorage.setItem('blog_posts_v10', JSON.stringify(posts));
-    localStorage.setItem('total_converted', totalConverted.toString());
-    localStorage.setItem('base_visitors', baseVisitors.toString());
-    localStorage.setItem('adsterra_config_v10', JSON.stringify(adsterraConfig));
+    localStorage.setItem('theme_mode_v11', isDark ? 'dark' : 'light');
+    localStorage.setItem('blog_posts_v11', JSON.stringify(posts));
+    localStorage.setItem('total_converted_v11', totalConverted.toString());
+    localStorage.setItem('base_visitors_v11', baseVisitors.toString());
+    localStorage.setItem('adsterra_config_v11', JSON.stringify(adsterraConfig));
+    localStorage.setItem('admin_password_v11', adminPassword);
     
-    if (!sessionStorage.getItem('v_tracked_v10')) {
+    if (!sessionStorage.getItem('v_tracked_v11')) {
         setTotalVisitors(prev => prev + 1);
-        sessionStorage.setItem('v_tracked_v10', 'true');
+        sessionStorage.setItem('v_tracked_v11', 'true');
     }
-  }, [isDark, posts, totalConverted, baseVisitors, adsterraConfig]);
+  }, [isDark, posts, totalConverted, baseVisitors, adsterraConfig, adminPassword]);
 
   const handleSavePost = (postData: Partial<Post>) => {
     const newPost = {
@@ -196,7 +199,7 @@ export default function App() {
         )}
 
         {view === 'security' && isAuthenticated && (
-           <SecuritySettings isDark={isDark} currentSavedPassword={adminPassword} onSave={(p) => {localStorage.setItem('admin_password', p); setAdminPassword(p); setView('admin');}} onCancel={() => setView('admin')} onForceResetData={() => {}} />
+           <SecuritySettings isDark={isDark} currentSavedPassword={adminPassword} onSave={(p) => { setAdminPassword(p); setView('admin');}} onCancel={() => setView('admin')} onForceResetData={() => {}} />
         )}
 
         {view === 'ads' && isAuthenticated && (
@@ -206,7 +209,7 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
-      {/* Footer - المنطقة المخصصة للإعلانات */}
+      {/* Footer - إعلانات Iframe Sandboxed */}
       <footer className={`border-t py-16 md:py-24 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/80' : 'border-zinc-200 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.02)]'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
@@ -224,35 +227,40 @@ export default function App() {
             </div>
           </div>
           
-          {/* حاويات الإعلانات المباشرة */}
-          <div className="mb-16 space-y-12 flex flex-col items-center min-h-[100px]">
+          {/* حاويات الإعلانات (النسخة 11.0) */}
+          <div className="mb-16 space-y-12 flex flex-col items-center">
              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
-                <div id="at-300-250-footer" className="w-full flex justify-center">
-                  <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان" />
+                <div id="v11-ad-mobile" className="w-full flex justify-center overflow-hidden">
+                  <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان الجوال" />
                 </div>
              )}
              
              {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
-               <div id="at-728-90-footer" className="max-w-4xl w-full hidden md:block">
-                 <AdUnit type="banner" code={adsterraConfig.banner728x90} isDark={isDark} label="مساحة إعلانية" />
+               <div id="v11-ad-desktop" className="max-w-4xl w-full hidden md:block overflow-hidden">
+                 <AdUnit type="banner" code={adsterraConfig.banner728x90} isDark={isDark} label="إعلان الحاسوب" />
                </div>
              )}
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
+          <div className="flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-8">
                <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-all">سياسة الخصوصية</button>
                <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-all">إدارة النظام</button>
                <span>Storehalal © {new Date().getFullYear()}</span>
           </div>
+          
+          {/* شارة النسخة للتأكد من التحديث */}
+          <div className="inline-block px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-[8px] font-black opacity-20 uppercase tracking-widest">
+            v{VERSION} Active Bridge
+          </div>
         </div>
       </footer>
       
-      {/* سكريبتات أدستيرا (Social Bar & Popunder) */}
+      {/* سكريبتات أدستيرا (تُحقن مباشرة في الـ head عبر AdUnit) */}
       {adsterraConfig.isEnabled && (
-        <div id="ad-background-scripts" style={{ position: 'fixed', top: 0, left: 0, width: '1px', height: '1px', opacity: 0.1, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }}>
+        <>
            {adsterraConfig.popUnder && <AdUnit type="script" code={adsterraConfig.popUnder} isDark={isDark} label="" />}
            {adsterraConfig.socialBar && <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} label="" />}
-        </div>
+        </>
       )}
     </div>
   );
