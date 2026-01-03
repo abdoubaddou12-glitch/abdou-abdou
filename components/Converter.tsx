@@ -2,7 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { 
   Upload, Download, Trash2, Maximize2, 
-  Loader2, RefreshCw, Lock, Unlock, Palette, Save, Ghost
+  Loader2, RefreshCw, Lock, Unlock, Palette, Save, Ghost,
+  Share2, Twitter, Facebook, MessageCircle, Send
 } from 'lucide-react';
 import { AdUnit } from './AdUnit.tsx';
 
@@ -25,8 +26,6 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
   const [height, setHeight] = useState<number>(0);
   const [lockAspectRatio, setLockAspectRatio] = useState(true);
   const [originalAspectRatio, setOriginalAspectRatio] = useState<number>(1);
-  const [rotation, setRotation] = useState(0);
-  const [padding, setPadding] = useState(0);
   const [isGrayscale, setIsGrayscale] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -86,6 +85,16 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
     link.download = `storehalal-convert.${format}`;
     link.click();
   };
+
+  const shareUrl = "https://storehalal.shop/";
+  const shareText = "جرب هذه الأداة الاحترافية لتحويل الصور مجاناً وبخصوصية تامة! 🚀";
+
+  const socialLinks = [
+    { name: 'WhatsApp', icon: <MessageCircle size={18} />, url: `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`, color: 'hover:bg-green-500' },
+    { name: 'Facebook', icon: <Facebook size={18} />, url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, color: 'hover:bg-blue-600' },
+    { name: 'X', icon: <Twitter size={18} />, url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, color: 'hover:bg-zinc-700' },
+    { name: 'Telegram', icon: <Send size={18} />, url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, color: 'hover:bg-sky-500' },
+  ];
 
   const savingsPercent = selectedImage ? Math.max(0, Math.round(((selectedImage.size - resultSize) / selectedImage.size) * 100)) : 0;
 
@@ -192,6 +201,32 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
                   <button onClick={() => setResult(null)} className="w-full py-2 text-[9px] font-black uppercase text-zinc-500 tracking-[0.3em] hover:text-emerald-500 transition-colors">تحويل صورة جديدة</button>
                 </div>
               )}
+            </div>
+
+            {/* Social Share Buttons */}
+            <div className="mt-12 pt-8 border-t border-emerald-500/10">
+               <div className="flex flex-col items-center gap-6">
+                  <div className="flex items-center gap-3 opacity-30">
+                    <Share2 size={14} className="text-emerald-500" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">شارك الأداة مع أصدقائك</span>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {socialLinks.map((social) => (
+                      <a 
+                        key={social.name}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 border ${
+                          isDark ? 'bg-white/5 border-white/5 text-white/40' : 'bg-zinc-50 border-zinc-100 text-zinc-400'
+                        } ${social.color} hover:text-white hover:scale-110 hover:-translate-y-1 shadow-sm`}
+                        title={`مشاركة عبر ${social.name}`}
+                      >
+                        {social.icon}
+                      </a>
+                    ))}
+                  </div>
+               </div>
             </div>
           </div>
         </div>
