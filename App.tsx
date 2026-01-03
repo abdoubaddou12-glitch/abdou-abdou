@@ -10,6 +10,7 @@ import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
 import { AdminPanel } from './components/AdminPanel.tsx';
 import { Policies } from './components/Policies.tsx';
+import { SecuritySettings } from './components/SecuritySettings.tsx';
 import { View } from './types.ts';
 
 export default function App() {
@@ -17,23 +18,55 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme_mode') !== 'light');
   
+  // إدارة كلمة السر
+  const [adminPassword, setAdminPassword] = useState(() => localStorage.getItem('admin_password') || 'abdou2024');
+
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem('total_converted')) || 0);
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem('total_visitors')) || 0);
   const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem('base_visitors')) || 0);
-  const [onlineNow, setOnlineNow] = useState(Math.floor(Math.random() * 15) + 5);
+  const [onlineNow, setOnlineNow] = useState(12);
 
   const [copySuccess, setCopySuccess] = useState(false);
+
+  // نظام تتبع الزوار الذكي
+  useEffect(() => {
+    const isNewSession = !sessionStorage.getItem('session_active');
+    if (isNewSession) {
+      const newTotal = totalVisitors + 1;
+      setTotalVisitors(newTotal);
+      localStorage.setItem('total_visitors', newTotal.toString());
+      sessionStorage.setItem('session_active', 'true');
+    }
+
+    const updateOnline = () => {
+      const hour = new Date().getHours();
+      let baseOnline = 15;
+      if (hour >= 18 && hour <= 23) baseOnline = 45;
+      else if (hour >= 3 && hour <= 7) baseOnline = 5;
+      const fluctuation = Math.floor(Math.random() * 10) - 5;
+      setOnlineNow(Math.max(3, baseOnline + fluctuation));
+    };
+
+    updateOnline();
+    const interval = setInterval(updateOnline, 15000);
+    return () => clearInterval(interval);
+  }, [totalVisitors]);
 
   useEffect(() => {
     document.body.className = isDark ? '' : 'light-mode';
     localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
     localStorage.setItem('total_converted', totalConverted.toString());
-    localStorage.setItem('total_visitors', totalVisitors.toString());
     localStorage.setItem('base_visitors', baseVisitors.toString());
-  }, [isDark, totalConverted, totalVisitors, baseVisitors]);
+    localStorage.setItem('admin_password', adminPassword);
+  }, [isDark, totalConverted, baseVisitors, adminPassword]);
 
   const handleConversionSuccess = (savedKB: number) => {
     setTotalConverted(prev => prev + 1);
+  };
+
+  const handlePasswordUpdate = (newPass: string) => {
+    setAdminPassword(newPass);
+    setView('admin');
   };
 
   const siteUrl = "https://storehalal.shop";
@@ -96,7 +129,7 @@ export default function App() {
           </div>
         )}
 
-        {view === 'login' && <AdminLogin isDark={isDark} onLogin={(p) => { if(p === 'abdou2024') {setIsAuthenticated(true); setView('admin'); return true;} return false; }} onCancel={() => setView('home')} />}
+        {view === 'login' && <AdminLogin isDark={isDark} onLogin={(p) => { if(p === adminPassword) {setIsAuthenticated(true); setView('admin'); return true;} return false; }} onCancel={() => setView('home')} />}
 
         {view === 'admin' && isAuthenticated && (
           <div className="animate-slide-up space-y-8">
@@ -112,17 +145,32 @@ export default function App() {
                 ctr: "N/A",
                 cpc: "Active"
               }}
-              posts={[]} // No posts
+              posts={[]} 
               onNewPost={() => {}}
               onEditPost={() => {}}
               onDeletePost={() => {}}
               onOpenAdSense={() => {}}
-              onOpenSecurity={() => {}} 
+              onOpenSecurity={() => setView('security')} 
               onSyncData={() => {}}
               baseVisitors={baseVisitors}
               onUpdateBaseVisitors={(val) => setBaseVisitors(val)}
             />
           </div>
+        )}
+
+        {view === 'security' && isAuthenticated && (
+           <div className="animate-slide-up space-y-8">
+              <button onClick={() => setView('admin')} className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all font-black uppercase tracking-widest text-xs">
+                <ArrowLeft size={16} /> العودة للوحة التحكم
+              </button>
+              <SecuritySettings 
+                isDark={isDark}
+                currentSavedPassword={adminPassword}
+                onSave={handlePasswordUpdate}
+                onCancel={() => setView('admin')}
+                onForceResetData={() => {}}
+              />
+           </div>
         )}
 
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
@@ -142,6 +190,23 @@ export default function App() {
                  <button onClick={() => { navigator.clipboard.writeText(siteUrl); setCopySuccess(true); setTimeout(() => setCopySuccess(false), 2000); }} className={`w-14 h-14 rounded-full border flex items-center justify-center transition-all ${copySuccess ? 'bg-emerald-500 text-black' : 'text-emerald-500 border-emerald-500/20'}`}>
                    {copySuccess ? <CheckCircle size={22} /> : <LinkIcon size={22} />}
                  </button>
+          </div>
+
+          <div className="mb-12 flex flex-col items-center">
+            <div className={`px-6 py-3 rounded-2xl border flex items-center gap-4 ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
+               <div className="flex flex-col items-start">
+                  <span className="text-[8px] font-black uppercase opacity-30 tracking-widest">إجمالي الزيارات</span>
+                  <span className="text-xl font-black italic tracking-tighter text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</span>
+               </div>
+               <div className="w-[1px] h-8 bg-white/10"></div>
+               <div className="flex flex-col items-end text-right">
+                  <span className="text-[8px] font-black uppercase opacity-30 tracking-widest">المتصلون الآن</span>
+                  <span className="text-xl font-black italic tracking-tighter flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    {onlineNow}
+                  </span>
+               </div>
+            </div>
           </div>
 
           <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-8 ${isDark ? 'border-white/5' : 'border-zinc-100'}`}>

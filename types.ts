@@ -1,6 +1,5 @@
 
-
-export type View = 'home' | 'admin' | 'login' | 'policies';
+export type View = 'home' | 'admin' | 'login' | 'policies' | 'security';
 
 export interface AnalyticsData {
   totalViews: number;
@@ -10,7 +9,6 @@ export interface AnalyticsData {
   cpc: string;
 }
 
-// Fix: Added missing Post interface to resolve import errors in PostCard.tsx and PostEditor.tsx
 export interface Post {
   id: string;
   title: string;
@@ -22,14 +20,12 @@ export interface Post {
   status: 'published' | 'draft';
 }
 
-// Fix: Added missing AdSenseConfig interface to resolve import errors in AdSense components
 export interface AdSenseConfig {
   isEnabled: boolean;
   publisherId: string;
   slotId: string;
 }
 
-// Fix: Added missing AdsterraConfig interface to resolve import error in AdSettings.tsx
 export interface AdsterraConfig {
   isEnabled: boolean;
   socialBar: string;

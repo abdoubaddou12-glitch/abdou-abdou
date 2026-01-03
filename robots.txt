@@ -3,6 +3,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /login
+Disallow: /security
 
-# Sitemap location
+# Map to sitemap
 Sitemap: https://storehalal.shop/sitemap.xml
