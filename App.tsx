@@ -86,12 +86,25 @@ export default function App() {
 
       <main className="max-w-6xl mx-auto w-full px-6 pt-32 pb-20 flex-grow">
         {view === 'home' && (
-          <div className="animate-slide-up space-y-20">
-            <section className="text-center pt-10">
-              <h1 className="text-5xl md:text-8xl font-black italic mb-8 text-glow leading-tight tracking-tighter">
+          <div className="animate-slide-up space-y-24">
+            <section className="text-center pt-6">
+              <h1 className="text-5xl md:text-8xl font-black italic mb-12 text-glow leading-tight tracking-tighter">
                 تحويل الصور <br />
                 <span className="text-emerald-500">بجودة هندسية.</span>
               </h1>
+              
+              {/* مساحة إعلانية علوية بتصميم هادئ */}
+              {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
+                <div className="mb-20 flex justify-center px-4">
+                  <AdUnit 
+                    type="script" 
+                    code={adsterraConfig.banner300x250} 
+                    isDark={isDark} 
+                    className="max-w-[340px]"
+                    label="مساحة مدعومة"
+                  />
+                </div>
+              )}
               
               <Converter 
                 onConversion={() => setTotalConverted(prev => prev + 1)} 
@@ -99,7 +112,6 @@ export default function App() {
                 adCode={adsterraConfig.isEnabled ? adsterraConfig.banner300x250 : ''}
               />
 
-              {/* Social Share Section - Placed directly under the converter */}
               <SocialShare isDark={isDark} />
             </section>
 
@@ -161,63 +173,63 @@ export default function App() {
         {view === 'policies' && <Policies isDark={isDark} onBack={() => setView('home')} />}
       </main>
 
-      <footer className={`border-t py-16 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
+      <footer className={`border-t py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/40' : 'border-zinc-200 bg-white'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
           
-          <div className="mb-12 flex flex-col items-center">
-            <div className={`px-6 py-3 rounded-2xl border flex items-center gap-4 ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-100'}`}>
+          <div className="mb-16 flex flex-col items-center">
+            <div className={`px-8 py-4 rounded-3xl border flex items-center gap-6 ${isDark ? 'bg-white/5 border-white/5 shadow-inner' : 'bg-zinc-50 border-zinc-100'}`}>
                <div className="flex flex-col items-start">
-                  <span className="text-[8px] font-black uppercase opacity-30 tracking-widest">إجمالي الزيارات</span>
-                  <span className="text-xl font-black italic tracking-tighter text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</span>
+                  <span className="text-[9px] font-black uppercase opacity-20 tracking-widest mb-1">إجمالي الزوار</span>
+                  <span className="text-2xl font-black italic tracking-tighter text-emerald-500">{(totalVisitors + baseVisitors).toLocaleString()}</span>
                </div>
-               <div className="w-[1px] h-8 bg-white/10"></div>
+               <div className="w-[1px] h-10 bg-emerald-500/10"></div>
                <div className="flex flex-col items-end text-right">
-                  <span className="text-[8px] font-black uppercase opacity-30 tracking-widest">المتصلون الآن</span>
-                  <span className="text-xl font-black italic tracking-tighter flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <span className="text-[9px] font-black uppercase opacity-20 tracking-widest mb-1">المتصلون الآن</span>
+                  <span className="text-2xl font-black italic tracking-tighter flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                     {onlineNow}
                   </span>
                </div>
             </div>
           </div>
           
-          {/* Adsterra Bottom Banner */}
-          <div className="mb-16 flex flex-col items-center">
+          {/* إعلان التذييل بتصميم نظيف */}
+          <div className="mb-20 flex flex-col items-center px-4">
              {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
                <div className="max-w-4xl w-full">
                  <AdUnit 
                    type="script" 
                    code={adsterraConfig.banner728x90} 
                    isDark={isDark} 
-                   label="محتوى مروج" 
+                   label="محتوى ممول" 
                  />
                </div>
              )}
           </div>
 
-          <div className={`flex flex-wrap justify-center gap-6 text-[10px] font-black uppercase tracking-widest ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
-               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-colors">سياسة الخصوصية</button>
-               <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-colors">الإدارة</button>
+          <div className={`flex flex-wrap justify-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'opacity-20' : 'text-zinc-300'}`}>
+               <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-all">سياسة الخصوصية</button>
+               <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-all">الإدارة</button>
                <span className="opacity-40">© {new Date().getFullYear()} Storehalal Convert</span>
           </div>
         </div>
       </footer>
       
-      {/* Invisible Adsterra Scripts */}
+      {/* سكريبتات Adsterra المخفية */}
       {adsterraConfig.isEnabled && (
-        <>
-          {adsterraConfig.popUnder && <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.popUnder }} />}
-          {adsterraConfig.socialBar && <div className="hidden" dangerouslySetInnerHTML={{ __html: adsterraConfig.socialBar }} />}
-        </>
+        <div className="hidden">
+           {adsterraConfig.popUnder && <AdUnit type="script" code={adsterraConfig.popUnder} isDark={isDark} />}
+           {adsterraConfig.socialBar && <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} />}
+        </div>
       )}
     </div>
   );
 }
 
 const FeatureCard = ({ icon, title, desc, isDark }: any) => (
-  <div className={`emerald-card p-8 group transition-all ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
-    <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6 group-hover:scale-110 transition-transform">{icon}</div>
-    <h3 className="text-xl font-black mb-4 italic tracking-tight">{title}</h3>
+  <div className={`emerald-card p-10 group transition-all duration-500 ${!isDark && 'bg-white shadow-xl shadow-zinc-200/40 hover:shadow-2xl'}`}>
+    <div className="w-16 h-16 rounded-[1.5rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-8 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-black transition-all duration-500">{icon}</div>
+    <h3 className="text-2xl font-black mb-4 italic tracking-tight">{title}</h3>
     <p className="text-sm font-medium opacity-40 leading-relaxed">{desc}</p>
   </div>
 );

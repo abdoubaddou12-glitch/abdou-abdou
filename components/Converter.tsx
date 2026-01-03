@@ -88,28 +88,30 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
       {!preview ? (
         <div 
           onClick={() => fileInputRef.current?.click()}
-          className={`emerald-card p-20 md:p-32 border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all group ${isDark ? 'border-emerald-500/20 hover:border-emerald-500/50' : 'bg-white border-emerald-500/30 hover:border-emerald-500 shadow-sm'}`}
+          className={`emerald-card p-24 md:p-40 border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all duration-500 group ${isDark ? 'border-emerald-500/10 hover:border-emerald-500/40 bg-black/40' : 'bg-white border-emerald-500/20 hover:border-emerald-500 shadow-sm'}`}
         >
           <input type="file" ref={fileInputRef} hidden onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} accept="image/*" />
-          <Upload size={48} className="text-emerald-500 mb-8 group-hover:scale-110 transition-transform" />
+          <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+             <Upload size={40} className="text-emerald-500" />
+          </div>
           <h2 className="text-3xl font-black mb-3 text-center">ارفع صورتك للمعالجة الفورية</h2>
-          <p className="opacity-40 font-bold uppercase tracking-widest text-xs">آمن، سريع، وبخصوصية كاملة</p>
+          <p className="opacity-30 font-bold uppercase tracking-[0.4em] text-[10px]">آمن • محلي • بدون رفع للدروبوكس</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start animate-slide-up">
           <div className="lg:col-span-5">
-            <div className={`emerald-card p-8 ${!isDark && 'bg-white shadow-xl shadow-zinc-200/50'}`}>
-              <div className={`relative aspect-square rounded-[2.5rem] overflow-hidden border ${isDark ? 'border-white/5 bg-zinc-900' : 'border-zinc-100 bg-zinc-50'}`}>
+            <div className={`emerald-card p-8 ${!isDark && 'bg-white shadow-2xl shadow-zinc-200/30'}`}>
+              <div className={`relative aspect-square rounded-[2.5rem] overflow-hidden border ${isDark ? 'border-white/5 bg-zinc-900 shadow-inner' : 'border-zinc-100 bg-zinc-50'}`}>
                 <img src={preview} className="w-full h-full object-contain" alt="Preview" />
-                <button onClick={() => {setPreview(null); setResult(null);}} className="absolute top-4 right-4 p-3 bg-red-500 text-white rounded-xl hover:scale-110 transition-all z-10">
-                  <Trash2 size={18} />
+                <button onClick={() => {setPreview(null); setResult(null);}} className="absolute top-5 right-5 p-3.5 bg-red-500 text-white rounded-2xl hover:scale-110 shadow-xl transition-all z-10">
+                  <Trash2 size={20} />
                 </button>
               </div>
             </div>
           </div>
 
-          <div className={`lg:col-span-7 emerald-card p-10 flex flex-col min-h-[500px] ${!isDark && 'bg-white'}`}>
-            <div className="flex gap-1 p-1.5 rounded-2xl bg-black/10 mb-8">
+          <div className={`lg:col-span-7 emerald-card p-10 flex flex-col min-h-[500px] ${!isDark && 'bg-white shadow-2xl shadow-zinc-200/30'}`}>
+            <div className="flex gap-1.5 p-1.5 rounded-2xl bg-black/10 mb-10">
               <TabBtn active={activeTab === 'transform'} onClick={() => setActiveTab('transform')} icon={<Maximize2 size={16}/>} label="الأبعاد" />
               <TabBtn active={activeTab === 'filters'} onClick={() => setActiveTab('filters')} icon={<Palette size={16}/>} label="الفلاتر" />
               <TabBtn active={activeTab === 'output'} onClick={() => setActiveTab('output')} icon={<Save size={16}/>} label="التصدير" />
@@ -117,14 +119,17 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
 
             <div className="flex-grow">
               {activeTab === 'transform' && (
-                <div className="space-y-8 animate-slide-up">
+                <div className="space-y-10 animate-slide-up">
                   <div className="grid grid-cols-2 gap-8">
                     <InputField label="العرض (px)" value={width} onChange={v => setWidth(v)} isDark={isDark} />
                     <InputField label="الارتفاع (px)" value={height} onChange={v => setHeight(v)} isDark={isDark} />
                   </div>
-                  <div className="flex items-center justify-between p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-                    <span className="text-[10px] font-black uppercase text-emerald-500">قفل التناسب</span>
-                    <button onClick={() => setLockAspectRatio(!lockAspectRatio)} className={`p-3 rounded-xl ${lockAspectRatio ? 'bg-emerald-500 text-black' : 'bg-zinc-800'}`}>
+                  <div className="flex items-center justify-between p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/10">
+                    <div className="flex flex-col">
+                       <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest mb-1">قفل التناسب</span>
+                       <span className="text-[11px] opacity-40 font-bold">الحفاظ على أبعاد الصورة الأصلية</span>
+                    </div>
+                    <button onClick={() => setLockAspectRatio(!lockAspectRatio)} className={`p-4 rounded-2xl transition-all ${lockAspectRatio ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'bg-zinc-800 text-zinc-500'}`}>
                       {lockAspectRatio ? <Lock size={20}/> : <Unlock size={20}/>}
                     </button>
                   </div>
@@ -132,45 +137,65 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
               )}
               {activeTab === 'filters' && (
                 <div className="space-y-8 animate-slide-up">
-                  <button onClick={() => setIsGrayscale(!isGrayscale)} className={`w-full py-5 rounded-xl border font-black text-xs ${isGrayscale ? 'bg-emerald-500 text-black' : 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10'}`}>
-                    <Ghost size={18} className="inline ml-2" /> تحويل للأسود والأبيض
+                  <button onClick={() => setIsGrayscale(!isGrayscale)} className={`w-full py-6 rounded-2xl border font-black text-xs transition-all flex items-center justify-center gap-3 ${isGrayscale ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'bg-emerald-500/5 text-emerald-500 border-emerald-500/10'}`}>
+                    <Ghost size={20} /> تحويل للأسود والأبيض (Grayscale)
                   </button>
                 </div>
               )}
               {activeTab === 'output' && (
-                <div className="space-y-8 animate-slide-up">
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-10 animate-slide-up">
+                  <div className="grid grid-cols-2 gap-3">
                     {['avif', 'webp', 'png', 'jpeg'].map(f => (
-                      <button key={f} onClick={() => setFormat(f as any)} className={`py-4 rounded-xl font-black text-[10px] uppercase ${format === f ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-500'}`}>{f}</button>
+                      <button key={f} onClick={() => setFormat(f as any)} className={`py-5 rounded-2xl font-black text-xs uppercase transition-all border ${format === f ? 'bg-emerald-500 border-emerald-500 text-black shadow-lg' : 'bg-zinc-800/50 border-white/5 text-zinc-500'}`}>{f}</button>
                     ))}
                   </div>
-                  <div className="space-y-5">
-                    <div className="flex justify-between"><label className="text-[10px] font-black uppercase opacity-40">الجودة</label><span className="text-emerald-500">{quality}%</span></div>
-                    <input type="range" min="10" max="100" value={quality} onChange={e => setQuality(Number(e.target.value))} className="w-full accent-emerald-500" />
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-end"><label className="text-[10px] font-black uppercase opacity-20 tracking-widest">جودة التصدير</label><span className="text-xl font-black italic text-emerald-500">{quality}%</span></div>
+                    <input type="range" min="10" max="100" value={quality} onChange={e => setQuality(Number(e.target.value))} className="w-full h-1.5 bg-emerald-500/10 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="mt-10 space-y-8">
+            <div className="mt-12 space-y-10">
               {!result ? (
                 <button 
                   onClick={handleConvert}
                   disabled={isProcessing}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-6 rounded-[2rem] font-black text-lg shadow-2xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black py-7 rounded-[2.5rem] font-black text-xl shadow-2xl shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-4"
                 >
-                  {isProcessing ? <Loader2 className="animate-spin" /> : <RefreshCw size={22} />}
-                  بدء معالجة الصورة
+                  {isProcessing ? <Loader2 className="animate-spin" /> : <RefreshCw size={24} />}
+                  بدء المعالجة الذكية
                 </button>
               ) : (
-                <div className="space-y-10 animate-fade-in text-center">
-                  <div className="emerald-card p-6 bg-emerald-500 text-black flex items-center justify-between">
-                     <span className="text-3xl font-black">{savingsPercent}% توفير</span>
-                     <span className="font-bold">{(resultSize/1024).toFixed(1)} KB</span>
+                <div className="space-y-12 animate-fade-in text-center">
+                  <div className="emerald-card p-8 bg-emerald-500 text-black flex items-center justify-between shadow-2xl shadow-emerald-500/40">
+                     <div className="text-right">
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40 block mb-1">نسبة التوفير</span>
+                        <span className="text-4xl font-black italic tracking-tighter">{savingsPercent}%</span>
+                     </div>
+                     <div className="text-left">
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40 block mb-1">الحجم الجديد</span>
+                        <span className="text-2xl font-black italic tracking-tighter">{(resultSize/1024).toFixed(1)} KB</span>
+                     </div>
                   </div>
-                  <button onClick={handleDownload} className="w-full bg-white text-black py-6 rounded-[2rem] font-black text-lg shadow-2xl flex items-center justify-center gap-4 hover:scale-[1.02] transition-all"><Download size={26} /> تحميل الصورة الآن</button>
-                  {adCode && <div className="pt-2 flex flex-col items-center"><AdUnit type="script" code={adCode} isDark={isDark} label="إعلان ممول" className="max-w-[300px]" /></div>}
-                  <button onClick={() => setResult(null)} className="w-full py-2 text-[9px] font-black uppercase text-zinc-500 tracking-[0.3em] hover:text-emerald-500 transition-colors">تحويل صورة جديدة</button>
+                  
+                  <button onClick={handleDownload} className="w-full bg-white text-black py-7 rounded-[2.5rem] font-black text-xl shadow-2xl flex items-center justify-center gap-4 hover:scale-[1.02] transition-all"><Download size={28} /> تحميل الملف المحسّن</button>
+                  
+                  {/* إعلان هادئ يظهر فقط بعد التحويل كنوع من المكافأة البصرية */}
+                  {adCode && (
+                    <div className="pt-4 flex flex-col items-center">
+                      <AdUnit 
+                        type="script" 
+                        code={adCode} 
+                        isDark={isDark} 
+                        className="max-w-[320px]" 
+                        label="مساحة ممولة"
+                      />
+                    </div>
+                  )}
+                  
+                  <button onClick={() => setResult(null)} className="w-full py-2 text-[10px] font-black uppercase text-zinc-500 tracking-[0.5em] hover:text-emerald-500 transition-colors mt-4">تحويل صورة أخرى</button>
                 </div>
               )}
             </div>
@@ -182,12 +207,12 @@ export const Converter: React.FC<ConverterProps> = ({ onConversion, isDark, adCo
 };
 
 const TabBtn = ({ active, onClick, icon, label }: any) => (
-  <button onClick={onClick} className={`flex-grow flex items-center justify-center gap-2 py-3 rounded-xl text-[9px] font-black uppercase transition-all ${active ? 'bg-emerald-500 text-black shadow-lg' : 'text-zinc-500'}`}>{icon} {label}</button>
+  <button onClick={onClick} className={`flex-grow flex items-center justify-center gap-3 py-4 rounded-xl text-[10px] font-black uppercase transition-all duration-300 ${active ? 'bg-emerald-500 text-black shadow-xl shadow-emerald-500/20' : 'text-zinc-500 hover:text-zinc-300'}`}>{icon} {label}</button>
 );
 
 const InputField = ({ label, value, onChange, isDark }: any) => (
-  <div className="space-y-2">
-    <label className="text-[10px] font-black uppercase opacity-40 pr-2">{label}</label>
-    <input type="number" value={value} onChange={e => onChange(Number(e.target.value))} className={`w-full px-6 py-4 rounded-2xl border font-black text-center ${isDark ? 'bg-black/40 border-white/5' : 'bg-zinc-50 border-zinc-200'}`} />
+  <div className="space-y-3">
+    <label className="text-[10px] font-black uppercase opacity-20 tracking-widest pr-2">{label}</label>
+    <input type="number" value={value} onChange={e => onChange(Number(e.target.value))} className={`w-full px-8 py-5 rounded-2xl border font-black text-lg text-center outline-none transition-all ${isDark ? 'bg-black/60 border-white/5 focus:border-emerald-500' : 'bg-zinc-50 border-zinc-200 focus:border-emerald-500'}`} />
   </div>
 );
