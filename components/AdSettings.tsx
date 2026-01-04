@@ -17,12 +17,13 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
   const [activeTab, setActiveTab] = useState<'adsense' | 'adsterra'>('adsterra');
 
   const handleRestoreDefaults = () => {
-    if (confirm('هل تريد استعادة أكواد Adsterra الافتراضية؟ سيتم تفعيل Social Bar و Popunder التلقائي.')) {
+    if (confirm('هل تريد استعادة أكواد Adsterra الموصى بها؟ سيتم تفعيل جميع الإعلانات بالأكواد الجديدة.')) {
       setAtConfig({
-        ...atConfig,
         isEnabled: true,
         socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
-        popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>'
+        popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>',
+        banner728x90: '',
+        banner300x250: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
       });
     }
   };
@@ -76,10 +77,10 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
               <Toggle enabled={atConfig.isEnabled} onToggle={() => setAtConfig({...atConfig, isEnabled: !atConfig.isEnabled})} />
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-start gap-3">
-              <AlertTriangle size={18} className="text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-[10px] font-medium opacity-60 leading-relaxed">
-                تنبيه: أكواد Social Bar و Popunder تعمل تلقائياً في الخلفية. البانرات (728x90 و 300x250) يجب أن تكون أكواد HTML/Script صالحة لتظهر في الموقع.
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
+              <AlertTriangle size={18} className="text-emerald-500 shrink-0 mt-0.5" />
+              <p className="text-[10px] font-black uppercase tracking-wider opacity-60 leading-relaxed">
+                ملاحظة: لقد قمنا بدمج الأكواد الخاصة بك (Social Bar، Popunder، والبانر 300x250) تلقائياً. تأكد من تفعيل الزر أعلاه لتظهر في الموقع.
               </p>
             </div>
             
@@ -92,7 +93,7 @@ export const AdSettings: React.FC<AdSettingsProps> = ({ adsense, adsterra, isDar
                 placeholder="إلصق كود البانر 728x90 هنا..." 
               />
               <CodeArea 
-                label="بانر للهاتف (300x250) - هام جداً" 
+                label="بانر للهاتف (300x250) - تم الإعداد" 
                 value={atConfig.banner300x250} 
                 onChange={(v) => setAtConfig({...atConfig, banner300x250: v})} 
                 isDark={isDark} 

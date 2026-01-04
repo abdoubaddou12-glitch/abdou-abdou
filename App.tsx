@@ -17,7 +17,7 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
-const VERSION = "14.1"; // تحديث النسخة لكسر الكاش
+const VERSION = "15.0"; // تحديث النسخة لضمان تحميل الإعدادات الجديدة
 
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
@@ -37,16 +37,18 @@ export default function App() {
   const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem(`v${VERSION}_conv`)) || 0);
   const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem(`v${VERSION}_vis`)) || 0);
   const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem(`v${VERSION}_base`)) || 0);
-  const [onlineNow] = useState(Math.floor(Math.random() * 15) + 12);
 
   const [adsterraConfig, setAdsterraConfig] = useState<AdsterraConfig>(() => {
     const saved = localStorage.getItem(`v${VERSION}_ads`);
-    return saved ? JSON.parse(saved) : { 
+    if (saved) return JSON.parse(saved);
+    
+    // الأكواد الافتراضية التي قدمها المستخدم
+    return { 
       isEnabled: true, 
-      socialBar: '', 
-      popUnder: '', 
+      socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>', 
+      popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
       banner728x90: '', 
-      banner300x250: ''
+      banner300x250: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
     };
   });
 
@@ -89,6 +91,14 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
       
+      {/* حقن سكريبتات Adsterra في الخلفية */}
+      {adsterraConfig.isEnabled && (
+        <>
+          <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} />
+          <AdUnit type="script" code={adsterraConfig.popUnder} isDark={isDark} />
+        </>
+      )}
+
       <nav className="fixed top-0 left-0 right-0 z-[100] p-4 md:p-6">
         <div className={`max-w-6xl mx-auto flex items-center justify-between px-5 py-3 md:py-4 rounded-3xl border ${isDark ? 'border-emerald-500/10 bg-black/70' : 'border-zinc-200 bg-white/90 shadow-xl'} backdrop-blur-2xl transition-all`}>
           <div onClick={() => setView('home')} className="flex items-center gap-3 cursor-pointer group">
@@ -187,15 +197,15 @@ export default function App() {
             </div>
           </div>
           
-          <div className="mb-12 space-y-8 flex flex-col items-center min-h-[50px]">
-             {adsterraConfig.isEnabled && adsterraConfig.banner300x250 && (
-                <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان الجوال" />
-             )}
-             
-             {adsterraConfig.isEnabled && adsterraConfig.banner728x90 && (
-               <div className="hidden md:block w-full max-w-4xl">
-                 <AdUnit type="banner" code={adsterraConfig.banner728x90} isDark={isDark} label="إعلان عريض" />
-               </div>
+          {/* حاويات البانرات الإعلانية */}
+          <div className="mb-12 space-y-12 flex flex-col items-center min-h-[100px]">
+             {adsterraConfig.isEnabled && (
+                <>
+                  <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان الجوال" />
+                  <div className="hidden md:block w-full max-w-4xl">
+                    <AdUnit type="banner" code={adsterraConfig.banner728x90} isDark={isDark} label="إعلان الحاسوب" />
+                  </div>
+                </>
              )}
           </div>
 
@@ -210,13 +220,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-      
-      {adsterraConfig.isEnabled && (
-        <>
-           {adsterraConfig.popUnder && <AdUnit type="script" code={adsterraConfig.popUnder} isDark={isDark} label="" />}
-           {adsterraConfig.socialBar && <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} label="" />}
-        </>
-      )}
     </div>
   );
 }
