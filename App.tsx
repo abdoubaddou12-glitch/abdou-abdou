@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LayoutDashboard, Zap, Sun, Moon, ArrowLeft, 
-  ShieldCheck, ImageIcon, Users, BookOpen, PenTool
+  PenTool
 } from 'lucide-react';
 import { AdminLogin } from './components/AdminLogin.tsx';
 import { Converter } from './components/Converter.tsx';
@@ -17,55 +17,79 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
-const VERSION = "15.1"; 
+const VERSION = "15.2"; 
 
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isDark, setIsDark] = useState(() => localStorage.getItem(`v${VERSION}_theme`) !== 'light');
+  
+  // الوضع الليلي المستقر
+  const [isDark, setIsDark] = useState(() => {
+    try {
+      return localStorage.getItem(`v${VERSION}_theme`) !== 'light';
+    } catch { return true; }
+  });
   
   const [adminPassword, setAdminPassword] = useState(() => {
-    return localStorage.getItem(`v${VERSION}_pass`) || 'abdou2024';
+    try {
+      return localStorage.getItem(`v${VERSION}_pass`) || 'abdou2024';
+    } catch { return 'abdou2024'; }
   });
 
   const [posts, setPosts] = useState<Post[]>(() => {
-    const saved = localStorage.getItem(`v${VERSION}_posts`);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(`v${VERSION}_posts`);
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
   });
 
-  const [totalConverted, setTotalConverted] = useState(() => Number(localStorage.getItem(`v${VERSION}_conv`)) || 0);
-  const [totalVisitors, setTotalVisitors] = useState(() => Number(localStorage.getItem(`v${VERSION}_vis`)) || 0);
-  const [baseVisitors, setBaseVisitors] = useState(() => Number(localStorage.getItem(`v${VERSION}_base`)) || 0);
+  const [totalConverted, setTotalConverted] = useState(() => {
+    try { return Number(localStorage.getItem(`v${VERSION}_conv`)) || 0; } catch { return 0; }
+  });
+  
+  const [totalVisitors, setTotalVisitors] = useState(() => {
+    try { return Number(localStorage.getItem(`v${VERSION}_vis`)) || 0; } catch { return 0; }
+  });
+  
+  const [baseVisitors, setBaseVisitors] = useState(() => {
+    try { return Number(localStorage.getItem(`v${VERSION}_base`)) || 0; } catch { return 0; }
+  });
 
   const [adsterraConfig, setAdsterraConfig] = useState<AdsterraConfig>(() => {
-    const saved = localStorage.getItem(`v${VERSION}_ads`);
-    if (saved) return JSON.parse(saved);
+    try {
+      const saved = localStorage.getItem(`v${VERSION}_ads`);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
     
-    // الأكواد الخاصة بك مدمجة افتراضياً
     return { 
       isEnabled: true, 
       socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>', 
       popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
-      banner728x90: '', // يمكنك إضافة كود بانر الحاسوب هنا لاحقاً
+      banner728x90: '', 
       banner300x250: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
     };
   });
 
   useEffect(() => {
-    document.body.className = isDark ? '' : 'light-mode';
-    localStorage.setItem(`v${VERSION}_theme`, isDark ? 'dark' : 'light');
-    localStorage.setItem(`v${VERSION}_posts`, JSON.stringify(posts));
-    localStorage.setItem(`v${VERSION}_conv`, totalConverted.toString());
-    localStorage.setItem(`v${VERSION}_base`, baseVisitors.toString());
-    localStorage.setItem(`v${VERSION}_ads`, JSON.stringify(adsterraConfig));
-    localStorage.setItem(`v${VERSION}_pass`, adminPassword);
-    
-    if (!sessionStorage.getItem(`v${VERSION}_track`)) {
-        setTotalVisitors(prev => prev + 1);
-        sessionStorage.setItem(`v${VERSION}_track`, 'true');
+    try {
+      document.body.className = isDark ? '' : 'light-mode';
+      localStorage.setItem(`v${VERSION}_theme`, isDark ? 'dark' : 'light');
+      localStorage.setItem(`v${VERSION}_posts`, JSON.stringify(posts));
+      localStorage.setItem(`v${VERSION}_conv`, totalConverted.toString());
+      localStorage.setItem(`v${VERSION}_vis`, totalVisitors.toString());
+      localStorage.setItem(`v${VERSION}_base`, baseVisitors.toString());
+      localStorage.setItem(`v${VERSION}_ads`, JSON.stringify(adsterraConfig));
+      localStorage.setItem(`v${VERSION}_pass`, adminPassword);
+      
+      if (!sessionStorage.getItem(`v${VERSION}_track`)) {
+          setTotalVisitors(prev => prev + 1);
+          sessionStorage.setItem(`v${VERSION}_track`, 'true');
+      }
+    } catch (e) {
+      console.warn("Storage sync failed", e);
     }
-  }, [isDark, posts, totalConverted, baseVisitors, adsterraConfig, adminPassword]);
+  }, [isDark, posts, totalConverted, totalVisitors, baseVisitors, adsterraConfig, adminPassword]);
 
   const handleSavePost = (postData: Partial<Post>) => {
     if (selectedPost) {
@@ -74,14 +98,13 @@ export default function App() {
       const newPost: Post = {
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('ar-MA'),
-        title: '',
-        category: 'تقنية',
-        excerpt: '',
-        content: '',
+        title: postData.title || '',
+        category: postData.category || 'تقنية',
+        excerpt: postData.excerpt || '',
+        content: postData.content || '',
         status: 'published',
-        image: '',
-        ...postData
-      } as Post;
+        image: postData.image || '',
+      };
       setPosts(prev => [newPost, ...prev]);
     }
     setView('admin');
@@ -91,7 +114,6 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
       
-      {/* سكريبتات Adsterra في الخلفية - تعمل على كافة الأجهزة */}
       {adsterraConfig.isEnabled && (
         <>
           <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} />
@@ -124,15 +146,13 @@ export default function App() {
         {view === 'home' && (
           <div className="space-y-24 md:space-y-32">
             <section className="text-center animate-slide-up">
-              <h1 className="text-4xl md:text-8xl font-black italic mb-10 text-glow leading-tight tracking-tighter">
+              <h1 className="text-4xl md:text-8xl font-black italic mb-10 leading-tight tracking-tighter">
                 مدونة احترافية <br />
                 <span className="text-emerald-500">& محول صور ذكي.</span>
               </h1>
-              
-              <Converter onConversion={() => setTotalConverted(prev => prev + 1)} isDark={isDark} />
+              <Converter onConversion={(kb) => setTotalConverted(prev => prev + kb)} isDark={isDark} />
               <SocialShare isDark={isDark} />
             </section>
-
             <BlogSection posts={posts} isDark={isDark} onPostClick={(post) => { setSelectedPost(post); setView('post'); }} />
           </div>
         )}
@@ -189,7 +209,6 @@ export default function App() {
 
       <footer className={`border-t py-12 md:py-20 transition-colors ${isDark ? 'border-emerald-500/10 bg-black/80' : 'border-zinc-200 bg-white shadow-xl'}`}>
         <div className="max-w-6xl mx-auto px-6 text-center">
-          
           <div className="mb-10 flex justify-center gap-4">
             <div className={`px-5 py-3 rounded-2xl border ${isDark ? 'bg-white/5 border-white/5' : 'bg-zinc-50 border-zinc-200'}`}>
                 <span className="text-[9px] font-black uppercase opacity-30 block mb-1">الزوار</span>
@@ -197,17 +216,13 @@ export default function App() {
             </div>
           </div>
           
-          {/* توزيع الإعلانات حسب نوع الجهاز */}
           <div className="mb-12 space-y-12 flex flex-col items-center">
              {adsterraConfig.isEnabled && (
                 <>
-                  {/* هذا البانر يظهر دائماً على الهاتف ويكون مركزياً */}
-                  <div className="w-full max-w-[320px] mx-auto">
+                  <div className="w-full max-w-[320px] mx-auto min-h-[250px]">
                     <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} label="إعلان الجوال" />
                   </div>
-                  
-                  {/* هذا البانر يظهر فقط على الحواسيب (الشاشات المتوسطة وما فوق) */}
-                  <div className="hidden md:block w-full max-w-4xl mx-auto">
+                  <div className="hidden md:block w-full max-w-4xl mx-auto min-h-[90px]">
                     <AdUnit type="banner" code={adsterraConfig.banner728x90 || adsterraConfig.banner300x250} isDark={isDark} label="إعلان الحاسوب" />
                   </div>
                 </>
@@ -218,10 +233,6 @@ export default function App() {
                <button onClick={() => setView('policies')} className="hover:text-emerald-500 transition-all">الخصوصية</button>
                <button onClick={() => setView('login')} className="hover:text-emerald-500 transition-all">الإدارة</button>
                <span>Storehalal © {new Date().getFullYear()}</span>
-          </div>
-          
-          <div className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-[8px] font-black opacity-20 uppercase tracking-widest">
-            STABLE ENGINE v{VERSION}
           </div>
         </div>
       </footer>
