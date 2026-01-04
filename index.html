@@ -51,7 +51,7 @@
     "react": "https://esm.sh/react@18.2.0",
     "react-dom": "https://esm.sh/react-dom@18.2.0",
     "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.344.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.344.0?external=react",
     "@google/genai": "https://esm.sh/@google/genai@1.34.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/"
@@ -63,5 +63,20 @@
     <div class="bg-glow"></div>
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
+    <script>
+      // حماية إضافية لإظهار رسالة خطأ بدلاً من الشاشة السوداء في حال فشل التحميل
+      window.onerror = function(msg, url, line) {
+        if (!document.getElementById('root').innerHTML) {
+          document.getElementById('root').innerHTML = `
+            <div style="color: white; padding: 20px; text-align: center; font-family: sans-serif;">
+              <h2>عذراً، حدث خطأ في تحميل الموقع</h2>
+              <p>يرجى إعادة تحميل الصفحة أو مسح ذاكرة التخزين المؤقت.</p>
+              <button onclick="location.reload()" style="background: #10b981; border: none; padding: 10px 20px; color: black; font-weight: bold; border-radius: 10px; cursor: pointer;">إعادة التحميل</button>
+            </div>
+          `;
+        }
+        return false;
+      };
+    </script>
   </body>
 </html>
