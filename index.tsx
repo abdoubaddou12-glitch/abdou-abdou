@@ -5,10 +5,17 @@ import App from './App.tsx';
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
-  const root = createRoot(rootElement);
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+  try {
+    const root = createRoot(rootElement);
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+  } catch (err) {
+    console.error("Critical Render Error:", err);
+    // محاولة إنقاذ أخيرة في حال فشل StrictMode
+    const root = createRoot(rootElement);
+    root.render(<App />);
+  }
 }

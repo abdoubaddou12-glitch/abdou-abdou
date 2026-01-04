@@ -17,7 +17,7 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
-const VERSION = "15.3"; // تحديث النسخة لفرض تنظيف البيانات القديمة
+const VERSION = "15.4"; // تحديث النسخة لضمان تنظيف البيانات المسببة للمشاكل
 
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
@@ -26,8 +26,7 @@ export default function App() {
   
   const [isDark, setIsDark] = useState(() => {
     try {
-      const saved = localStorage.getItem(`v${VERSION}_theme`);
-      return saved !== 'light';
+      return localStorage.getItem(`v${VERSION}_theme`) !== 'light';
     } catch { return true; }
   });
   
@@ -86,7 +85,7 @@ export default function App() {
           setTotalVisitors(prev => prev + 1);
           sessionStorage.setItem(`v${VERSION}_track`, 'true');
       }
-    } catch (e) { console.error("Sync Error", e); }
+    } catch (e) { console.error("Storage Sync Error", e); }
   }, [isDark, posts, totalConverted, totalVisitors, baseVisitors, adsterraConfig, adminPassword]);
 
   const handleSavePost = (postData: Partial<Post>) => {
@@ -96,7 +95,7 @@ export default function App() {
       const newPost: Post = {
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('ar-MA'),
-        title: postData.title || 'بدون عنوان',
+        title: postData.title || 'عنوان المقال',
         category: postData.category || 'تقنية',
         excerpt: postData.excerpt || '',
         content: postData.content || '',
