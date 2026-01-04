@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, Zap, Sun, Moon, ArrowLeft, 
   PenTool
@@ -17,17 +17,17 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
-const VERSION = "15.2"; 
+const VERSION = "15.3"; // تحديث النسخة لفرض تنظيف البيانات القديمة
 
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // الوضع الليلي المستقر
   const [isDark, setIsDark] = useState(() => {
     try {
-      return localStorage.getItem(`v${VERSION}_theme`) !== 'light';
+      const saved = localStorage.getItem(`v${VERSION}_theme`);
+      return saved !== 'light';
     } catch { return true; }
   });
   
@@ -60,7 +60,7 @@ export default function App() {
     try {
       const saved = localStorage.getItem(`v${VERSION}_ads`);
       if (saved) return JSON.parse(saved);
-    } catch (e) {}
+    } catch {}
     
     return { 
       isEnabled: true, 
@@ -86,9 +86,7 @@ export default function App() {
           setTotalVisitors(prev => prev + 1);
           sessionStorage.setItem(`v${VERSION}_track`, 'true');
       }
-    } catch (e) {
-      console.warn("Storage sync failed", e);
-    }
+    } catch (e) { console.error("Sync Error", e); }
   }, [isDark, posts, totalConverted, totalVisitors, baseVisitors, adsterraConfig, adminPassword]);
 
   const handleSavePost = (postData: Partial<Post>) => {
@@ -98,12 +96,12 @@ export default function App() {
       const newPost: Post = {
         id: Date.now().toString(),
         date: new Date().toLocaleDateString('ar-MA'),
-        title: postData.title || '',
+        title: postData.title || 'بدون عنوان',
         category: postData.category || 'تقنية',
         excerpt: postData.excerpt || '',
         content: postData.content || '',
         status: 'published',
-        image: postData.image || '',
+        image: postData.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800',
       };
       setPosts(prev => [newPost, ...prev]);
     }
