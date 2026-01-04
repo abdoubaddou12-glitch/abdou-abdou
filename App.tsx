@@ -17,7 +17,7 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
-const VERSION = "15.0"; // تحديث النسخة لضمان تحميل الإعدادات الجديدة
+const VERSION = "15.1"; 
 
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
@@ -42,12 +42,12 @@ export default function App() {
     const saved = localStorage.getItem(`v${VERSION}_ads`);
     if (saved) return JSON.parse(saved);
     
-    // الأكواد الافتراضية التي قدمها المستخدم
+    // الأكواد الخاصة بك مدمجة افتراضياً
     return { 
       isEnabled: true, 
       socialBar: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>', 
       popUnder: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
-      banner728x90: '', 
+      banner728x90: '', // يمكنك إضافة كود بانر الحاسوب هنا لاحقاً
       banner300x250: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
     };
   });
@@ -91,7 +91,7 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
       
-      {/* حقن سكريبتات Adsterra في الخلفية */}
+      {/* سكريبتات Adsterra في الخلفية - تعمل على كافة الأجهزة */}
       {adsterraConfig.isEnabled && (
         <>
           <AdUnit type="script" code={adsterraConfig.socialBar} isDark={isDark} />
@@ -197,13 +197,18 @@ export default function App() {
             </div>
           </div>
           
-          {/* حاويات البانرات الإعلانية */}
-          <div className="mb-12 space-y-12 flex flex-col items-center min-h-[100px]">
+          {/* توزيع الإعلانات حسب نوع الجهاز */}
+          <div className="mb-12 space-y-12 flex flex-col items-center">
              {adsterraConfig.isEnabled && (
                 <>
-                  <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} className="max-w-[320px]" label="إعلان الجوال" />
-                  <div className="hidden md:block w-full max-w-4xl">
-                    <AdUnit type="banner" code={adsterraConfig.banner728x90} isDark={isDark} label="إعلان الحاسوب" />
+                  {/* هذا البانر يظهر دائماً على الهاتف ويكون مركزياً */}
+                  <div className="w-full max-w-[320px] mx-auto">
+                    <AdUnit type="banner" code={adsterraConfig.banner300x250} isDark={isDark} label="إعلان الجوال" />
+                  </div>
+                  
+                  {/* هذا البانر يظهر فقط على الحواسيب (الشاشات المتوسطة وما فوق) */}
+                  <div className="hidden md:block w-full max-w-4xl mx-auto">
+                    <AdUnit type="banner" code={adsterraConfig.banner728x90 || adsterraConfig.banner300x250} isDark={isDark} label="إعلان الحاسوب" />
                   </div>
                 </>
              )}
