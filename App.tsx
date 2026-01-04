@@ -17,7 +17,7 @@ import { AdUnit } from './components/AdUnit.tsx';
 import { SocialShare } from './components/SocialShare.tsx';
 import { View, AdsterraConfig, Post } from './types.ts';
 
-const VERSION = "15.6"; // إصدار جديد لفرض تحديث البيانات
+const VERSION = "15.8"; // تحديث لفرض تنظيف الكاش
 
 export default function App() {
   const [view, setView] = useState<View | 'post' | 'editor'>('home');
@@ -86,7 +86,7 @@ export default function App() {
           sessionStorage.setItem(`v${VERSION}_track`, 'true');
       }
     } catch (e) {
-      console.warn("Storage sync failed:", e);
+      console.warn("Storage write blocked or failed.");
     }
   }, [isDark, posts, totalConverted, totalVisitors, baseVisitors, adsterraConfig, adminPassword]);
 
