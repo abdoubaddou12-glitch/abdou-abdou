@@ -4,18 +4,21 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 
 const rootElement = document.getElementById('root');
-if (rootElement) {
-  try {
-    const root = createRoot(rootElement);
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
-  } catch (err) {
-    console.error("Critical Render Error:", err);
-    // محاولة إنقاذ أخيرة في حال فشل StrictMode
-    const root = createRoot(rootElement);
-    root.render(<App />);
-  }
+
+if (!rootElement) {
+  throw new Error("Failed to find the root element");
+}
+
+const root = createRoot(rootElement);
+
+try {
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} catch (err) {
+  console.error("Critical Start-up Error:", err);
+  // محاولة رندر بدون StrictMode في حال وجود تعارض برمجيات قديمة
+  root.render(<App />);
 }
